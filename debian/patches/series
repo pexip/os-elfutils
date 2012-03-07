@@ -1,0 +1,10 @@
+redhat-portability.diff 
+redhat-robustify.diff 
+hppa_backend.diff
+arm_backend.diff
+mips_backend.diff
+m68k_backend.diff
+do-autoreconf.diff
+testsuite-ignore-elflint.diff
+elf_additions.diff
+fix_ftbfs_with_O3.diff
