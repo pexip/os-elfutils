@@ -1,13 +1,15 @@
 Source: elfutils
 Priority: optional
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Maintainer: Pexip AS <packaging@pexip.com>
+XSBC-Pexip-Original-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 XSBC-Original-Maintainer: Kurt Roeckx <kurt@roeckx.be>
-Uploaders: Christian Aichinger <Greek0@gmx.net>
+XSBC-Pexip-Original-Uploaders: Christian Aichinger <Greek0@gmx.net>
 Build-Depends: debhelper (>= 8.1.3), autotools-dev, bzip2, zlib1g-dev, libbz2-dev, liblzma-dev, m4, gettext
 Build-Conflicts: autoconf2.13, automake1.4
 Standards-Version: 3.8.4
 Section: libs
 Homepage: https://fedorahosted.org/elfutils/
+XS-Pexip-Upstream: http://archive.ubuntu.com/ubuntu/ precise
 
 Package: elfutils
 Section: utils
