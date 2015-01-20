@@ -8,3 +8,4 @@ do-autoreconf.diff
 testsuite-ignore-elflint.diff
 elf_additions.diff
 fix_ftbfs_with_O3.diff
+CVE-2014-9447.patch
