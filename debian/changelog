@@ -1,3 +1,18 @@
+elfutils (0.152-1ubuntu3.1pexip1) pexip; urgency=low
+
+  * New upstream release
+
+ -- John-Mark Bell <jmb@pexip.com>  Sun, 25 Jan 2015 16:12:22 +0000
+
+elfutils (0.152-1ubuntu3.1) precise-security; urgency=medium
+
+  * SECURITY UPDATE: Directory traversal via crafted ar archive
+    - debian/patches/CVE-2014-9447.patch: Prevent root directory traversal
+      while extracting ar archives
+    - CVE-2014-9447
+
+ -- Tyler Hicks <tyhicks@canonical.com>  Tue, 20 Jan 2015 15:22:54 -0600
+
 elfutils (0.152-1ubuntu3pexip1) pexip; urgency=low
 
   * Prepare Pexip packaging
