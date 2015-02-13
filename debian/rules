@@ -30,36 +30,36 @@ endif
 ifneq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
         make_check = no
 endif
-
-CFLAGS = -g
-
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+    NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+    MAKEFLAGS += -j$(NUMJOBS)
 endif
 
-config.status: configure
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
+config.status: configure.ac
 	dh_testdir
-	rm -f config/config.guess config/config.sub
-	ln -s /usr/share/misc/config.guess config/config.guess
-	ln -s /usr/share/misc/config.sub config/config.sub
-	CFLAGS="$(CFLAGS)" ./configure $(confflags) --prefix=/usr \
+	autoreconf -fis
+	CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
+		./configure $(confflags) --prefix=/usr \
 		--libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
-		--program-prefix=eu- --enable-thread-safety
+		--enable-maintainer-mode \
+		--program-prefix=eu-
 
 build: build-stamp
 build-stamp:  config.status
 	dh_testdir
 
-	$(MAKE)
+	$(MAKE) $(MAKEFLAGS)
 
 ifeq ($(make_check), yes)
 	# Check that those files exist.
 	-ls -l /proc/$$$$/maps
 	-ls -l /proc/$$$$/auxv
 	-ls -l /proc/$$$$/
-	LC_CTYPE=C $(MAKE) check
+	LC_CTYPE=C $(MAKE) check $(MAKEFLAGS) || { cat tests/test-suite.log; exit 1; }
+	cat tests/test-suite.log
 endif
 
 	touch build-stamp
@@ -68,11 +68,16 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
-
-	# Add here commands to clean up after the build process.
 	[ ! -f Makefile ] || $(MAKE) distclean
+	rm -f configure version.h
+	rm -f INSTALL aclocal.m4
+	rm -f config/depcomp config/install-sh config/missing config/compile config/ylwrap config/ar-lib
 	rm -f config/config.guess config/config.sub elfutils.spec
+	rm -f config.h.in
+	rm -f config/test-driver
 	rm -rf autom4te.cache
+	rm -f rm Makefile.in backends/Makefile.in config/Makefile.in lib/Makefile.in libasm/Makefile.in libcpu/Makefile.in libdw/Makefile.in libdwfl/Makefile.in libebl/Makefile.in libelf/Makefile.in m4/Makefile.in src/Makefile.in tests/Makefile.in libdwelf/Makefile.in
+	rm -f libdw/known-dwarf.h
 
 	dh_clean
 
@@ -89,11 +94,13 @@ install: build
 	rm debian/tmp/usr/include/elfutils/libebl.h
 
 # Build architecture-independent files here.
-binary-indep: build install
+build-indep: build
+binary-indep: build-indep install
 # We have nothing to do.
 
 # Build architecture-dependent files here.
-binary-arch: build install
+build-arch: build
+binary-arch: build-arch install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs ChangeLog
