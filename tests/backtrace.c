@@ -1,5 +1,5 @@
 /* Test program for unwinding of frames.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2014, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@
 #include <error.h>
 #include <unistd.h>
 #include <dwarf.h>
+#ifdef __linux__
 #include <sys/resource.h>
 #include <sys/ptrace.h>
 #include <signal.h>
@@ -37,6 +38,7 @@
 #include <string.h>
 #include <argp.h>
 #include ELFUTILS_HEADER(dwfl)
+#endif
 
 #ifndef __linux__
 
@@ -62,7 +64,7 @@ dump_modules (Dwfl_Module *mod, void **userdata __attribute__ ((unused)),
   return DWARF_CB_OK;
 }
 
-static bool is_x86_64_native;
+static bool use_raise_jmp_patching;
 static pid_t check_tid;
 
 static void
@@ -91,14 +93,15 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
   static bool reduce_frameno = false;
   if (reduce_frameno)
     frameno--;
-  if (! is_x86_64_native && frameno >= 2)
+  if (! use_raise_jmp_patching && frameno >= 2)
     frameno += 2;
   const char *symname2 = NULL;
   switch (frameno)
   {
     case 0:
       if (! reduce_frameno && symname
-	       && strcmp (symname, "__kernel_vsyscall") == 0)
+	       && (strcmp (symname, "__kernel_vsyscall") == 0
+		   || strcmp (symname, "__libc_do_syscall") == 0))
 	reduce_frameno = true;
       else
 	assert (symname && strcmp (symname, "raise") == 0);
@@ -109,8 +112,8 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
     case 2: // x86_64 only
       /* __restore_rt - glibc maybe does not have to have this symbol.  */
       break;
-    case 3: // x86_64 only
-      if (is_x86_64_native)
+    case 3: // use_raise_jmp_patching
+      if (use_raise_jmp_patching)
 	{
 	  /* Verify we trapped on the very first instruction of jmp.  */
 	  assert (symname != NULL && strcmp (symname, "jmp") == 0);
@@ -120,7 +123,7 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
 	  assert (symname2 == NULL || strcmp (symname2, "jmp") != 0);
 	  break;
 	}
-      /* PASSTHRU */
+      /* FALLTHRU */
     case 4:
       assert (symname != NULL && strcmp (symname, "stdarg") == 0);
       break;
@@ -135,7 +138,7 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
       // there is no guarantee that the compiler doesn't reorder the
       // instructions or even inserts some padding instructions at the end
       // (which apparently happens on ppc64).
-      if (is_x86_64_native)
+      if (use_raise_jmp_patching)
         assert (symname2 == NULL || strcmp (symname2, "backtracegen") != 0);
       break;
   }
@@ -147,6 +150,13 @@ frame_callback (Dwfl_Frame *state, void *frame_arg)
   int *framenop = frame_arg;
   Dwarf_Addr pc;
   bool isactivation;
+
+  if (*framenop > 16)
+    {
+      error (0, 0, "Too many frames: %d\n", *framenop);
+      return DWARF_CB_ABORT;
+    }
+
   if (! dwfl_frame_pc (state, &pc, &isactivation))
     {
       error (0, 0, "%s", dwfl_errmsg (-1));
@@ -233,10 +243,10 @@ see_exec_module (Dwfl_Module *mod, void **userdata __attribute__ ((unused)),
     return DWARF_CB_OK;
   assert (data->mod == NULL);
   data->mod = mod;
-  return DWARF_CB_OK;
+  return DWARF_CB_ABORT;
 }
 
-/* On x86_64 only:
+/* We used to do this on x86_64 only (see backtrace-child why we now don't):
      PC will get changed to function 'jmp' by backtrace.c function
      prepare_thread.  Then SIGUSR2 will be signalled to backtrace-child
      which will invoke function sigusr2.
@@ -244,27 +254,35 @@ see_exec_module (Dwfl_Module *mod, void **userdata __attribute__ ((unused)),
      instruction of a function.  Properly handled unwind should not slip into
      the previous unrelated function.  */
 
+#ifdef __x86_64__
+/* #define RAISE_JMP_PATCHING 1 */
+#endif
+
 static void
 prepare_thread (pid_t pid2 __attribute__ ((unused)),
 		void (*jmp) (void) __attribute__ ((unused)))
 {
-#ifndef __x86_64__
+#ifndef RAISE_JMP_PATCHING
   abort ();
-#else /* x86_64 */
+#else /* RAISE_JMP_PATCHING */
   long l;
+  struct user_regs_struct user_regs;
   errno = 0;
-  l = ptrace (PTRACE_POKEUSER, pid2,
-	      (void *) (intptr_t) offsetof (struct user_regs_struct, rip), jmp);
-  assert_perror (errno);
+  l = ptrace (PTRACE_GETREGS, pid2, 0, (intptr_t) &user_regs);
+  assert (errno == 0);
+  assert (l == 0);
+  user_regs.rip = (intptr_t) jmp;
+  l = ptrace (PTRACE_SETREGS, pid2, 0, (intptr_t) &user_regs);
+  assert (errno == 0);
   assert (l == 0);
   l = ptrace (PTRACE_CONT, pid2, NULL, (void *) (intptr_t) SIGUSR2);
   int status;
   pid_t got = waitpid (pid2, &status, __WALL);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (got == pid2);
   assert (WIFSTOPPED (status));
   assert (WSTOPSIG (status) == SIGUSR1);
-#endif /* __x86_64__ */
+#endif /* RAISE_JMP_PATCHING */
 }
 
 #include <asm/unistd.h>
@@ -328,7 +346,7 @@ exec_dump (const char *exec)
   errno = 0;
   int status;
   pid_t got = waitpid (pid, &status, 0);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (got == pid);
   assert (WIFSTOPPED (status));
   // Main thread will signal SIGUSR2.  Other thread will signal SIGUSR1.
@@ -338,7 +356,7 @@ exec_dump (const char *exec)
      __WCLONE, probably despite pthread_create already had to be called the new
      task is not yet alive enough for waitpid.  */
   pid_t pid2 = waitpid (-1, &status, __WALL);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (pid2 > 0);
   assert (pid2 != pid);
   assert (WIFSTOPPED (status));
@@ -356,21 +374,20 @@ exec_dump (const char *exec)
   assert (ssize > 0 && ssize < (ssize_t) sizeof (data.selfpath));
   data.selfpath[ssize] = '\0';
   data.mod = NULL;
-  ptrdiff_t ptrdiff = dwfl_getmodules (dwfl, see_exec_module, &data, 0);
-  assert (ptrdiff == 0);
+  dwfl_getmodules (dwfl, see_exec_module, &data, 0);
   assert (data.mod != NULL);
   GElf_Addr loadbase;
   Elf *elf = dwfl_module_getelf (data.mod, &loadbase);
   GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (elf, &ehdr_mem);
   assert (ehdr != NULL);
   /* It is false also on x86_64 with i386 inferior.  */
-#ifndef __x86_64__
-  is_x86_64_native = false;
-#else /* __x86_64__ */
-  is_x86_64_native = ehdr->e_ident[EI_CLASS] == ELFCLASS64;
+#ifndef RAISE_JMP_PATCHING
+  use_raise_jmp_patching = false;
+#else /* RAISE_JMP_PATCHING_ */
+  use_raise_jmp_patching = ehdr->e_machine == EM_X86_64;
 #endif /* __x86_64__ */
-  void (*jmp) (void);
-  if (is_x86_64_native)
+  void (*jmp) (void) = 0;
+  if (use_raise_jmp_patching)
     {
       // Find inferior symbol named "jmp".
       int nsym = dwfl_module_getsymtab (data.mod);
@@ -459,6 +476,9 @@ main (int argc __attribute__ ((unused)), char **argv)
     };
   (void) argp_parse (&argp, argc, argv, 0, NULL, &dwfl);
   assert (dwfl != NULL);
+  /* We want to make sure the dwfl was properly attached.  */
+  if (dwfl_pid (dwfl) < 0)
+    error (2, 0, "dwfl_pid: %s", dwfl_errmsg (-1));
   dump (dwfl);
   dwfl_end (dwfl);
   return 0;

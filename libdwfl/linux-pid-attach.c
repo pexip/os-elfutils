@@ -1,5 +1,5 @@
 /* Get Dwarf Frame state for target live PID process.
-   Copyright (C) 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2013, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -26,16 +26,16 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
+#include "libelfP.h"
 #include "libdwflP.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 #include <dirent.h>
 #include <sys/syscall.h>
 #include <unistd.h>
-
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
 
 #ifdef __linux__
 
@@ -247,6 +247,8 @@ static void
 pid_detach (Dwfl *dwfl __attribute__ ((unused)), void *dwfl_arg)
 {
   struct __libdwfl_pid_arg *pid_arg = dwfl_arg;
+  elf_end (pid_arg->elf);
+  close (pid_arg->elf_fd);
   closedir (pid_arg->dir);
   free (pid_arg);
 }
@@ -290,13 +292,23 @@ dwfl_linux_proc_attach (Dwfl *dwfl, pid_t pid, bool assume_ptrace_stopped)
 {
   char buffer[36];
   FILE *procfile;
+  int err = 0; /* The errno to return and set for dwfl->attcherr.  */
 
   /* Make sure to report the actual PID (thread group leader) to
      dwfl_attach_state.  */
   snprintf (buffer, sizeof (buffer), "/proc/%ld/status", (long) pid);
   procfile = fopen (buffer, "r");
   if (procfile == NULL)
-    return errno;
+    {
+      err = errno;
+    fail:
+      if (dwfl->process == NULL && dwfl->attacherr == DWFL_E_NOERROR)
+	{
+	  errno = err;
+	  dwfl->attacherr = __libdwfl_canon_error (DWFL_E_ERRNO);
+	}
+      return err;
+    }
 
   char *line = NULL;
   size_t linelen = 0;
@@ -317,26 +329,58 @@ dwfl_linux_proc_attach (Dwfl *dwfl, pid_t pid, bool assume_ptrace_stopped)
   fclose (procfile);
 
   if (pid == 0)
-    return ESRCH;
+    {
+      err = ESRCH;
+      goto fail;
+    }
 
-  char dirname[64];
-  int i = snprintf (dirname, sizeof (dirname), "/proc/%ld/task", (long) pid);
-  assert (i > 0 && i < (ssize_t) sizeof (dirname) - 1);
-  DIR *dir = opendir (dirname);
+  char name[64];
+  int i = snprintf (name, sizeof (name), "/proc/%ld/task", (long) pid);
+  assert (i > 0 && i < (ssize_t) sizeof (name) - 1);
+  DIR *dir = opendir (name);
   if (dir == NULL)
-    return errno;
+    {
+      err = errno;
+      goto fail;
+    }
+
+  Elf *elf;
+  i = snprintf (name, sizeof (name), "/proc/%ld/exe", (long) pid);
+  assert (i > 0 && i < (ssize_t) sizeof (name) - 1);
+  int elf_fd = open (name, O_RDONLY);
+  if (elf_fd >= 0)
+    {
+      elf = elf_begin (elf_fd, ELF_C_READ_MMAP, NULL);
+      if (elf == NULL)
+	{
+	  /* Just ignore, dwfl_attach_state will fall back to trying
+	     to associate the Dwfl with one of the existing DWfl_Module
+	     ELF images (to know the machine/class backend to use).  */
+	  close (elf_fd);
+	  elf_fd = -1;
+	}
+    }
+  else
+    elf = NULL;
   struct __libdwfl_pid_arg *pid_arg = malloc (sizeof *pid_arg);
   if (pid_arg == NULL)
     {
+      elf_end (elf);
+      close (elf_fd);
       closedir (dir);
-      return ENOMEM;
+      err = ENOMEM;
+      goto fail;
     }
   pid_arg->dir = dir;
+  pid_arg->elf = elf;
+  pid_arg->elf_fd = elf_fd;
   pid_arg->tid_attached = 0;
   pid_arg->assume_ptrace_stopped = assume_ptrace_stopped;
-  if (! INTUSE(dwfl_attach_state) (dwfl, NULL, pid, &pid_thread_callbacks,
+  if (! INTUSE(dwfl_attach_state) (dwfl, elf, pid, &pid_thread_callbacks,
 				   pid_arg))
     {
+      elf_end (elf);
+      close (elf_fd);
       closedir (dir);
       free (pid_arg);
       return -1;
@@ -358,68 +402,22 @@ __libdwfl_get_pid_arg (Dwfl *dwfl)
 
 #else	/* __linux__ */
 
-static pid_t
-pid_next_thread (Dwfl *dwfl __attribute__ ((unused)),
-	         void *dwfl_arg __attribute__ ((unused)),
-		 void **thread_argp __attribute__ ((unused)))
-{
-  errno = ENOSYS;
-  __libdwfl_seterrno (DWFL_E_ERRNO);
-  return -1;
-}
-
-static bool
-pid_getthread (Dwfl *dwfl __attribute__ ((unused)),
-	       pid_t tid __attribute__ ((unused)),
-	       void *dwfl_arg __attribute__ ((unused)),
-	       void **thread_argp __attribute__ ((unused)))
+bool
+internal_function
+__libdwfl_ptrace_attach (pid_t tid __attribute__ ((unused)),
+			 bool *tid_was_stoppedp __attribute__ ((unused)))
 {
   errno = ENOSYS;
   __libdwfl_seterrno (DWFL_E_ERRNO);
   return false;
 }
 
-static bool
-pid_memory_read (Dwfl *dwfl __attribute__ ((unused)),
-                 Dwarf_Addr addr __attribute__ ((unused)),
-	         Dwarf_Word *result __attribute__ ((unused)),
-	         void *arg __attribute__ ((unused)))
-{
-  errno = ENOSYS;
-  __libdwfl_seterrno (DWFL_E_ERRNO);
-  return false;
-}
-
-static bool
-pid_set_initial_registers (Dwfl_Thread *thread __attribute__ ((unused)),
-			   void *thread_arg __attribute__ ((unused)))
-{
-  errno = ENOSYS;
-  __libdwfl_seterrno (DWFL_E_ERRNO);
-  return false;
-}
-
-static void
-pid_detach (Dwfl *dwfl __attribute__ ((unused)),
-	    void *dwfl_arg __attribute__ ((unused)))
+void
+internal_function
+__libdwfl_ptrace_detach (pid_t tid __attribute__ ((unused)),
+			 bool tid_was_stopped __attribute__ ((unused)))
 {
 }
-
-static void
-pid_thread_detach (Dwfl_Thread *thread __attribute__ ((unused)),
-		  void *thread_arg __attribute__ ((unused)))
-{
-}
-
-static const Dwfl_Thread_Callbacks pid_thread_callbacks =
-{
-  pid_next_thread,
-  pid_getthread,
-  pid_memory_read,
-  pid_set_initial_registers,
-  pid_detach,
-  pid_thread_detach,
-};
 
 int
 dwfl_linux_proc_attach (Dwfl *dwfl __attribute__ ((unused)),

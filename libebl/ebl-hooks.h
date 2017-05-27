@@ -1,5 +1,5 @@
 /* Backend hook signatures internal interface for libebl.
-   Copyright (C) 2000-2011, 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2000-2011, 2013, 2014, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -25,9 +25,6 @@
    You should have received copies of the GNU General Public License and
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
-
-/* Return symbol representaton of object file type.  */
-const char *EBLHOOK(object_type_name) (int, char *, size_t);
 
 /* Return symbolic representation of relocation type.  */
 const char *EBLHOOK(reloc_type_name) (int, char *, size_t);
@@ -80,9 +77,6 @@ const char *EBLHOOK(dynamic_tag_name) (int64_t, char *, size_t);
 /* Check dynamic tag.  */
 bool EBLHOOK(dynamic_tag_check) (int64_t);
 
-/* Combine section header flags values.  */
-GElf_Word EBLHOOK(sh_flags_combine) (GElf_Word, GElf_Word);
-
 /* Return symbolic representation of OS ABI.  */
 const char *EBLHOOK(osabi_name) (int, char *, size_t);
 
@@ -132,7 +126,7 @@ bool EBLHOOK(check_special_symbol) (Elf *, GElf_Ehdr *, const GElf_Sym *,
 bool EBLHOOK(check_st_other_bits) (unsigned char st_other);
 
 /* Check if backend uses a bss PLT in this file.  */
-bool EBLHOOK(bss_plt_p) (Elf *, GElf_Ehdr *);
+bool EBLHOOK(bss_plt_p) (Elf *);
 
 /* Return location expression to find return value given the
    DW_AT_type DIE of a DW_TAG_subprogram DIE.  */
@@ -150,7 +144,7 @@ int EBLHOOK(syscall_abi) (Ebl *ebl, int *sp, int *pc,
 			  int *callno, int args[6]);
 
 /* Disassembler function.  */
-int EBLHOOK(disasm) (const uint8_t **startp, const uint8_t *end,
+int EBLHOOK(disasm) (Ebl *ebl, const uint8_t **startp, const uint8_t *end,
 		     GElf_Addr addr, const char *fmt, DisasmOutputCB_t outcb,
 		     DisasmGetSymCB_t symcb, void *outcbarg, void *symcbarg);
 
@@ -187,7 +181,7 @@ bool EBLHOOK(unwind) (Ebl *ebl, Dwarf_Addr pc, ebl_tid_registers_t *setfunc,
 		      bool *signal_framep);
 
 /* Returns true if the value can be resolved to an address in an
-   allocated section, which will be returned in *SHNDXP.
+   allocated section, which will be returned in *ADDR.
    (e.g. function descriptor resolving)  */
 bool EBLHOOK(resolve_sym_value) (Ebl *ebl, GElf_Addr *addr);
 
