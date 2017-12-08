@@ -50,7 +50,7 @@ Package: libdw-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libelf-dev, libdw1 (= ${binary:Version}), ${misc:Depends}
+Depends: libelf-dev, liblzma-dev, libdw1 (= ${binary:Version}), ${misc:Depends}
 Description: libdw1 development libraries and header files
  libdw1 provides a library that provides access to DWARF debug information
  stored inside ELF files.
