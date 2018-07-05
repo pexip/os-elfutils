@@ -170,7 +170,7 @@ __libdwfl_elf_address_range (Elf *elf, GElf_Addr base, bool add_p_vaddr,
       /* An assigned base address is meaningless for these.  */
       base = 0;
       add_p_vaddr = true;
-
+      /* Fallthrough. */
     case ET_DYN:
     default:;
       size_t phnum;
@@ -291,7 +291,7 @@ dwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name, int fd,
   if (fd < 0)
     {
       closefd = true;
-      fd = open64 (file_name, O_RDONLY);
+      fd = open (file_name, O_RDONLY);
       if (fd < 0)
 	{
 	  __libdwfl_seterrno (DWFL_E_ERRNO);
@@ -321,7 +321,7 @@ dwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name, int fd,
 INTDEF (dwfl_report_elf)
 NEW_VERSION (dwfl_report_elf, ELFUTILS_0.156)
 
-#ifdef SHARED
+#ifdef SYMBOL_VERSIONING
 Dwfl_Module *
   _compat_without_add_p_vaddr_dwfl_report_elf (Dwfl *dwfl, const char *name,
 					       const char *file_name, int fd,

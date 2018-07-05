@@ -33,11 +33,12 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
 
 
 modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
-	  tilegx
+	  tilegx m68k bpf
 libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
 	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
-	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a
+	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
+	     libebl_m68k_pic.a libebl_bpf_pic.a
 noinst_LIBRARIES = $(libebl_pic)
 noinst_DATA = $(libebl_pic:_pic.a=.so)
 
@@ -58,7 +59,7 @@ am_libebl_sh_pic_a_OBJECTS = $(sh_SRCS:.c=.os)
 
 x86_64_SRCS = x86_64_init.c x86_64_symbol.c x86_64_corenote.c x86_64_cfi.c \
 	      x86_64_retval.c x86_64_regs.c i386_auxv.c x86_64_syscall.c \
-	      x86_64_initreg.c
+	      x86_64_initreg.c x32_corenote.c
 cpu_x86_64 = ../libcpu/libcpu_x86_64.a
 libebl_x86_64_pic_a_SOURCES = $(x86_64_SRCS)
 am_libebl_x86_64_pic_a_OBJECTS = $(x86_64_SRCS:.c=.os)
@@ -84,7 +85,8 @@ libebl_aarch64_pic_a_SOURCES = $(aarch64_SRCS)
 am_libebl_aarch64_pic_a_OBJECTS = $(aarch64_SRCS:.c=.os)
 
 sparc_SRCS = sparc_init.c sparc_symbol.c sparc_regs.c sparc_retval.c \
-	     sparc_corenote.c sparc64_corenote.c sparc_auxv.c
+	     sparc_corenote.c sparc64_corenote.c sparc_auxv.c sparc_attrs.c \
+             sparc_cfi.c sparc_initreg.c
 libebl_sparc_pic_a_SOURCES = $(sparc_SRCS)
 am_libebl_sparc_pic_a_OBJECTS = $(sparc_SRCS:.c=.os)
 
@@ -111,19 +113,35 @@ tilegx_SRCS = tilegx_init.c tilegx_symbol.c tilegx_regs.c \
 libebl_tilegx_pic_a_SOURCES = $(tilegx_SRCS)
 am_libebl_tilegx_pic_a_OBJECTS = $(tilegx_SRCS:.c=.os)
 
+m68k_SRCS = m68k_init.c m68k_symbol.c m68k_regs.c \
+	    m68k_retval.c m68k_corenote.c
+libebl_m68k_pic_a_SOURCES = $(m68k_SRCS)
+am_libebl_m68k_pic_a_OBJECTS = $(m68k_SRCS:.c=.os)
+
+bpf_SRCS = bpf_init.c bpf_regs.c
+# The disam hook depends on this if we have linux/bpf.h.
+if HAVE_LINUX_BPF_H
+cpu_bpf = ../libcpu/libcpu_bpf.a
+else
+cpu_bpf = 
+endif
+libebl_bpf_pic_a_SOURCES = $(bpf_SRCS)
+am_libebl_bpf_pic_a_OBJECTS = $(bpf_SRCS:.c=.os)
+
 
 libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw)
 	@rm -f $(@:.so=.map)
-	echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' \
+	$(AM_V_at)echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' \
 	  > $(@:.so=.map)
-	$(LINK) -shared -o $(@:.map=.so) \
+	$(AM_V_CCLD)$(LINK) -shared -o $(@:.map=.so) \
 		-Wl,--whole-archive $< $(cpu_$*) -Wl,--no-whole-archive \
 		-Wl,--version-script,$(@:.so=.map) \
 		-Wl,-z,defs -Wl,--as-needed $(libelf) $(libdw)
-	$(textrel_check)
+	@$(textrel_check)
 
 libebl_i386.so: $(cpu_i386)
 libebl_x86_64.so: $(cpu_x86_64)
+libebl_bpf.so: $(cpu_bpf)
 
 install: install-am install-ebl-modules
 install-ebl-modules:

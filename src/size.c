@@ -1,5 +1,5 @@
 /* Print size information from ELF file.
-   Copyright (C) 2000-2007,2009,2012,2014 Red Hat, Inc.
+   Copyright (C) 2000-2007,2009,2012,2014,2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -28,20 +28,17 @@
 #include <libelf.h>
 #include <libintl.h>
 #include <locale.h>
-#include <mcheck.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/param.h>
 
 #include <system.h>
 
 
 /* Name and version of program.  */
-static void print_version (FILE *stream, struct argp_state *state);
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
@@ -106,8 +103,8 @@ static void handle_elf (Elf *elf, const char *fullname, const char *fname);
 static void show_bsd_totals (void);
 
 #define INTERNAL_ERROR(fname) \
-  error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s-%s): %s"),      \
-	 fname, __LINE__, PACKAGE_VERSION, __DATE__, elf_errmsg (-1))
+  error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s): %s"),      \
+	 fname, __LINE__, PACKAGE_VERSION, elf_errmsg (-1))
 
 
 /* User-selectable options.  */
@@ -160,9 +157,6 @@ main (int argc, char *argv[])
   int remaining;
   int result = 0;
 
-  /* Make memory leak detection possible.  */
-  mtrace ();
-
   /* We use no threads here which can interfere with handling a stream.  */
   __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   __fsetlocking (stdout, FSETLOCKING_BYCALLER);
@@ -200,20 +194,6 @@ main (int argc, char *argv[])
     show_bsd_totals ();
 
   return result;
-}
-
-
-/* Print the version information.  */
-static void
-print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
-{
-  fprintf (stream, "size (%s) %s\n", PACKAGE_NAME, PACKAGE_VERSION);
-  fprintf (stream, gettext ("\
-Copyright (C) %s Red Hat, Inc.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2012");
-  fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 
 
@@ -427,10 +407,9 @@ show_sysv (Elf *elf, const char *prefix, const char *fname,
 	INTERNAL_ERROR (fullname);
 
       /* Ignore all sections which are not used at runtime.  */
-      if ((shdr->sh_flags & SHF_ALLOC) != 0)
-	maxlen = MAX (maxlen,
-		      (int) strlen (elf_strptr (elf, shstrndx,
-						shdr->sh_name)));
+      const char *name = elf_strptr (elf, shstrndx, shdr->sh_name);
+      if (name != NULL && (shdr->sh_flags & SHF_ALLOC) != 0)
+	maxlen = MAX (maxlen, (int) strlen (name));
     }
 
   fputs_unlocked (fname, stdout);
@@ -601,14 +580,13 @@ show_bsd_totals (void)
 static void
 show_segments (Elf *elf, const char *fullname)
 {
-  GElf_Ehdr ehdr_mem;
-  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-  if (ehdr == NULL)
+  size_t phnum;
+  if (elf_getphdrnum (elf, &phnum) != 0)
     INTERNAL_ERROR (fullname);
 
   GElf_Off total = 0;
   bool first = true;
-  for (size_t cnt = 0; cnt < ehdr->e_phnum; ++cnt)
+  for (size_t cnt = 0; cnt < phnum; ++cnt)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr;

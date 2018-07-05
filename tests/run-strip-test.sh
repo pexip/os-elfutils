@@ -34,13 +34,13 @@ status=0
 cmp $stripped testfile.temp || status=$?
 
 # Check elflint and the expected result.
-testrun ${abs_top_builddir}/src/elflint -q testfile.temp || status=$?
+testrun ${abs_top_builddir}/src/elflint --gnu -q testfile.temp || status=$?
 
 test -z "$debugfile" || {
 cmp $debugfile testfile.debug.temp || status=$?
 
 # Check elflint and the expected result.
-testrun ${abs_top_builddir}/src/elflint -q -d testfile.debug.temp || status=$?
+testrun ${abs_top_builddir}/src/elflint --gnu -q -d testfile.debug.temp || status=$?
 
 # Now test unstrip recombining those files.
 testrun ${abs_top_builddir}/src/unstrip -o testfile.unstrip testfile.temp testfile.debug.temp
@@ -48,6 +48,13 @@ testrun ${abs_top_builddir}/src/unstrip -o testfile.unstrip testfile.temp testfi
 # Check that it came back whole.
 testrun ${abs_top_builddir}/src/elfcmp --hash-inexact $original testfile.unstrip
 }
+
+# Now strip in-place and make sure it is smaller.
+SIZE_original=$(stat -c%s $original)
+testrun ${abs_top_builddir}/src/strip $original
+SIZE_stripped=$(stat -c%s $original)
+test $SIZE_stripped -lt $SIZE_original ||
+  { echo "*** failure in-place strip file not smaller $original"; status=1; }
 
 tempfiles testfile.sections
 testrun ${abs_top_builddir}/src/readelf -S testfile.temp > testfile.sections || status=$?

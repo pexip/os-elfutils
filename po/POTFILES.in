@@ -2,9 +2,8 @@
 # Copyright (C) 2000-2010 Red Hat, Inc.
 
 # Files from the compatibility library
+lib/color.c
 lib/xmalloc.c
-#lib/xstrdup.c
-lib/xstrndup.c
 
 # Library sources
 libasm/asm_error.c
@@ -14,7 +13,6 @@ libdwfl/libdwflP.h
 libebl/eblbackendname.c
 libebl/eblcorenotetypename.c
 libebl/ebldynamictagname.c
-libebl/eblobjecttypename.c
 libebl/eblobjnote.c
 libebl/eblobjnotetypename.c
 libebl/eblosabiname.c
@@ -28,19 +26,22 @@ libelf/elf_error.c
 # Program sources
 src/addr2line.c
 src/ar.c
+src/arlib-argp.c
 src/arlib.c
 src/elfcmp.c
+src/elfcompress.c
 src/elflint.c
 src/findtextrel.c
-src/i386_ld.c
-src/ld.c
-src/ldgeneric.c
-src/ldscript.y
 src/nm.c
 src/objdump.c
 src/ranlib.c
 src/readelf.c
 src/size.c
+src/stack.c
 src/strings.c
 src/strip.c
 src/unstrip.c
+
+# Tests
+tests/backtrace.c
+tests/dwflmodtest.c

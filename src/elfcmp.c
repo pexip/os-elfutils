@@ -1,5 +1,5 @@
 /* Compare relevant content of two ELF files.
-   Copyright (C) 2005-2012 Red Hat, Inc.
+   Copyright (C) 2005-2012, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -45,7 +45,6 @@ static  int regioncompare (const void *p1, const void *p2);
 
 
 /* Name and version of program.  */
-static void print_version (FILE *stream, struct argp_state *state);
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
@@ -287,7 +286,8 @@ main (int argc, char *argv[])
 
       /* Compare the headers.  We allow the name to be at a different
 	 location.  */
-      if (unlikely (strcmp (sname1, sname2) != 0))
+      if (unlikely (sname1 == NULL || sname2 == NULL
+		    || strcmp (sname1, sname2) != 0))
 	{
 	  error (0, 0, gettext ("%s %s differ: section [%zu], [%zu] name"),
 		 fname1, fname2, elf_ndxscn (scn1), elf_ndxscn (scn2));
@@ -295,8 +295,8 @@ main (int argc, char *argv[])
 	}
 
       /* We ignore certain sections.  */
-      if (strcmp (sname1, ".gnu_debuglink") == 0
-	  || strcmp (sname1, ".gnu.prelink_undo") == 0)
+      if ((sname1 != NULL && strcmp (sname1, ".gnu_debuglink") == 0)
+	  || (sname1 != NULL && strcmp (sname1, ".gnu.prelink_undo") == 0))
 	continue;
 
       if (shdr1->sh_type != shdr2->sh_type
@@ -333,6 +333,11 @@ main (int argc, char *argv[])
 	{
 	case SHT_DYNSYM:
 	case SHT_SYMTAB:
+	  if (shdr1->sh_entsize == 0)
+	    error (2, 0,
+		   gettext ("symbol table [%zu] in '%s' has zero sh_entsize"),
+		   elf_ndxscn (scn1), fname1);
+
 	  /* Iterate over the symbol table.  We ignore the st_size
 	     value of undefined symbols.  */
 	  for (int ndx = 0; ndx < (int) (shdr1->sh_size / shdr1->sh_entsize);
@@ -355,13 +360,14 @@ main (int argc, char *argv[])
 					      sym1->st_name);
 	      const char *name2 = elf_strptr (elf2, shdr2->sh_link,
 					      sym2->st_name);
-	      if (unlikely (strcmp (name1, name2) != 0
+	      if (unlikely (name1 == NULL || name2 == NULL
+			    || strcmp (name1, name2) != 0
 			    || sym1->st_value != sym2->st_value
 			    || (sym1->st_size != sym2->st_size
 				&& sym1->st_shndx != SHN_UNDEF)
 			    || sym1->st_info != sym2->st_info
 			    || sym1->st_other != sym2->st_other
-			    || sym1->st_shndx != sym1->st_shndx))
+			    || sym1->st_shndx != sym2->st_shndx))
 		{
 		  // XXX Do we want to allow reordered symbol tables?
 		symtab_mismatch:
@@ -504,6 +510,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 
 	  if (unlikely (data1->d_size != data2->d_size
 			|| (shdr1->sh_type != SHT_NOBITS
+			    && data1->d_size != 0
 			    && memcmp (data1->d_buf, data2->d_buf,
 				       data1->d_size) != 0)))
 	    {
@@ -590,13 +597,13 @@ cannot read note section [%zu] '%s' in '%s': %s"),
     {
       GElf_Phdr phdr1_mem;
       GElf_Phdr *phdr1 = gelf_getphdr (elf1, ndx, &phdr1_mem);
-      if (ehdr1 == NULL)
+      if (phdr1 == NULL)
 	error (2, 0,
 	       gettext ("cannot get program header entry %d of '%s': %s"),
 	       ndx, fname1, elf_errmsg (-1));
       GElf_Phdr phdr2_mem;
       GElf_Phdr *phdr2 = gelf_getphdr (elf2, ndx, &phdr2_mem);
-      if (ehdr2 == NULL)
+      if (phdr2 == NULL)
 	error (2, 0,
 	       gettext ("cannot get program header entry %d of '%s': %s"),
 	       ndx, fname2, elf_errmsg (-1));
@@ -647,24 +654,12 @@ cannot read note section [%zu] '%s' in '%s': %s"),
  out:
   elf_end (elf1);
   elf_end (elf2);
+  ebl_closebackend (ebl1);
+  ebl_closebackend (ebl2);
   close (fd1);
   close (fd2);
 
   return result;
-}
-
-
-/* Print the version information.  */
-static void
-print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
-{
-  fprintf (stream, "elfcmp (%s) %s\n", PACKAGE_NAME, PACKAGE_VERSION);
-  fprintf (stream, gettext ("\
-Copyright (C) %s Red Hat, Inc.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2012");
-  fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 
 
@@ -759,7 +754,7 @@ search_for_copy_reloc (Ebl *ebl, size_t scnndx, int symndx)
 	       gettext ("cannot get content of section %zu: %s"),
 	       elf_ndxscn (scn), elf_errmsg (-1));
 
-      if (shdr->sh_type == SHT_REL)
+      if (shdr->sh_type == SHT_REL && shdr->sh_entsize != 0)
 	for (int ndx = 0; ndx < (int) (shdr->sh_size / shdr->sh_entsize);
 	     ++ndx)
 	  {
@@ -773,7 +768,7 @@ search_for_copy_reloc (Ebl *ebl, size_t scnndx, int symndx)
 		&& ebl_copy_reloc_p (ebl, GELF_R_TYPE (rel->r_info)))
 	      return true;
 	  }
-      else
+      else if (shdr->sh_entsize != 0)
 	for (int ndx = 0; ndx < (int) (shdr->sh_size / shdr->sh_entsize);
 	     ++ndx)
 	  {
@@ -810,8 +805,7 @@ compare_Elf32_Word (const void *p1, const void *p2)
 {
   const Elf32_Word *w1 = p1;
   const Elf32_Word *w2 = p2;
-  assert (sizeof (int) >= sizeof (*w1));
-  return (int) *w1 - (int) *w2;
+  return *w1 < *w2 ? -1 : *w1 > *w2 ? 1 : 0;
 }
 
 static int

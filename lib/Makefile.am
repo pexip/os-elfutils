@@ -28,17 +28,17 @@
 ## not, see <http://www.gnu.org/licenses/>.
 ##
 include $(top_srcdir)/config/eu.am
-AM_CFLAGS += -fpic
+AM_CFLAGS += -fPIC
 AM_CPPFLAGS += -I$(srcdir)/../libelf
 
 noinst_LIBRARIES = libeu.a
 
 libeu_a_SOURCES = xstrdup.c xstrndup.c xmalloc.c next_prime.c \
 		  crc32.c crc32_file.c md5.c sha1.c \
-		  color.c
+		  color.c version.c
 
-noinst_HEADERS = fixedsizehash.h system.h dynamicsizehash.h list.h md5.h \
-		 sha1.h eu-config.h
+noinst_HEADERS = fixedsizehash.h libeu.h system.h dynamicsizehash.h list.h \
+		 md5.h sha1.h eu-config.h
 EXTRA_DIST = dynamicsizehash.c
 
 if !GPROF
