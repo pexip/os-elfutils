@@ -1,6 +1,7 @@
 elfutils (0.168-1pexip1) pexip; urgency=low
 
   * Migrate to Stretch
+  * debian/patches/pkgconfig.patch: Drop; merged upstream
 
  -- John-Mark Bell <jmb@pexip.com>  Tue, 10 Jul 2018 18:53:37 +0100
 
