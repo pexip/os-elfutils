@@ -1,3 +1,170 @@
+elfutils (0.168-1pexip1) pexip; urgency=low
+
+  * Migrate to Stretch
+
+ -- John-Mark Bell <jmb@pexip.com>  Tue, 10 Jul 2018 18:53:37 +0100
+
+elfutils (0.168-1) unstable; urgency=medium
+
+  * Fix CVE-2017-7607 (Closes: #859996)
+  * Fix CVE-2017-7608 (Closes: #859995)
+  * Fix CVE-2017-7609 (Closes: #859994)
+  * Fix CVE-2017-7610 (Closes: #859993)
+  * Fix CVE-2017-7611 (Closes: #859992)
+  * Fix CVE-2017-7612 (Closes: #859991)
+  * Fix CVE-2017-7613 (Closes: #859990)
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sat, 27 May 2017 15:05:37 +0200
+
+elfutils (0.168-0.2) unstable; urgency=medium
+
+  * debian/copyright: Update to the current licensing, as introduced
+    with elfutils 0.154.
+  * Drop the m68k_backend.diff patch.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 29 Dec 2016 14:23:54 +0100
+
+elfutils (0.168-0.1) experimental; urgency=medium
+
+  * Non-maintainer upload.
+  * New upstream release
+    - m68k_backend.diff: Don't apply.
+    - testsuite-amd64-fix-backtrace-native.patch: Remove, applied upstream.
+    - Refresh patches.
+    - Build failure on non Linux targets fixed. Closes: #816394.
+  * Update libdw1 symbols file.
+  * Improve DEB_BUILD_OPTIONS=nocheck handling (Helmut Grohne). See #832456.
+    - Don't treat DEB_BUILD_OPTIONS=casinocheck as nocheck.
+    - Don't default to nocheck for cross building.
+    - Annotate Build-Depends: gcc-multilib with <!nocheck> profile.
+  * Update reference to new sourceware.org home.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 29 Dec 2016 06:09:04 +0100
+
+elfutils (0.166-2.2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * testsuite-amd64-fix-backtrace-native.patch: Backport upstream
+    patch to fix FTBFS on amd64 (Closes: #841124)
+
+ -- James Clarke <jrtc27@jrtc27.com>  Tue, 18 Oct 2016 08:13:34 +0100
+
+elfutils (0.166-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Build-Depend on gcc-multilib and libc6-dbg on sparc64 (Closes: #832584)
+
+ -- James Clarke <jrtc27@jrtc27.com>  Fri, 07 Oct 2016 15:16:09 +0100
+
+elfutils (0.166-2) unstable; urgency=medium
+
+  * Actually add ignore_strmerge.diff to the patch series.
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sat, 23 Jul 2016 18:46:20 +0200
+
+elfutils (0.166-1) unstable; urgency=medium
+
+  * New upstream release
+  * Ignore run-native-test on Hurd, the maps file doesn't have
+    paths in it.  Patch from Samuel Thibault <sthibault@debian.org> 
+    (Closes: #682101)
+  * Make cross compilation actually work.  Patch from Helmut Grohne
+    <helmut@subdivi.de>  (Closes: #818099)
+  * Add libebl.a to libdw-dev (Closes: #825747, #647918)
+  * Ignore strmerge test failured, needed on at least mips.  Patch
+    from Jurica Stanojkovic <Jurica.Stanojkovic@imgtec.com>
+    (Closes: #818485)
+  * Change versioned build-depends on debhelper from 8.1.3 to 9 to
+    make lintian happy.
+  * Update Standards-Version to 3.9.8, no changes required.
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sat, 23 Jul 2016 17:25:04 +0200
+
+elfutils (0.165-3) unstable; urgency=medium
+
+  * Add patches from Mark Wielaard to fix non-Linux issues.
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sat, 16 Jan 2016 17:53:34 +0100
+
+elfutils (0.165-2) unstable; urgency=medium
+
+  * Make the new libelf.h work with older elf.h from glibc (Closes: #810885)
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Wed, 13 Jan 2016 17:50:08 +0100
+
+elfutils (0.165-1) unstable; urgency=medium
+
+  * New upstream release
+  * Install libelf.pc and libdw.pc file.
+  * Update libelf1.symbols and libdw1.symbols with 0.165 version
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Mon, 11 Jan 2016 21:28:32 +0100
+
+elfutils (0.164-1) unstable; urgency=medium
+
+  * New upstream release
+    - Fixes sparc64 issues (Closes: #805630)
+    - Drop patches applied upstream: 0001-Reduce-scope-of-some-includes.patch, 
+      0002-tests-Mark-an-unused-argument-as-such.patch,
+      0003-tests-dwfl-bug-fd-leak-Guard-against-null-module-add.patch,
+      0004-tests-skip-run-deleted.sh-when-dwfl_linux_proc_attac.patch,
+      pr18792.diff
+    - Remove redhat-portability.diff and scanf-format.patch
+    - Update backend to use to stop using the old-style function
+      definition: hppa_backend.diff, m68k_backend.diff, mips_backend.diff
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sat, 26 Dec 2015 20:55:48 +0100
+
+elfutils (0.163-5.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix finding the detached debug info when no build-id's are used.
+    Closes: #795386.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 14 Aug 2015 12:25:05 +0200
+
+elfutils (0.163-5) unstable; urgency=medium
+
+  * Fix typo in 0003-Add-mips-n64-relocation-format-hack.patch that
+    causing crash (Closes: #794488)
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sat, 08 Aug 2015 15:12:31 +0200
+
+elfutils (0.163-4) unstable; urgency=medium
+
+  * More fixes for kfreebsd and hurd
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Tue, 21 Jul 2015 11:39:55 +0000
+
+elfutils (0.163-3) unstable; urgency=medium
+
+  * Fix build failures on kfreebsd and hurd
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Tue, 21 Jul 2015 13:01:57 +0200
+
+elfutils (0.163-2) unstable; urgency=medium
+
+  * Drop non_linux.patch, it has been applied upstream
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Mon, 20 Jul 2015 15:49:09 +0200
+
+elfutils (0.163-1) unstable; urgency=medium
+
+  * New upstream release
+    - Drop arm_unsupported.patch, arm64.patch, CVE-2014-9447.patch,
+      arm_syscall.patch, arm_func_value.patch, arm_unwind_ret_mask.patch,
+      unaligned.patch, aarch64-run-native-test-fix.patch: applied upstream
+    - Added ppc64el support (Closes: #754798)
+    - Fixed too much string replacement (Closes: #775117)
+  * Add flex and bison to build-depends
+  * Change hppa, m68k and mips backend to not use the removed DW_TAG_mutable_type.
+  * Ignore errors on kfreebsd in the native test suite (Closes: #649038)
+  * Add mips64el support (Closes: #774639)
+  * install known-dwarf.h in libdw-dev
+  * Update libdw1.symbols file
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Mon, 20 Jul 2015 14:30:21 +0200
+
 elfutils (0.159-4.2pexip2) pexip; urgency=low
 
   * Add pkgconfig files
@@ -96,7 +263,7 @@ elfutils (0.157-2) unstable; urgency=low
   * Application in the readelf binary package, libdw1 itself use internal
     APIs from libelf and so need a strict dependency on the same libelf1
     binary package.  libasm1 also needs a strict dependency on libdw1 since
-    it uses libebl.a and so uses the MODVERSION to openthe backends.  The
+    it uses libebl.a and so uses the MODVERSION to open the backends.  The
     dependency from libasm1 to libdw1 was missing.
     Disabling the thread safety resulted in struct Elf's size changing
     causing things like eu-readelf to break when an older libelf1 was

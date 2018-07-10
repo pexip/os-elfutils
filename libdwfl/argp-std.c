@@ -1,5 +1,5 @@
 /* Standard argp argument parsers for tools using libdwfl.
-   Copyright (C) 2005-2010, 2012 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2012, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -171,10 +171,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    if (result != 0)
 	      return fail (dwfl, result, arg);
 
-	    result = INTUSE(dwfl_linux_proc_attach) (dwfl, atoi (arg), false);
-	    if (result != 0)
-	      /* Non-fatal to not be able to attach to process.  */
-	      failure (dwfl, result, _("cannot attach to process"));
+	    /* Non-fatal to not be able to attach to process, ignore error.  */
+	    INTUSE(dwfl_linux_proc_attach) (dwfl, atoi (arg), false);
+
 	    opt->dwfl = dwfl;
 	  }
 	else
@@ -274,7 +273,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
 	if (opt->core)
 	  {
-	    int fd = open64 (opt->core, O_RDONLY);
+	    int fd = open (opt->core, O_RDONLY);
 	    if (fd < 0)
 	      {
 		int code = errno;
@@ -301,12 +300,22 @@ parse_opt (int key, char *arg, struct argp_state *state)
 		return fail (dwfl, result, opt->core);
 	      }
 
-	    result = INTUSE(dwfl_core_file_attach) (dwfl, core);
-	    if (result < 0)
-	      /* Non-fatal to not be able to attach to core.  */
-	      failure (dwfl, result, _("cannot attach to core"));
+	    /* Non-fatal to not be able to attach to core, ignore error.  */
+	    INTUSE(dwfl_core_file_attach) (dwfl, core);
 
-	    /* From now we leak FD and CORE.  */
+	    /* Store core Elf and fd in Dwfl to expose with dwfl_end.  */
+	    if (dwfl->user_core == NULL)
+	      {
+		dwfl->user_core = calloc (1, sizeof (struct Dwfl_User_Core));
+		if (dwfl->user_core == NULL)
+		  {
+		    argp_failure (state, EXIT_FAILURE, 0,
+				  _("Not enough memory"));
+		    return ENOMEM;
+		  }
+	      }
+	    dwfl->user_core->core = core;
+	    dwfl->user_core->fd = fd;
 
 	    if (result == 0)
 	      {

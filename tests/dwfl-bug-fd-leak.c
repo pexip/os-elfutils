@@ -27,6 +27,15 @@
 #include <error.h>
 #include <unistd.h>
 #include <dwarf.h>
+
+#ifndef __linux__
+int
+main (void)
+{
+  return 77; /* dwfl_linux_proc_report is linux specific.  */
+}
+#else
+
 #include <sys/resource.h>
 #include ELFUTILS_HEADER(dwfl)
 
@@ -65,7 +74,11 @@ elfutils_open (pid_t pid, Dwarf_Addr address)
     }
   else
     {
-      Elf *elf = dwfl_module_getelf (dwfl_addrmodule (dwfl, address), &bias);
+      Dwfl_Module *module = dwfl_addrmodule (dwfl, address);
+      if (module == NULL)
+	error (2, 0, "dwfl_addrmodule: no module available for 0x%" PRIx64 "",
+	       address);
+      Elf *elf = dwfl_module_getelf (module, &bias);
       if (elf == NULL)
 	error (2, 0, "dwfl_module_getelf: %s", dwfl_errmsg (-1));
     }
@@ -100,3 +113,4 @@ main (void)
 
   return 0;
 }
+#endif

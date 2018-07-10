@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000-2010, 2013 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013, 2014, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -25,6 +25,19 @@
    You should have received copies of the GNU General Public License and
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
+
+
+/* This is the interface for the Elfutils Backend Library.
+   It is a completely UNSUPPORTED interface.  Don't use any libebl
+   function directly.  These are only for internal elfutils backends
+   and tools.  There is NO source or binary compatible guarantee.
+
+   The ABI of the backend modules is not guaranteed.  Really, no guarantee
+   whatsoever.  We are enforcing this in the code.  The modules and their
+   users must match.  No third-party EBL module are supported or allowed.
+   The only reason there are separate modules is to not have the code for
+   all architectures in all the binaries.  */
+
 
 #ifndef _LIBEBL_H
 #define _LIBEBL_H 1
@@ -74,10 +87,6 @@ extern int ebl_get_elfdata (Ebl *ebl) __attribute__ ((__pure__));
 
 /* Return backend name.  */
 extern const char *ebl_backend_name (Ebl *ebl);
-
-/* Return relocation type name.  */
-extern const char *ebl_object_type_name (Ebl *ebl, int object,
-					 char *buf, size_t len);
 
 /* Return relocation type name.  */
 extern const char *ebl_reloc_type_name (Ebl *ebl, int reloc,
@@ -150,10 +159,6 @@ extern bool ebl_check_special_symbol (Ebl *ebl, GElf_Ehdr *ehdr,
 /* Check whether only valid bits are set on the st_other symbol flag.  */
 extern bool ebl_check_st_other_bits (Ebl *ebl, unsigned char st_other);
 
-/* Return combined section header flags value.  */
-extern GElf_Word ebl_sh_flags_combine (Ebl *ebl, GElf_Word flags1,
-				       GElf_Word flags2);
-
 /* Return symbolic representation of OS ABI.  */
 extern const char *ebl_osabi_name (Ebl *ebl, int osabi, char *buf, size_t len);
 
@@ -201,7 +206,7 @@ extern bool ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr,
 				 bool remove_comment, bool only_remove_debug);
 
 /* Check if backend uses a bss PLT in this file.  */
-extern bool ebl_bss_plt_p (Ebl *ebl, GElf_Ehdr *ehdr);
+extern bool ebl_bss_plt_p (Ebl *ebl);
 
 /* Return size of entry in SysV-style hash table.  */
 extern int ebl_sysvhash_entrysize (Ebl *ebl);
@@ -282,75 +287,6 @@ extern int ebl_syscall_abi (Ebl *ebl, int *sp, int *pc,
 extern int ebl_abi_cfi (Ebl *ebl, Dwarf_CIE *abi_info)
   __nonnull_attribute__ (2);
 
-/* ELF string table handling.  */
-struct Ebl_Strtab;
-struct Ebl_Strent;
-
-/* Create new ELF string table object in memory.  */
-extern struct Ebl_Strtab *ebl_strtabinit (bool nullstr);
-
-/* Free resources allocated for ELF string table ST.  */
-extern void ebl_strtabfree (struct Ebl_Strtab *st);
-
-/* Add string STR (length LEN is != 0) to ELF string table ST.  */
-extern struct Ebl_Strent *ebl_strtabadd (struct Ebl_Strtab *st,
-					 const char *str, size_t len);
-
-/* Finalize string table ST and store size and memory location information
-   in DATA.  */
-extern void ebl_strtabfinalize (struct Ebl_Strtab *st, Elf_Data *data);
-
-/* Get offset in string table for string associated with SE.  */
-extern size_t ebl_strtaboffset (struct Ebl_Strent *se);
-
-/* Return the string associated with SE.  */
-extern const char *ebl_string (struct Ebl_Strent *se);
-
-
-/* ELF wide char string table handling.  */
-struct Ebl_WStrtab;
-struct Ebl_WStrent;
-
-/* Create new ELF wide char string table object in memory.  */
-extern struct Ebl_WStrtab *ebl_wstrtabinit (bool nullstr);
-
-/* Free resources allocated for ELF wide char string table ST.  */
-extern void ebl_wstrtabfree (struct Ebl_WStrtab *st);
-
-/* Add string STR (length LEN is != 0) to ELF string table ST.  */
-extern struct Ebl_WStrent *ebl_wstrtabadd (struct Ebl_WStrtab *st,
-					   const wchar_t *str, size_t len);
-
-/* Finalize string table ST and store size and memory location information
-   in DATA.  */
-extern void ebl_wstrtabfinalize (struct Ebl_WStrtab *st, Elf_Data *data);
-
-/* Get offset in wide char string table for string associated with SE.  */
-extern size_t ebl_wstrtaboffset (struct Ebl_WStrent *se);
-
-
-/* Generic string table handling.  */
-struct Ebl_GStrtab;
-struct Ebl_GStrent;
-
-/* Create new string table object in memory.  */
-extern struct Ebl_GStrtab *ebl_gstrtabinit (unsigned int width, bool nullstr);
-
-/* Free resources allocated for string table ST.  */
-extern void ebl_gstrtabfree (struct Ebl_GStrtab *st);
-
-/* Add string STR (length LEN is != 0) to string table ST.  */
-extern struct Ebl_GStrent *ebl_gstrtabadd (struct Ebl_GStrtab *st,
-					   const char *str, size_t len);
-
-/* Finalize string table ST and store size and memory location information
-   in DATA.  */
-extern void ebl_gstrtabfinalize (struct Ebl_GStrtab *st, Elf_Data *data);
-
-/* Get offset in wide char string table for string associated with SE.  */
-extern size_t ebl_gstrtaboffset (struct Ebl_GStrent *se);
-
-
 /* Register map info. */
 typedef struct
 {
@@ -408,6 +344,23 @@ extern bool ebl_set_initial_registers_tid (Ebl *ebl,
    EBL architecture can unwind iff EBL_FRAME_NREGS > 0.  */
 extern size_t ebl_frame_nregs (Ebl *ebl)
   __nonnull_attribute__ (1);
+
+/* Offset to apply to the value of the return_address_register, as
+   fetched from a Dwarf CFI.  This is used by some backends, where the
+   return_address_register actually contains the call address.  */
+extern int ebl_ra_offset (Ebl *ebl)
+  __nonnull_attribute__ (1);
+
+/* Mask to use for function symbol or unwind return addresses in case
+   the architecture adds some extra non-address bits to it.  This is
+   different from ebl_resolve_sym_value which only works for actual
+   symbol addresses (in non-ET_REL files) that might resolve to an
+   address in a different section.  ebl_func_addr_mask is called to
+   turn a given function value into the a real address or offset (the
+   original value might not be a real address).  This works for all
+   cases where an actual function address (or offset in ET_REL symbol
+   tables) is needed.  */
+extern GElf_Addr ebl_func_addr_mask (Ebl *ebl);
 
 /* Convert *REGNO as is in DWARF to a lower range suitable for
    Dwarf_Frame->REGS indexing.  */

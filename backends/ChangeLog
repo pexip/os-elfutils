@@ -1,3 +1,286 @@
+2016-11-02  Mark Wielaard  <mjw@redhat.com>
+
+	* i386_regs.c (i386_register_info): Add fallthrough comment.
+	* i386_retval.c (i386_return_value_location): Move fallthrough
+	comment.
+	* linux-core-note.c (core_note): Adjust fallthrough comment.
+	* m68k_retval.c (m68k_return_value_location): Move fallthrough
+	comment.
+	* ppc_regs.c (ppc_register_info): Add fallthrough comment.
+	* x86_64_regs.c (x86_64_register_info): Likewise.
+
+2016-08-09  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_attrs.c (sparc_check_object_attribute): Fix the
+	calculation of GNU_SParc_HWCAPS and GNU_SParc_HWCAPS2 values as
+	comma-separated list of hw capability names.
+
+2016-07-10  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* m68k_corenote.c (ALIGN_PRSTATUS): Define.
+	* linux-core-note.c (struct EBLHOOK(prstatus)): Set alignment to
+	ALIGN_PRSTATUS if defined.
+
+2016-06-28  Richard Henderson <rth@redhat.com>
+
+	* Makefile.am (modules): Add bpf.
+	(libebl_pic): Add libebl_bpf_pic.a.
+	(am_libebl_bpf_pic_a_OBJECTS): New.
+	* bpf_init.c, bpf_regs.c, bpf_reloc.def: New files.
+	* common-reloc.c (copy_reloc_p): Honor NO_COPY_RELOC.
+	(init_reloc): Likewise.
+
+2016-05-20  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* Makefile.am (modules): Add m68k.
+	(libebl_pic): Add libebl_m68k_pic.a.
+	(m68k_SRCS, libebl_m68k_pic_a_SOURCES)
+	(am_libebl_m68k_pic_a_OBJECTS): Define.
+	* m68k_init.c: New file.
+	* m68k_symbol.c: New file.
+	* m68k_regs.c: New file.
+	* m68k_retval.c: New file.
+	* m68k_corenote.c: New file.
+	* m68k_reloc.def: New file.
+	* linux-core-note.c (ALIGN_INT): Only define if not defined.
+
+2016-02-26  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_initreg.c (EBLHOOK): Provide a dummy
+	sparc_set_initial_registers_tid for sparc32.  This fixes the build
+	in sparcv9-*-* targets.
+
+2016-02-26  Andreas Schwab  <schwab@suse.de>
+
+	* ppc_symbol.c (ppc_dynamic_tag_name): Add DT_PPC_OPT.
+	(ppc_dynamic_tag_check): Likewise.
+
+2015-12-28  Mark Wielaard  <mjw@redhat.com>
+
+	* i386_reloc.def: Add GOT32X.
+	* x86_64_reloc.def: Add GOTPCRELX and REX_GOTPCRELX.
+
+2016-02-12  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_corenote.c (aarch64_syscall_items): New Ebl_Core_Item[].
+	(EXTRA_NOTES): Add NT_ARM_SYSTEM_CALL.
+	* eblcorenotetypename.c (ebl_core_note_type_name):
+	Add ARM_SYSTEM_CALL.
+
+2015-12-08  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_init.c (sparc_init): Hook sparc_set_initial_registers_tid.
+	* sparc_initreg.c: New file.
+	* Makefile.am (sparc_SRCS): Added sparc_initreg.c.
+
+2015-12-08  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_corenote.c: Header comment typo fixed.
+	(PRSTATUS_REGSET_ITEMS): Defined, so the PC can be fetched from
+	core files.
+	* Makefile.am (sparc_SRCS): Added sparc_cfi.c
+	* sparc_cfi.c: New file.
+	* sparc_init.c (sparc_init): Set eh->frame_nregs, eh->ra_offset
+	and hook sparc_abi_cfi.
+
+2015-10-21  Chih-Hung Hsieh  <chh@google.com>
+
+	* ia64_retval.c (hfa_type): Move nested function 'hfa' to file scope.
+	* aarch64_regs.c (aarch64_register_info): Move nested function 'regtype'
+	to file scope.
+
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
+	* ppc_symbol.c (ppc_check_special_symbol): Also allow _SDA_BASE_
+	in .data section.
+
+2015-10-05  Josh Stone  <jistone@redhat.com>
+
+	* Makefile.am (libebl_%.so): Add AM_V_at and AM_V_CCLD silencers.
+
+2015-10-06  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_attrs.c: New file.
+	* Makefile.am (sparc_SRCS): Added sparc_attrs.c
+	* sparc_init.c (sparc_init): Hook sparc_check_object_attribute.
+
+2015-10-02  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_init.c (RELOC_TYPE_ID): Defined.
+	* common-reloc.c (reloc_type_name): Apply target-specific
+	relocation ID extractors if defined.
+	(reloc_type_check): Likewise.
+	(reloc_valid_use): Likewise.
+
+2015-10-02  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_reloc.def: Added relocation types WDISP10, JMP_IREL and
+	IRELATIVE.
+
+2015-09-22  Mark Wielaard  <mjw@redhat.com>
+
+	* arm_attrs.c: Remove old-style function definitions.
+	* linux-core-note.c: Likewise.
+	* ppc_attrs.c: Likewise.
+
+2015-09-04  Chih-Hung Hsieh  <chh@google.com>
+
+	* aarch64_init.c (aarch64_init): Replace K&R function definition
+	with ansi-C definitions.
+	* alpha_init.c (alpha_init): Likewise.
+	* arm_init.c (arm_init): Likewise.
+	* i386_init.c (i386_init): Likewise.
+	* ia64_init.c (ia64_init): Likewise.
+	* ppc64_init.c (ppc64_init): Likewise.
+	* ppc_init.c (ppc_init): Likewise.
+	* s390_init.c (s390_init): Likewise.
+	* sh_init.c (sh_init): Likewise.
+	* sparc_init.c (sparc_init): Likewise.
+	* tilegx_init.c (tilegx_init): Likewise.
+	* x86_64_init.c (x86_64_init): Likewise.
+
+2015-09-03  Mark Wielaard  <mjw@redhat.com>
+
+	* sparc_regs.c (sparc_register_info): Use ebl->class not ebl->machine.
+
+2015-06-26  Pino Toscano  <toscano.pino@tiscali.it>
+
+	* i386_initreg.c: Reduce scope of some includes to match their usage.
+
+2015-04-28  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_reloc.def: Drop "64" from TLS_DTPMOD64, TLS_DTPREL64 and
+	TLS_TPREL64.
+
+2015-04-01  H.J. Lu  <hjl.tools@gmail.com>
+
+	* Makefile.am (x86_64_SRCS): Add x32_corenote.c.
+	* linux-core-note.c (PR_REG): New.
+	(PRPSINFO_UID_T): Likewise.
+	(ALIGN_PRPSINFO_UID_T): Likewise.
+	(TYPE_PRPSINFO_UID_T): Likewise.
+	(PRPSINFO_GID_T): Likewise.
+	(ALIGN_PRPSINFO_GID_T): Likewise.
+	(TYPE_PRPSINFO_GID_T): Likewise.
+	(pr_reg): Replace ULONG with PR_REG.
+	(pr_uid): Replace UID_T with PRPSINFO_UID_T.
+	(uid): Likewise.
+	(pr_gid): Replace GID_T with PRPSINFO_GID_T.
+	(gid): Likewise.
+	* x32_corenote.c: New file.
+	* x86_64_corenote.c (BITS): New.  Support x32.
+	(BACKEND): Support x32.
+	(ULONG): Likewise.
+	(ALIGN_ULONG): Likewise.
+	(TYPE_ULONG): Likewise.
+	(PRPSINFO_UID_T): New.
+	(ALIGN_PRPSINFO_UID_T): Likewise.
+	(TYPE_PRPSINFO_UID_T): Likewise.
+	(PRPSINFO_GID_T): Likewise.
+	(ALIGN_PRPSINFO_GID_T): Likewise.
+	(TYPE_PRPSINFO_GID_T): Likewise.
+	(PR_REG): Likewise.
+	(ALIGN_PR_REG): Likewise.
+	* x86_64_init.c (x32_core_note): New.
+	(x86_64_init): Set eh->core_note to x32_core_note for x32.
+
+2015-03-23  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_symbol.c (aarch64_check_special_symbol): Accept
+	_GLOBAL_OFFSET_TABLE_ pointing anywhere in .got.
+
+2015-03-09  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_reloc.def (COPY): Add DYN.
+	* arm_reloc.def (COPY): Likewise.
+	* i386_reloc.def (COPY): Likewise.
+	* ia64_reloc.def (COPY): Likewise.
+	* ppc64_reloc.def (COPY): Likewise.
+	* ppc_reloc.def (COPY): Likewise.
+	* s390_reloc.def (COPY): Likewise.
+	* sh_reloc.def (COPY): Likewise.
+	* sparc_reloc.def (COPY): Likewise.
+	* tilegx_reloc.def (COPY): Likewise.
+	* x86_64_reloc.def (COPY): Likewise.
+
+2015-02-23  Petr Machata  <pmachata@redhat.com>
+
+	* arm_symbol.c (arm_symbol_type_name): New function.
+	* arm_init.c (arm_init): Initialize the hook.
+
+2014-12-30  Mark Wielaard  <mjw@redhat.com>
+
+	* ppc_symbol.c (find_dyn_got): Check sh_entsize is not zero.
+
+2014-12-18  Ulrich Drepper  <drepper@gmail.com>
+
+	* Makefile.am: Suppress output of textrel_check command.
+
+2014-11-22  Mark Wielaard  <mjw@redhat.com>
+
+	* ppc64_symbol.c (ppc64_bss_plt_p): Remove ehdr argument.
+	* ppc_symbol.c (find_dyn_got): Likewise. Use elf_getphdrnum.
+	(ppc_check_special_symbol): Call find_dyn_got without ehdr.
+	(ppc_bss_plt_p): Remove ehdr argument.
+
+2014-11-17  Mark Wielaard  <mjw@redhat.com>
+
+	* ppc64_init.c (ppc64_init): Check section name is not NULL.
+
+2014-10-06  Mark Wielaard  <mjw@redhat.com>
+
+	* libebl_CPU.h (dwarf_peel_type): Removed.
+	(dwarf_peeled_die_type): Use libdw dwarf_peel_type.
+
+2014-07-18  Kyle McMartin  <kyle@redhat.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_initreg.c: Check HAVE_SYS_USER_REGS.
+	(aarch64_set_initial_registers_tid): Use user_regs_struct and
+	user_fpsimd_struct.
+	* arm_initreg.c: Check HAVE_SYS_USER_REGS.
+	(arm_set_initial_registers_tid): Use user_regs_struct in compat mode.
+
+2014-07-04  Menanteau Guy  <menantea@linux.vnet.ibm.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* ppc64_init.c (ppc64_init): Hook check_st_other_bits.
+	* ppc64_reloc.def: TLSGD, TLSLD, TOCSAVE, ADDR16_HIGH, ADDR16_HIGHA,
+	TPREL16_HIGH, TPREL16_HIGHA, DTPREL16_HIGH, DTPREL16_HIGHA, JMP_IREL,
+	IRELATIVE, REL16, REL16_LO, REL16_HI and REL16_HA.
+	* ppc64_symbol.c (ppc64_dynamic_tag_name): Recognize DT_PPC64_OPT.
+	(ppc64_dynamic_tag_check): Likewise.
+	(ppc64_check_st_other_bits): New function.
+
+2014-07-04  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_retval.c (aarch64_return_value_location): Handle
+	DW_ATE_boolean.
+
+2014-06-18  Mark Wielaard  <mjw@redhat.com>
+
+	* libebl_CPU.h (dwarf_peel_type): Remove DW_TAG_mutable_type
+	handling.
+
+2014-06-17  Mark Wielaard  <mjw@redhat.com>
+
+	* arm_init.c (arm_init): Set func_addr_mask.
+
+2014-06-20  Petr Machata  <pmachata@redhat.com>
+
+	* alpha_retval.c (alpha_return_value_location): Call
+	dwarf_peeled_die_type instead of inlining equivalent code.
+	* arm_retval.c (arm_return_value_location): Likewise.
+	* i386_retval.c (i386_return_value_location): Likewise.
+	* ia64_retval.c (ia64_return_value_location): Likewise.
+	* ppc64_retval.c (ppc64_return_value_location): Likewise.
+	* ppc_retval.c (ppc_return_value_location): Likewise.
+	* s390_retval.c (s390_return_value_location): Likewise.
+	* sh_retval.c (sh_return_value_location): Likewise.
+	* sparc_retval.c (sparc_return_value_location): Likewise.
+	* tilegx_retval.c (tilegx_return_value_location): Likewise.
+	* x86_64_retval.c (x86_64_return_value_location): Likewise.
+
 2014-05-19  Mark Wielaard  <mjw@redhat.com>
 
 	* arm_init.c (arm_init): Hook check_reloc_target_type.

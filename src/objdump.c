@@ -1,5 +1,5 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 2005, 2006, 2007, 2009, 2011, 2012 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2009, 2011, 2012, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -26,21 +26,19 @@
 #include <inttypes.h>
 #include <libintl.h>
 #include <locale.h>
-#include <mcheck.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/param.h>
 
+#include <libeu.h>
 #include <system.h>
 #include "../libebl/libeblP.h"
 
 
 /* Name and version of program.  */
-static void print_version (FILE *stream, struct argp_state *state);
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
@@ -101,8 +99,8 @@ static int handle_elf (Elf *elf, const char *prefix, const char *fname,
 
 
 #define INTERNAL_ERROR(fname) \
-  error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s-%s): %s"),      \
-	 fname, __LINE__, PACKAGE_VERSION, __DATE__, elf_errmsg (-1))
+  error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s): %s"),      \
+	 fname, __LINE__, PACKAGE_VERSION, elf_errmsg (-1))
 
 
 /* List of sections which should be used.  */
@@ -131,9 +129,6 @@ static bool print_disasm;
 int
 main (int argc, char *argv[])
 {
-  /* Make memory leak detection possible.  */
-  mtrace ();
-
   /* We use no threads here which can interfere with handling a stream.  */
   (void) __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);
@@ -170,20 +165,6 @@ main (int argc, char *argv[])
     }
 
   return result;
-}
-
-
-/* Print the version information.  */
-static void
-print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
-{
-  fprintf (stream, "objdump (%s) %s\n", PACKAGE_NAME, PACKAGE_VERSION);
-  fprintf (stream, gettext ("\
-Copyright (C) %s Red Hat, Inc.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2012");
-  fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 
 
@@ -238,7 +219,9 @@ parse_opt (int key, char *arg,
 		     program_invocation_short_name);
 	  exit (EXIT_FAILURE);
 	}
-
+      /* We only use this for checking the number of arguments, we don't
+	 actually want to consume them.  */
+      /* Fallthrough */
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -389,7 +372,7 @@ show_relocs_x (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *symdata,
 					   ? xndx : sym->st_shndx),
 			       &destshdr_mem);
 
-      if (shdr == NULL)
+      if (shdr == NULL || destshdr == NULL)
 	printf ("<%s %ld>",
 		gettext ("INVALID SECTION"),
 		(long int) (sym->st_shndx == SHN_XINDEX
@@ -418,7 +401,8 @@ show_relocs_rel (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data,
 		 Elf_Data *symdata, Elf_Data *xndxdata, size_t symstrndx,
 		 size_t shstrndx)
 {
-  int nentries = shdr->sh_size / shdr->sh_entsize;
+  size_t sh_entsize = gelf_fsize (ebl->elf, ELF_T_REL, 1, EV_CURRENT);
+  int nentries = shdr->sh_size / sh_entsize;
 
   for (int cnt = 0; cnt < nentries; ++cnt)
     {
@@ -438,7 +422,8 @@ show_relocs_rela (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data,
 		  Elf_Data *symdata, Elf_Data *xndxdata, size_t symstrndx,
 		  size_t shstrndx)
 {
-  int nentries = shdr->sh_size / shdr->sh_entsize;
+  size_t sh_entsize = gelf_fsize (ebl->elf, ELF_T_RELA, 1, EV_CURRENT);
+  int nentries = shdr->sh_size / sh_entsize;
 
   for (int cnt = 0; cnt < nentries; ++cnt)
     {
@@ -460,13 +445,13 @@ section_match (Elf *elf, uint32_t scnndx, GElf_Shdr *shdr, size_t shstrndx)
     return true;
 
   struct section_list *runp = section_list;
+  const char *name = elf_strptr (elf, shstrndx, shdr->sh_name);
 
   do
     {
       if (runp->is_name)
 	{
-	  if (strcmp (runp->name,
-		      elf_strptr (elf, shstrndx, shdr->sh_name)) == 0)
+	  if (name && strcmp (runp->name, name) == 0)
 	    return true;
 	}
       else
@@ -506,6 +491,8 @@ show_relocs (Ebl *ebl, const char *fname, uint32_t shstrndx)
 	  GElf_Shdr *destshdr = gelf_getshdr (elf_getscn (ebl->elf,
 							  shdr->sh_info),
 					      &destshdr_mem);
+	  if (unlikely (destshdr == NULL))
+	    continue;
 
 	  printf (gettext ("\nRELOCATION RECORDS FOR [%s]:\n"
 			   "%-*s TYPE                 VALUE\n"),
@@ -522,6 +509,8 @@ show_relocs (Ebl *ebl, const char *fname, uint32_t shstrndx)
 	  GElf_Shdr symshdr_mem;
 	  GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
 	  Elf_Data *symdata = elf_getdata (symscn, NULL);
+	  if (unlikely (symshdr == NULL || symdata == NULL))
+	    continue;
 
 	  /* Search for the optional extended section index table.  */
 	  Elf_Data *xndxdata = NULL;
