@@ -21,7 +21,6 @@
 #endif
 
 #include <argp.h>
-#include <error.h>
 #include <fcntl.h>
 #include <gelf.h>
 #include <inttypes.h>
@@ -36,7 +35,7 @@
 #include <unistd.h>
 
 #include <system.h>
-
+#include <printversion.h>
 
 /* Name and version of program.  */
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
@@ -375,8 +374,10 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname)
 	INTERNAL_ERROR (fname);
     }
 
-  if (unlikely (elf_end (elf) != 0))
-    INTERNAL_ERROR (fname);
+  /* Only close ELF handle if this was a "top level" ar file.  */
+  if (prefix == NULL)
+    if (unlikely (elf_end (elf) != 0))
+      INTERNAL_ERROR (fname);
 
   return result;
 }

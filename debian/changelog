@@ -1,3 +1,90 @@
+elfutils (0.176-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload with maintainer permission
+  * Fixes FTBFS on riscv64 (Closes: #928832)
+
+ -- Karsten Merker <merker@debian.org>  Tue, 28 May 2019 20:53:12 +0200
+
+elfutils (0.176-1) unstable; urgency=medium
+
+  * New upstream release
+    - Fixes CVE-2019-7150 (Closes: #920909)
+    - Fixes CVE-2019-7149 (Closes: #920910)
+    - Fixes CVE-2019-7146 (Closes: #920911)
+    - Fixes CVE-2019-7665 (Closes: #921880)
+    - Fixes CVE-2019-7664 (Closes: #921881)
+    - Fixes CVE-2019-7148
+    - Drop 0001-tests-Call-test_cleanup-in-backtrace-subr.sh-check_u.patch,
+      applied upstream.
+  * Update upstream PGP key to new one
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sat, 16 Feb 2019 14:54:50 +0100
+
+elfutils (0.175-2) unstable; urgency=medium
+
+  * Add support for the mips ABI CFI callback
+  * Properly clean up in test suite on skipped tests
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sun, 30 Dec 2018 15:02:01 +0100
+
+elfutils (0.175-1) unstable; urgency=medium
+
+  * New upstream release
+    - Build with gcc-8 (Closes: #911276)
+    - Drop fix-gcc7-ftbfs.diff
+    - Drop GNU_variable_value.patch
+    - Drop locviews.patch
+    - Update patches
+  * Fixes CVE-2018-18521 (Closes: #911413)
+  * Fixes CVE-2018-18520 (Closes: #911414)
+  * Fixes CVE-2018-18310 (Closes: #911083)
+  * Fixes CVE-2018-16403
+  * Fixes CVE-2018-16402
+  * Fixes CVE-2018-16062 (Closes: #907562)
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sun, 18 Nov 2018 23:01:23 +0100
+
+elfutils (0.170-0.5) unstable; urgency=medium
+
+  * Non-maintainer upload acked by Kurt Roeckx.
+  * Fix FTCBFS: Add zlib1g-dev:native to Build-Depends. (Closes: #901748)
+
+ -- Helmut Grohne <helmut@subdivi.de>  Sun, 24 Jun 2018 20:54:50 +0200
+
+elfutils (0.170-0.4) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Backport patches for DWARF locview support (Mark Wielaard).
+
+ -- Matthias Klose <doko@debian.org>  Mon, 09 Apr 2018 14:21:19 +0200
+
+elfutils (0.170-0.3) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add disable_werror.patch. (Closes: #886004)
+
+ -- Helmut Grohne <helmut@subdivi.de>  Sun, 28 Jan 2018 14:52:20 +0100
+
+elfutils (0.170-0.2) unstable; urgency=medium
+
+  * Non-maintainer upload, acked by maintainer.
+  * libelf-dev,libdw-dev: Add missing dependencies for packages that
+    our pkg-config files requires (zlib1g-dev, liblzma-dev).
+    (Closes: #885071)
+
+ -- Andreas Henriksson <andreas@fatal.se>  Sat, 30 Dec 2017 18:14:17 +0100
+
+elfutils (0.170-0.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * New upstream release
+  * Fix fallthrough warnings exposed by GCC 7. Closes: #853387.
+  * Bump standards version.
+  * Configure with --disable-silent-rules.
+  * Update libdw1 symbols file.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 12 Sep 2017 00:07:19 +0200
+
 elfutils (0.168-1) unstable; urgency=medium
 
   * Fix CVE-2017-7607 (Closes: #859996)

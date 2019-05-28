@@ -81,9 +81,7 @@
 #include <config.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <errno.h>
-#include <sys/ptrace.h>
 #include <string.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -100,6 +98,8 @@ main (int argc __attribute__ ((unused)), char **argv)
 }
 
 #else /* __linux__ */
+#include <sys/ptrace.h>
+#include <signal.h>
 
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #define NOINLINE_NOCLONE __attribute__ ((noinline, noclone))
@@ -164,7 +164,6 @@ stdarg (int f UNUSED, ...)
   if (ptraceme)
     {
       long l = ptrace (PTRACE_TRACEME, 0, NULL, NULL);
-      assert (errno == 0);
       assert (l == 0);
     }
 #ifdef RAISE_JMP_PATCHING
@@ -236,7 +235,6 @@ main (int argc UNUSED, char **argv)
     {
       errno = 0;
       long l = ptrace (PTRACE_TRACEME, 0, NULL, NULL);
-      assert (errno == 0);
       assert (l == 0);
     }
   if (gencore)

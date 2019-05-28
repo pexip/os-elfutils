@@ -26,6 +26,10 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include "libdwflP.h"
 #include <inttypes.h>
 #include <sys/types.h>
@@ -213,7 +217,7 @@ proc_maps_report (Dwfl *dwfl, FILE *f, GElf_Addr sysinfo_ehdr, pid_t pid)
       uint64_t ino;
       int nread = -1;
       if (sscanf (line, "%" PRIx64 "-%" PRIx64 " %*s %" PRIx64
-		  " %x:%x %" PRIi64 " %n",
+		  " %x:%x %" PRIu64 " %n",
 		  &start, &end, &offset, &dmajor, &dminor, &ino, &nread) < 6
 	  || nread <= 0)
 	{
@@ -418,7 +422,7 @@ dwfl_linux_proc_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
       if (fd < 0)
 	goto detach;
 
-      *elfp = elf_from_remote_memory (base, getpagesize (), NULL,
+      *elfp = elf_from_remote_memory (base, sysconf (_SC_PAGESIZE), NULL,
 				      &read_proc_memory, &fd);
 
       close (fd);

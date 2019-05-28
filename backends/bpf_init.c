@@ -52,9 +52,8 @@ bpf_init (Elf *elf __attribute__ ((unused)),
   eh->name = "BPF";
   bpf_init_reloc (eh);
   HOOK (eh, register_info);
-#ifdef HAVE_LINUX_BPF_H
   HOOK (eh, disasm);
-#endif
+  HOOK (eh, reloc_simple_type);
 
   return MODVERSION;
 }

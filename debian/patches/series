@@ -9,10 +9,6 @@ kfreebsd_path.patch
 0003-Add-mips-n64-relocation-format-hack.patch
 hurd_path.patch
 ignore_strmerge.diff
-CVE-2017-7607.patch
-CVE-2017-7608.patch
-CVE-2017-7609.patch
-CVE-2017-7610.patch
-CVE-2017-7611.patch
-CVE-2017-7612.patch
-CVE-2017-7613.patch
+disable_werror.patch
+mips_cfi.patch
+riscv-retval-workaround.patch

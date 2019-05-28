@@ -1,5 +1,5 @@
 /* Disassembler for BPF.
-   Copyright (C) 2016 Red Hat, Inc.
+   Copyright (C) 2016, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -35,15 +35,10 @@
 #include <stdio.h>
 #include <gelf.h>
 #include <inttypes.h>
-#include <linux/bpf.h>
+#include "bpf.h"
 
 #include "../libelf/common.h"
 #include "../libebl/libeblP.h"
-
-/* BPF_PSEUDO_MAP_FD was only introduced in linux 3.20.  */
-#ifndef BPF_PSEUDO_MAP_FD
-  #define BPF_PSEUDO_MAP_FD 1
-#endif
 
 static const char class_string[8][8] = {
   [BPF_LD]    = "ld",
@@ -351,6 +346,18 @@ bpf_disasm (Ebl *ebl, const uint8_t **startp, const uint8_t *end,
 	case BPF_JMP | BPF_JSGE | BPF_K:
 	  code_fmt = J64(REGS(1), >=, IMMS(2));
 	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JLT | BPF_K:
+	  code_fmt = J64(REG(1), <, IMMS(2));
+	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JLE | BPF_K:
+	  code_fmt = J64(REG(1), <=, IMMS(2));
+	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JSLT | BPF_K:
+	  code_fmt = J64(REGS(1), <, IMMS(2));
+	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JSLE | BPF_K:
+	  code_fmt = J64(REGS(1), <=, IMMS(2));
+	  goto do_dst_imm_jmp;
 
 	case BPF_JMP | BPF_JEQ | BPF_X:
 	  code_fmt = J64(REG(1), ==, REG(2));
@@ -372,6 +379,18 @@ bpf_disasm (Ebl *ebl, const uint8_t **startp, const uint8_t *end,
 	  goto do_dst_src_jmp;
 	case BPF_JMP | BPF_JSGE | BPF_X:
 	  code_fmt = J64(REGS(1), >=, REGS(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JLT | BPF_X:
+	  code_fmt = J64(REG(1), <, REG(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JLE | BPF_X:
+	  code_fmt = J64(REG(1), <=, REG(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JSLT | BPF_X:
+	  code_fmt = J64(REGS(1), <, REGS(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JSLE | BPF_X:
+	  code_fmt = J64(REGS(1), <=, REGS(2));
 	  goto do_dst_src_jmp;
 
 	case BPF_LDX | BPF_MEM | BPF_B:

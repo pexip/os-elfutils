@@ -24,7 +24,6 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <error.h>
 #include <unistd.h>
 #include <dwarf.h>
 #ifdef __linux__
@@ -39,6 +38,7 @@
 #include <argp.h>
 #include ELFUTILS_HEADER(dwfl)
 #endif
+#include "system.h"
 
 #ifndef __linux__
 
@@ -90,6 +90,10 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
       return;
     }
   Dwfl_Module *mod;
+  /* See case 4. Special case to help out simple frame pointer unwinders. */
+  static bool duplicate_sigusr2 = false;
+  if (duplicate_sigusr2)
+    frameno--;
   static bool reduce_frameno = false;
   if (reduce_frameno)
     frameno--;
@@ -123,8 +127,16 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
 	  assert (symname2 == NULL || strcmp (symname2, "jmp") != 0);
 	  break;
 	}
-      /* FALLTHRU */
+      FALLTHROUGH;
     case 4:
+      /* Some simple frame unwinders get this wrong and think sigusr2
+	 is calling itself again. Allow it and just pretend there is
+	 an extra sigusr2 frame. */
+      if (symname != NULL && strcmp (symname, "sigusr2") == 0)
+	{
+	  duplicate_sigusr2 = true;
+	  break;
+	}
       assert (symname != NULL && strcmp (symname, "stdarg") == 0);
       break;
     case 5:
@@ -269,16 +281,13 @@ prepare_thread (pid_t pid2 __attribute__ ((unused)),
   struct user_regs_struct user_regs;
   errno = 0;
   l = ptrace (PTRACE_GETREGS, pid2, 0, (intptr_t) &user_regs);
-  assert (errno == 0);
   assert (l == 0);
   user_regs.rip = (intptr_t) jmp;
   l = ptrace (PTRACE_SETREGS, pid2, 0, (intptr_t) &user_regs);
-  assert (errno == 0);
   assert (l == 0);
   l = ptrace (PTRACE_CONT, pid2, NULL, (void *) (intptr_t) SIGUSR2);
   int status;
   pid_t got = waitpid (pid2, &status, __WALL);
-  assert (errno == 0);
   assert (got == pid2);
   assert (WIFSTOPPED (status));
   assert (WSTOPSIG (status) == SIGUSR1);
@@ -346,7 +355,6 @@ exec_dump (const char *exec)
   errno = 0;
   int status;
   pid_t got = waitpid (pid, &status, 0);
-  assert (errno == 0);
   assert (got == pid);
   assert (WIFSTOPPED (status));
   // Main thread will signal SIGUSR2.  Other thread will signal SIGUSR1.
@@ -356,7 +364,6 @@ exec_dump (const char *exec)
      __WCLONE, probably despite pthread_create already had to be called the new
      task is not yet alive enough for waitpid.  */
   pid_t pid2 = waitpid (-1, &status, __WALL);
-  assert (errno == 0);
   assert (pid2 > 0);
   assert (pid2 != pid);
   assert (WIFSTOPPED (status));

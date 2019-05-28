@@ -26,6 +26,10 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include "libdwflP.h"
 #include <stdio.h>
 #include <fcntl.h>
@@ -385,7 +389,7 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod,
       /* If FILE_NAME is a symlink, the debug file might be associated
 	 with the symlink target name instead.  */
 
-      char *canon = canonicalize_file_name (file_name);
+      char *canon = realpath (file_name, NULL);
       if (canon != NULL && strcmp (file_name, canon))
 	fd = find_debuginfo_in_path (mod, canon,
 				     debuglink_file, debuglink_crc,
