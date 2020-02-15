@@ -211,6 +211,15 @@ void *
 internal_function
 __libelf_decompress (void *buf_in, size_t size_in, size_t size_out)
 {
+  /* Catch highly unlikely compression ratios so we don't allocate
+     some giant amount of memory for nothing. The max compression
+     factor 1032:1 comes from http://www.zlib.net/zlib_tech.html  */
+  if (unlikely (size_out / 1032 > size_in))
+    {
+      __libelf_seterrno (ELF_E_INVALID_DATA);
+      return NULL;
+    }
+
   void *buf_out = malloc (size_out);
   if (unlikely (buf_out == NULL))
     {
@@ -317,6 +326,12 @@ __libelf_reset_rawdata (Elf_Scn *scn, void *buf, size_t size, size_t align,
 
   scn->rawdata_base = buf;
   scn->flags |= ELF_F_MALLOCED;
+
+  /* Pretend we (tried to) read the data from the file and setup the
+     data (might have to convert the Chdr to native format).  */
+  scn->data_read = 1;
+  scn->flags |= ELF_F_FILEDATA;
+  __libelf_set_data_list_rdlock (scn, 1);
 }
 
 int
@@ -440,14 +455,14 @@ elf_compress (Elf_Scn *scn, int type, unsigned int flags)
 	{
 	  Elf32_Shdr *shdr = elf32_getshdr (scn);
 	  shdr->sh_size = new_size;
-	  shdr->sh_addralign = 1;
+	  shdr->sh_addralign = __libelf_type_align (ELFCLASS32, ELF_T_CHDR);
 	  shdr->sh_flags |= SHF_COMPRESSED;
 	}
       else
 	{
 	  Elf64_Shdr *shdr = elf64_getshdr (scn);
 	  shdr->sh_size = new_size;
-	  shdr->sh_addralign = 1;
+	  shdr->sh_addralign = __libelf_type_align (ELFCLASS64, ELF_T_CHDR);
 	  shdr->sh_flags |= SHF_COMPRESSED;
 	}
 
@@ -504,7 +519,8 @@ elf_compress (Elf_Scn *scn, int type, unsigned int flags)
 
       __libelf_reset_rawdata (scn, scn->zdata_base,
 			      scn->zdata_size, scn->zdata_align,
-			      __libelf_data_type (elf, sh_type));
+			      __libelf_data_type (elf, sh_type,
+						  scn->zdata_align));
 
       return 1;
     }

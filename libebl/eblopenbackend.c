@@ -1,5 +1,5 @@
 /* Generate ELF backend handle.
-   Copyright (C) 2000-2016 Red Hat, Inc.
+   Copyright (C) 2000-2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -32,13 +32,13 @@
 
 #include <assert.h>
 #include <dlfcn.h>
-#include <error.h>
 #include <libelfP.h>
 #include <dwarf.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
+#include <system.h>
 #include <libeblP.h>
 
 
@@ -133,6 +133,8 @@ static const struct
   { "xtensa", "elf_xtensa", "xtensa", 6, EM_XTENSA, 0, 0 },
   { "aarch64", "elf_aarch64", "aarch64", 7, EM_AARCH64, ELFCLASS64, 0 },
   { "bpf", "elf_bpf", "bpf", 3, EM_BPF, 0, 0 },
+  { "riscv", "elf_riscv", "riscv", 5, EM_RISCV, ELFCLASS64, ELFDATA2LSB },
+  { "riscv", "elf_riscv", "riscv", 5, EM_RISCV, ELFCLASS32, ELFDATA2LSB },
 };
 #define nmachines (sizeof (machines) / sizeof (machines[0]))
 
@@ -143,7 +145,7 @@ static const struct
 static const char *default_reloc_type_name (int ignore, char *buf, size_t len);
 static bool default_reloc_type_check (int ignore);
 static bool default_reloc_valid_use (Elf *elf, int ignore);
-static Elf_Type default_reloc_simple_type (Ebl *ebl, int ignore);
+static Elf_Type default_reloc_simple_type (Ebl *ebl, int ignore, int *addsub);
 static bool default_gotpc_reloc_check (Elf *elf, int ignore);
 static const char *default_segment_type_name (int ignore, char *buf,
 					      size_t len);
@@ -179,10 +181,11 @@ static bool default_debugscn_p (const char *name);
 static bool default_copy_reloc_p (int reloc);
 static bool default_none_reloc_p (int reloc);
 static bool default_relative_reloc_p (int reloc);
-static bool default_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
+static bool default_check_special_symbol (Elf *elf,
 					  const GElf_Sym *sym,
 					  const char *name,
 					  const GElf_Shdr *destshdr);
+static bool default_data_marker_symbol (const GElf_Sym *sym, const char *sname);
 static bool default_check_st_other_bits (unsigned char st_other);
 static bool default_check_special_section (Ebl *, int,
 					   const GElf_Shdr *, const char *);
@@ -234,6 +237,7 @@ fill_defaults (Ebl *result)
   result->none_reloc_p = default_none_reloc_p;
   result->relative_reloc_p = default_relative_reloc_p;
   result->check_special_symbol = default_check_special_symbol;
+  result->data_marker_symbol = default_data_marker_symbol;
   result->check_st_other_bits = default_check_st_other_bits;
   result->bss_plt_p = default_bss_plt_p;
   result->return_value_location = default_return_value_location;
@@ -448,7 +452,8 @@ default_reloc_valid_use (Elf *elf __attribute__ ((unused)),
 
 static Elf_Type
 default_reloc_simple_type (Ebl *eh __attribute__ ((unused)),
-			   int ignore __attribute__ ((unused)))
+			   int ignore __attribute__ ((unused)),
+			   int *addsub __attribute__ ((unused)))
 {
   return ELF_T_NUM;
 }
@@ -635,6 +640,13 @@ default_debugscn_p (const char *name)
       ".gdb_index",
       /* GNU/DWARF 5 extension/proposal */
       ".debug_macro",
+      /* DWARF 5 */
+      ".debug_addr",
+      ".debug_line_str",
+      ".debug_loclists",
+      ".debug_names",
+      ".debug_rnglists",
+      ".debug_str_offsets",
       /* SGI/MIPS DWARF 2 extensions */
       ".debug_weaknames",
       ".debug_funcnames",
@@ -662,10 +674,16 @@ strong_alias (default_copy_reloc_p, default_relative_reloc_p)
 
 static bool
 default_check_special_symbol (Elf *elf __attribute__ ((unused)),
-			      GElf_Ehdr *ehdr __attribute__ ((unused)),
 			      const GElf_Sym *sym __attribute__ ((unused)),
 			      const char *name __attribute__ ((unused)),
 			      const GElf_Shdr *destshdr __attribute__ ((unused)))
+{
+  return false;
+}
+
+static bool
+default_data_marker_symbol (const GElf_Sym *sym __attribute__ ((unused)),
+			    const char *sname __attribute__ ((unused)))
 {
   return false;
 }

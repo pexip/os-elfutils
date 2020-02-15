@@ -26,7 +26,6 @@
 #include <ctype.h>
 #include <dwarf.h>
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <gelf.h>
 #include <inttypes.h>
@@ -44,6 +43,8 @@
 
 #include <libeu.h>
 #include <system.h>
+#include <color.h>
+#include <printversion.h>
 #include "../libebl/libeblP.h"
 #include "../libdwfl/libdwflP.h"
 

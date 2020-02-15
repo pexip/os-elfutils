@@ -24,7 +24,6 @@
 #include <argp.h>
 #include <assert.h>
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <gelf.h>
 #include <libintl.h>
@@ -38,6 +37,7 @@
 #include <sys/stat.h>
 
 #include <system.h>
+#include <printversion.h>
 
 #include "arlib.h"
 
