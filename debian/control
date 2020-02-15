@@ -7,7 +7,7 @@ Build-Conflicts: autoconf2.13, automake1.4
 Standards-Version: 3.9.8
 Section: libs
 Homepage: https://sourceware.org/elfutils/
-XS-Pexip-Upstream: http://ftp.debian.org/debian/ stretch
+XS-Pexip-Upstream: http://ftp.debian.org/debian/ buster
 
 Package: elfutils
 Section: utils
