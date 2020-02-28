@@ -1,3 +1,9 @@
+elfutils (0.176-1.1pexip1) pexip; urgency=medium
+
+  * Migrate to Buster
+
+ -- Vincent Sanders <vince@pexip.com>  Fri, 28 Feb 2020 14:50:13 +0000
+
 elfutils (0.176-1.1) unstable; urgency=medium
 
   * Non-maintainer upload with maintainer permission
