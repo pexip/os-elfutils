@@ -21,7 +21,6 @@
 #endif
 
 #include <argp.h>
-#include <error.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <libintl.h>
@@ -35,6 +34,8 @@
 
 #include <libeu.h>
 #include <system.h>
+#include <color.h>
+#include <printversion.h>
 #include "../libebl/libeblP.h"
 
 
@@ -221,7 +222,7 @@ parse_opt (int key, char *arg,
 	}
       /* We only use this for checking the number of arguments, we don't
 	 actually want to consume them.  */
-      /* Fallthrough */
+      FALLTHROUGH;
     default:
       return ARGP_ERR_UNKNOWN;
     }

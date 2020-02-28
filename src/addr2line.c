@@ -23,7 +23,6 @@
 #include <argp.h>
 #include <assert.h>
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <libdwfl.h>
@@ -38,6 +37,7 @@
 #include <unistd.h>
 
 #include <system.h>
+#include <printversion.h>
 
 
 /* Name and version of program.  */
@@ -186,6 +186,7 @@ main (int argc, char *argv[])
 	    buf[chars - 1] = '\0';
 
 	  result = handle_address (buf, dwfl);
+	  fflush (stdout);
 	}
 
       free (buf);
@@ -445,9 +446,9 @@ print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
 	      if (shdr != NULL)
 		{
 		  Elf *elf = dwfl_module_getelf (mod, &ebias);
-		  GElf_Ehdr ehdr;
-		  if (gelf_getehdr (elf, &ehdr) != NULL)
-		    printf (" (%s)", elf_strptr (elf, ehdr.e_shstrndx,
+		  size_t shstrndx;
+		  if (elf_getshdrstrndx (elf, &shstrndx) >= 0)
+		    printf (" (%s)", elf_strptr (elf, shstrndx,
 						 shdr->sh_name));
 		}
 	    }
@@ -617,7 +618,7 @@ handle_address (const char *string, Dwfl *dwfl)
 	case 1:
 	  addr = 0;
 	  j = i;
-	  /* Fallthrough */
+	  FALLTHROUGH;
 	case 2:
 	  if (string[j] != '\0')
 	    break;

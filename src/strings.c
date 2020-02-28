@@ -25,7 +25,6 @@
 #include <ctype.h>
 #include <endian.h>
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <gelf.h>
 #include <inttypes.h>
@@ -42,6 +41,7 @@
 
 #include <libeu.h>
 #include <system.h>
+#include <printversion.h>
 
 #ifndef MAP_POPULATE
 # define MAP_POPULATE 0
@@ -245,7 +245,7 @@ parse_opt (int key, char *arg,
 	case 'b':
 	case 'B':
 	  big_endian = true;
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 
 	case 'l':
 	case 'L':

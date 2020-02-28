@@ -1,7 +1,7 @@
 # -*- rpm-spec-*-
 Summary: A collection of utilities and DSOs to handle ELF files and DWARF data
 Name: elfutils
-Version: 0.168
+Version: 0.176
 Release: 1
 URL: http://elfutils.org/
 License: GPLv3+ and (GPLv2+ or LGPLv3+)
@@ -224,9 +224,92 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %files default-yama-scope
-%config(noreplace) %{_sysctldir}/10-default-yama-scope.conf
+%{_sysctldir}/10-default-yama-scope.conf
 
 %changelog
+* Thu Feb 14 2019 Mark Wielaard <mark@klomp.org> 0.176-1
+- build: Add new --enable-install-elfh option.
+  Do NOT use this for system installs (it overrides glibc elf.h).
+- backends: riscv improved core file and return value location support.
+- Fixes CVE-2019-7146, CVE-2019-7148, CVE-2019-7149, CVE-2019-7150,
+        CVE-2019-7664, CVE-2019-7665.
+
+* Wed Nov 14 2018 Mark Wielaard <mark@klomp.org> 0.175-1
+- readelf: Handle mutliple .debug_macro sections.
+  Recognize and parse GNU Property notes, NT_VERSION notes and
+  GNU Build Attribute ELF Notes.
+- strip: Handle SHT_GROUP correctly.
+  Add strip --reloc-debug-sections-only option.
+  Handle relocations against GNU compressed sections.
+- libdwelf: New function dwelf_elf_begin.
+- libcpu: Recognize bpf jump variants BPF_JLT, BPF_JLE, BPF_JSLT
+  and BPF_JSLE.
+- backends: RISCV handles ADD/SUB relocations.
+  Handle SHT_X86_64_UNWIND.
+- Fixes CVE-2018-18310, CVE-2018-18520 and CVE-2018-18521.
+
+* Fri Sep 14 2018 Mark Wielaard <mark@klomp> 0.174-1
+- libelf, libdw and all tools now handle extended shnum and shstrndx
+  correctly.
+- elfcompress: Don't rewrite input file if no section data needs
+  updating.  Try harder to keep same file mode bits (suid) on rewrite.
+- strip: Handle mixed (out of order) allocated/non-allocated sections.
+- unstrip: Handle SHT_GROUP sections.
+- backends: RISCV and M68K now have backend implementations to
+  generate CFI based backtraces.
+- Fixes CVE-2018-16062, CVE-2018-16402 and CVE-2018-16403.
+
+* Fri Jun 29 2018 Mark Wielaard,,, <mark@klomp.org> 0.173-1
+- More fixes for crashes and hangs found by afl-fuzz. In particular
+  various functions now detect and break infinite loops caused by bad
+  DIE tree cycles.
+- readelf: Will now lookup the size and signedness of constant value
+  types to display them correctly (and not just how they were encoded).
+- libdw: New function dwarf_next_lines to read CU-less .debug_line data.
+  dwarf_begin_elf now accepts ELF files containing just .debug_line
+  or .debug_frame sections (which can be read without needing a DIE
+  tree from the .debug_info section).
+  Removed dwarf_getscn_info, which was never implemented.
+- backends: Handle BPF simple relocations.
+  The RISCV backends now handles ABI specific CFI and knows about
+  RISCV register types and names.
+
+* Mon Jun 11 2018 Mark Wielaard <mark@klomp.org> 0.172-1
+- No functional changes compared to 0.171.
+- Various bug fixes in libdw and eu-readelf dealing with bad DWARF5
+  data. Thanks to running the afl fuzzer on eu-readelf and various
+  testcases.
+- eu-readelf -N is ~15% faster.
+
+* Fri Jun 01 2018 Mark Wielaard <mark@klomp.org> 0.171-1
+- DWARF5 and split dwarf, including GNU DebugFission, support.
+- readelf: Handle all new DWARF5 sections.
+  --debug-dump=info+ will show split unit DIEs when found.
+  --dwarf-skeleton can be used when inspecting a .dwo file.
+  Recognizes GNU locviews with --debug-dump=loc.
+- libdw: New functions dwarf_die_addr_die, dwarf_get_units,
+  dwarf_getabbrevattr_data and dwarf_cu_info.
+  libdw will now try to resolve the alt file on first use
+  when not set yet with dwarf_set_alt.
+  dwarf_aggregate_size() now works with multi-dimensional arrays.
+- libdwfl: Use process_vm_readv when available instead of ptrace.
+- backends: Add a RISC-V backend.
+
+* Wed Aug  2 2017 Mark Wielaard <mark@klomp.org> 0.170-1
+- libdw: Added new DWARF5 attribute, tag, character encoding,
+  language code, calling convention, defaulted member function
+  and macro constants to dwarf.h.
+  New functions dwarf_default_lower_bound and dwarf_line_file.
+  dwarf_peel_type now handles DWARF5 immutable, packed and shared tags.
+  dwarf_getmacros now handles DWARF5 .debug_macro sections.
+- strip: Add -R, --remove-section=SECTION and --keep-section=SECTION.
+- backends: The bpf disassembler is now always build on all platforms.
+
+* Fri May  5 2017 Mark Wielaard <mark@klomp.org> 0.169-1
+- backends: Add support for EM_PPC64 GNU_ATTRIBUTES.
+  Frame pointer unwinding fallback support for i386, x86_64, aarch64.
+- translations: Update Polish translation.
+
 * Tue Dec 27 2016 Mark Wielaard <mark@klomp.org> 0.168-1
 - http://elfutils.org/ is now hosted at http://sourceware.org/elfutils/
 - libelf: gelf_newehdr and gelf_newehdr now return void *.

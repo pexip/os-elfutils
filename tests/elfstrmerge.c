@@ -24,11 +24,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <error.h>
 #include <stdio.h>
 #include <inttypes.h>
 #include <unistd.h>
 
+#include <system.h>
 #include <gelf.h>
 #include ELFUTILS_HEADER(dwelf)
 #include "elf-knowledge.h"
@@ -194,7 +194,7 @@ main (int argc, char **argv)
   size_t symtabndx = 0;
   Elf_Scn *symtabscn = NULL;
   GElf_Shdr symtabshdr_mem;
-  GElf_Shdr *symtabshdr;
+  GElf_Shdr *symtabshdr = NULL;
   while ((symtabscn = elf_nextscn (elf, symtabscn)) != NULL)
     {
       symtabshdr = gelf_getshdr (symtabscn, &symtabshdr_mem);
@@ -209,7 +209,7 @@ main (int argc, char **argv)
 	}
     }
 
-  if (symtabndx == 0)
+  if (symtabshdr == NULL)
     fail ("No symtab found", fname);
 
   if ((symtabshdr->sh_flags & SHF_ALLOC) != 0)
@@ -577,7 +577,8 @@ main (int argc, char **argv)
 	      break;
 
 	    case SHT_DYNAMIC:
-	      /* Fallthrough.  There are string indexes in here, but
+	      FALLTHROUGH;
+	      /* There are string indexes in here, but
 		 they (should) point to a allocated string table,
 		 which we don't alter.  */
 	    default:

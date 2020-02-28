@@ -1,5 +1,5 @@
 /* Compress or decompress an ELF file.
-   Copyright (C) 2015, 2016 Red Hat, Inc.
+   Copyright (C) 2015, 2016, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -18,7 +18,6 @@
 #include <config.h>
 #include <assert.h>
 #include <argp.h>
-#include <error.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <inttypes.h>
@@ -34,8 +33,9 @@
 #include ELFUTILS_HEADER(ebl)
 #include ELFUTILS_HEADER(dwelf)
 #include <gelf.h>
-#include "libeu.h"
 #include "system.h"
+#include "libeu.h"
+#include "printversion.h"
 
 /* Name and version of program.  */
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
@@ -149,7 +149,7 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 		    N_("Only one input file allowed together with '-o'"));
       /* We only use this for checking the number of arguments, we don't
 	 actually want to consume them.  */
-      /* Fallthrough */
+      FALLTHROUGH;
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -284,6 +284,15 @@ process_file (const char *fname)
   bool get_section (size_t ndx)
   {
     return (sections[ndx / WORD_BITS] & (1U << (ndx % WORD_BITS))) != 0;
+  }
+
+  /* How many sections are we going to change?  */
+  size_t get_sections (void)
+  {
+    size_t s = 0;
+    for (size_t i = 0; i < shnum / WORD_BITS + 1; i++)
+      s += __builtin_popcount (sections[i]);
+    return s;
   }
 
   int cleanup (int res)
@@ -422,6 +431,9 @@ process_file (const char *fname)
      names change and whether there is a symbol table that might need
      to be adjusted be if the section header name table is changed.
 
+     If nothing needs changing, and the input and output file are the
+     same, we are done.
+
      Second a collection pass that creates the Elf sections and copies
      the data.  This pass will compress/decompress section data when
      needed.  And it will collect all data needed if we'll need to
@@ -464,7 +476,26 @@ process_file (const char *fname)
 
       if (section_name_matches (sname))
 	{
-	  if (shdr->sh_type != SHT_NOBITS
+	  if (!force && type == T_DECOMPRESS
+	      && (shdr->sh_flags & SHF_COMPRESSED) == 0
+	      && strncmp (sname, ".zdebug", strlen (".zdebug")) != 0)
+	    {
+	      if (verbose > 0)
+		printf ("[%zd] %s already decompressed\n", ndx, sname);
+	    }
+	  else if (!force && type == T_COMPRESS_ZLIB
+		   && (shdr->sh_flags & SHF_COMPRESSED) != 0)
+	    {
+	      if (verbose > 0)
+		printf ("[%zd] %s already compressed\n", ndx, sname);
+	    }
+	  else if (!force && type == T_COMPRESS_GNU
+		   && strncmp (sname, ".zdebug", strlen (".zdebug")) == 0)
+	    {
+	      if (verbose > 0)
+		printf ("[%zd] %s already GNU compressed\n", ndx, sname);
+	    }
+	  else if (shdr->sh_type != SHT_NOBITS
 	      && (shdr->sh_flags & SHF_ALLOC) == 0)
 	    {
 	      set_section (ndx);
@@ -516,6 +547,14 @@ process_file (const char *fname)
 	    if (last_offset < off)
 	      last_offset = off;
 	  }
+    }
+
+  if (foutput == NULL && get_sections () == 0)
+    {
+      if (verbose > 0)
+	printf ("Nothing to do.\n");
+      fnew = NULL;
+      return cleanup (0);
     }
 
   if (adjust_names)
@@ -1235,13 +1274,16 @@ process_file (const char *fname)
   elf_end (elfnew);
   elfnew = NULL;
 
-  /* Try to match mode and owner.group of the original file.  */
-  if (fchmod (fdnew, st.st_mode & ALLPERMS) != 0)
-    if (verbose >= 0)
-      error (0, errno, "Couldn't fchmod %s", fnew);
+  /* Try to match mode and owner.group of the original file.
+     Note to set suid bits we have to make sure the owner is setup
+     correctly first. Otherwise fchmod will drop them silently
+     or fchown may clear them.  */
   if (fchown (fdnew, st.st_uid, st.st_gid) != 0)
     if (verbose >= 0)
       error (0, errno, "Couldn't fchown %s", fnew);
+  if (fchmod (fdnew, st.st_mode & ALLPERMS) != 0)
+    if (verbose >= 0)
+      error (0, errno, "Couldn't fchmod %s", fnew);
 
   /* Finally replace the old file with the new file.  */
   if (foutput == NULL)
@@ -1276,7 +1318,7 @@ main (int argc, char **argv)
 	N_("Print a message for each section being (de)compressed"),
 	0 },
       { "force", 'f', NULL, 0,
-	N_("Force compression of section even if it would become larger"),
+	N_("Force compression of section even if it would become larger or update/rewrite the file even if no section would be (de)compressed"),
 	0 },
       { "permissive", 'p', NULL, 0,
 	N_("Relax a few rules to handle slightly broken ELF files"),

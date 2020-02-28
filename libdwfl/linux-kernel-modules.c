@@ -28,13 +28,18 @@
 
 /* In case we have a bad fts we include this before config.h because it
    can't handle _FILE_OFFSET_BITS.
-   Everything we need here is fine if its declarations just come first.  */
+   Everything we need here is fine if its declarations just come first.
+   Also, include sys/types.h before fts. On some systems fts.h is not self
+   contained. */
 #ifdef BAD_FTS
+  #include <sys/types.h>
   #include <fts.h>
 #endif
 
 #include <config.h>
+#include <system.h>
 
+#include "libelfP.h"
 #include "libdwflP.h"
 #include <inttypes.h>
 #include <errno.h>
@@ -54,6 +59,7 @@
     #define fopen fopen64
   #endif
 #else
+  #include <sys/types.h>
   #include <fts.h>
 #endif
 
@@ -151,11 +157,18 @@ try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
 static inline const char *
 kernel_release (void)
 {
+#ifdef __linux__
   /* Cache the `uname -r` string we'll use.  */
   static struct utsname utsname;
   if (utsname.release[0] == '\0' && uname (&utsname) != 0)
     return NULL;
   return utsname.release;
+#else
+  /* Used for finding the running linux kernel, which isn't supported
+     on non-linux kernel systems.  */
+  errno = ENOTSUP;
+  return NULL;
+#endif
 }
 
 static int
@@ -500,7 +513,7 @@ intuit_kernel_bounds (Dwarf_Addr *start, Dwarf_Addr *end, Dwarf_Addr *notes)
 	if (*notes == 0 && !strcmp (state.p, "__start_notes\n"))
 	  *notes = *end;
 
-      Dwarf_Addr round_kernel = sysconf (_SC_PAGE_SIZE);
+      Dwarf_Addr round_kernel = sysconf (_SC_PAGESIZE);
       *start &= -(Dwarf_Addr) round_kernel;
       *end += round_kernel - 1;
       *end &= -(Dwarf_Addr) round_kernel;
@@ -542,15 +555,41 @@ check_notes (Dwfl_Module *mod, const char *notesfile,
     return 1;
 
   unsigned char *p = buf.data;
+  size_t len = 0;
   while (p < &buf.data[n])
     {
       /* No translation required since we are reading the native kernel.  */
       GElf_Nhdr *nhdr = (void *) p;
-      p += sizeof *nhdr;
+      len += sizeof *nhdr;
+      p += len;
       unsigned char *name = p;
-      p += (nhdr->n_namesz + 3) & -4U;
-      unsigned char *bits = p;
-      p += (nhdr->n_descsz + 3) & -4U;
+      unsigned char *bits;
+      /* This is somewhat ugly, GNU Property notes use different padding,
+	 but all we have is the file content, so we have to actually check
+	 the name and type.  */
+      if (nhdr->n_type == NT_GNU_PROPERTY_TYPE_0
+          && nhdr->n_namesz == sizeof "GNU"
+          && name + nhdr->n_namesz < &buf.data[n]
+          && !memcmp (name, "GNU", sizeof "GNU"))
+	{
+	  len += nhdr->n_namesz;
+	  len = NOTE_ALIGN8 (len);
+	  p = buf.data + len;
+	  bits = p;
+	  len += nhdr->n_descsz;
+	  len = NOTE_ALIGN8 (len);
+	  p = buf.data + len;
+	}
+      else
+	{
+	  len += nhdr->n_namesz;
+	  len = NOTE_ALIGN4 (len);
+	  p = buf.data + len;
+	  bits = p;
+	  len += nhdr->n_descsz;
+	  len = NOTE_ALIGN4 (len);
+	  p = buf.data + len;
+	}
 
       if (p <= &buf.data[n]
 	  && nhdr->n_type == NT_GNU_BUILD_ID
