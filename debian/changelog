@@ -1,3 +1,9 @@
+elfutils (0.176-1.1pexip2) pexip; urgency=medium
+
+  * Rebuild in buster environment
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Wed, 15 Jul 2020 18:17:41 +0000
+
 elfutils (0.176-1.1pexip1) pexip; urgency=medium
 
   * Migrate to Buster
