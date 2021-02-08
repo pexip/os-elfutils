@@ -57,7 +57,13 @@ dwarf_getcfi (Dwarf *dbg)
       cfi->datarel = 0;
 
       cfi->e_ident = (unsigned char *) elf_getident (dbg->elf, NULL);
+
+      GElf_Ehdr ehdr;
+      gelf_getehdr (dbg->elf, &ehdr);
+      cfi->e_machine = ehdr.e_machine;
+
       cfi->other_byte_order = dbg->other_byte_order;
+      cfi->default_same_value = false;
 
       cfi->next_offset = 0;
       cfi->cie_tree = cfi->fde_tree = cfi->expr_tree = NULL;

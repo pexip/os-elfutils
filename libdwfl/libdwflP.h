@@ -41,10 +41,11 @@
 #include "../libdw/libdwP.h"	/* We need its INTDECLs.  */
 #include "../libdwelf/libdwelfP.h"
 
-typedef struct Dwfl_Process Dwfl_Process;
+#ifdef ENABLE_LIBDEBUGINFOD
+#include "../debuginfod/debuginfod.h"
+#endif
 
-/* gettext helper macros.  */
-#define _(Str) dgettext ("elfutils", Str)
+typedef struct Dwfl_Process Dwfl_Process;
 
 #define DWFL_ERRORS							      \
   DWFL_ERROR (NOERROR, N_("no error"))					      \
@@ -57,6 +58,7 @@ typedef struct Dwfl_Process Dwfl_Process;
   DWFL_ERROR (ZLIB, N_("gzip decompression failed"))			      \
   DWFL_ERROR (BZLIB, N_("bzip2 decompression failed"))			      \
   DWFL_ERROR (LZMA, N_("LZMA decompression failed"))			      \
+  DWFL_ERROR (ZSTD, N_("zstd decompression failed"))			      \
   DWFL_ERROR (UNKNOWN_MACHINE, N_("no support library found for machine"))    \
   DWFL_ERROR (NOREL, N_("Callbacks missing for ET_REL file"))		      \
   DWFL_ERROR (BADRELTYPE, N_("Unsupported relocation type"))		      \
@@ -114,7 +116,9 @@ struct Dwfl_User_Core
 struct Dwfl
 {
   const Dwfl_Callbacks *callbacks;
-
+#ifdef ENABLE_LIBDEBUGINFOD
+  debuginfod_client *debuginfod;
+#endif
   Dwfl_Module *modulelist;    /* List in order used by full traversals.  */
 
   Dwfl_Process *process;
@@ -130,12 +134,7 @@ struct Dwfl
   GElf_Addr *lookup_addr;	/* Start address of segment.  */
   Dwfl_Module **lookup_module;	/* Module associated with segment, or null.  */
   int *lookup_segndx;		/* User segment index, or -1.  */
-
-  /* Cache from last dwfl_report_segment call.  */
-  const void *lookup_tail_ident;
-  GElf_Off lookup_tail_vaddr;
-  GElf_Off lookup_tail_offset;
-  int lookup_tail_ndx;
+  int next_segndx;
 
   struct Dwfl_User_Core *user_core;
 };
@@ -242,8 +241,7 @@ struct Dwfl_Thread
 {
   Dwfl_Process *process;
   pid_t tid;
-  /* The current frame being unwound.  Initially it is the bottom frame.
-     Later the processed frames get freed and this pointer is updated.  */
+  /* Bottom (innermost) frame while we're initializing, NULL afterwards.  */
   Dwfl_Frame *unwound;
   void *callbacks_arg;
 };
@@ -612,6 +610,10 @@ extern Dwfl_Error __libdw_unlzma (int fd, off_t start_offset,
 				  void *mapped, size_t mapped_size,
 				  void **whole, size_t *whole_size)
   internal_function;
+extern Dwfl_Error __libdw_unzstd (int fd, off_t start_offset,
+				  void *mapped, size_t mapped_size,
+				  void **whole, size_t *whole_size)
+  internal_function;
 
 /* Skip the image header before a file image: updates *START_OFFSET.  */
 extern Dwfl_Error __libdw_image_header (int fd, off_t *start_offset,
@@ -634,6 +636,21 @@ extern Dwfl_Error __libdw_open_elf (int fd, Elf **elfp) internal_function;
    *VADDRP is not modified if the function fails.  */
 extern bool __libdwfl_dynamic_vaddr_get (Elf *elf, GElf_Addr *vaddrp)
   internal_function;
+
+#ifdef ENABLE_LIBDEBUGINFOD
+/* Internal interface to libdebuginfod (if installed).  */
+int
+__libdwfl_debuginfod_find_executable (Dwfl *dwfl,
+				      const unsigned char *build_id_bits,
+				      size_t build_id_len);
+int
+__libdwfl_debuginfod_find_debuginfo (Dwfl *dwfl,
+				     const unsigned char *build_id_bits,
+				     size_t build_id_len);
+void
+__libdwfl_debuginfod_end (debuginfod_client *c);
+#endif
+
 
 /* These are working nicely for --core, but are not ready to be
    exported interfaces quite yet.  */

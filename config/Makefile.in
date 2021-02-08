@@ -88,18 +88,23 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@LIBDEBUGINFOD_TRUE@am__append_1 = libdebuginfod.pc
 subdir = config
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/biarch.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = libelf.pc libdw.pc
+CONFIG_CLEAN_FILES = libelf.pc libdw.pc libdebuginfod.pc profile.sh \
+	profile.csh
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -150,9 +155,11 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(pkgconfigdir)"
 DATA = $(pkgconfig_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
-am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/libdw.pc.in \
-	$(srcdir)/libelf.pc.in ChangeLog ar-lib compile config.guess \
-	config.sub depcomp install-sh missing
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/libdebuginfod.pc.in \
+	$(srcdir)/libdw.pc.in $(srcdir)/libelf.pc.in \
+	$(srcdir)/profile.csh.in $(srcdir)/profile.sh.in ChangeLog \
+	ar-lib compile config.guess config.rpath config.sub depcomp \
+	install-sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -169,7 +176,11 @@ CC_BIARCH = @CC_BIARCH@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -178,33 +189,44 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GCOV = @GCOV@
+GENHTML = @GENHTML@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GREP = @GREP@
 HAVE_BISON = @HAVE_BISON@
 HAVE_BUNZIP2 = @HAVE_BUNZIP2@
+HAVE_CXX11 = @HAVE_CXX11@
 HAVE_FLEX = @HAVE_FLEX@
 HAVE_GAWK = @HAVE_GAWK@
 HAVE_VALGRIND = @HAVE_VALGRIND@
+HAVE_ZSTD = @HAVE_ZSTD@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INTLLIBS = @INTLLIBS@
+INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+LCOV = @LCOV@
 LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LIBEBL_SUBDIR = @LIBEBL_SUBDIR@
+LIBDEBUGINFOD_SONAME = @LIBDEBUGINFOD_SONAME@
+LIBICONV = @LIBICONV@
+LIBINTL = @LIBINTL@
 LIBLZMA = @LIBLZMA@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBZSTD = @LIBZSTD@
+LTLIBICONV = @LTLIBICONV@
+LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
-MODVERSION = @MODVERSION@
 MSGFMT = @MSGFMT@
 MSGFMT_015 = @MSGFMT_015@
 MSGMERGE = @MSGMERGE@
@@ -218,8 +240,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+POSUB = @POSUB@
 RANLIB = @RANLIB@
 READELF = @READELF@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -236,6 +263,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -258,6 +286,7 @@ eu_version = @eu_version@
 exec_prefix = @exec_prefix@
 fpic_CFLAGS = @fpic_CFLAGS@
 fpie_CFLAGS = @fpie_CFLAGS@
+fts_LIBS = @fts_LIBS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -267,19 +296,29 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+libarchive_CFLAGS = @libarchive_CFLAGS@
+libarchive_LIBS = @libarchive_LIBS@
+libcurl_CFLAGS = @libcurl_CFLAGS@
+libcurl_LIBS = @libcurl_LIBS@
 libdir = @libdir@
 libexecdir = @libexecdir@
+libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
+libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+obstack_LIBS = @obstack_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+sqlite3_CFLAGS = @sqlite3_CFLAGS@
+sqlite3_LIBS = @sqlite3_LIBS@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
@@ -287,9 +326,12 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 zip_LIBS = @zip_LIBS@
-EXTRA_DIST = elfutils.spec.in known-dwarf.awk 10-default-yama-scope.conf
+EXTRA_DIST = elfutils.spec.in known-dwarf.awk 10-default-yama-scope.conf \
+	     libelf.pc.in libdw.pc.in libdebuginfod.pc.in \
+	     debuginfod.service debuginfod.sysconfig profile.sh.in profile.csh.in
+
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libelf.pc libdw.pc
+pkgconfig_DATA = libelf.pc libdw.pc $(am__append_1)
 all: all-am
 
 .SUFFIXES:
@@ -325,6 +367,12 @@ $(am__aclocal_m4_deps):
 libelf.pc: $(top_builddir)/config.status $(srcdir)/libelf.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 libdw.pc: $(top_builddir)/config.status $(srcdir)/libdw.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+libdebuginfod.pc: $(top_builddir)/config.status $(srcdir)/libdebuginfod.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+profile.sh: $(top_builddir)/config.status $(srcdir)/profile.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+profile.csh: $(top_builddir)/config.status $(srcdir)/profile.csh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-pkgconfigDATA: $(pkgconfig_DATA)
 	@$(NORMAL_INSTALL)
@@ -424,6 +472,8 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@LIBDEBUGINFOD_FALSE@uninstall-local:
+@LIBDEBUGINFOD_FALSE@install-data-local:
 clean: clean-am
 
 clean-am: clean-generic mostlyclean-am
@@ -444,7 +494,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-pkgconfigDATA
+install-data-am: install-data-local install-pkgconfigDATA
 
 install-dvi: install-dvi-am
 
@@ -488,32 +538,38 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-pkgconfigDATA
+uninstall-am: uninstall-local uninstall-pkgconfigDATA
 
 .MAKE: install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic cscopelist-am \
 	ctags-am distclean distclean-generic distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-pkgconfigDATA install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
-	pdf-am ps ps-am tags-am uninstall uninstall-am \
-	uninstall-pkgconfigDATA
+	install-data-am install-data-local install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-pkgconfigDATA install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic pdf pdf-am ps ps-am tags-am uninstall \
+	uninstall-am uninstall-local uninstall-pkgconfigDATA
 
 .PRECIOUS: Makefile
 
-	     libelf.pc.in libdw.pc.in
+
+@LIBDEBUGINFOD_TRUE@install-data-local:
+@LIBDEBUGINFOD_TRUE@	$(INSTALL_DATA) profile.sh -D $(DESTDIR)$(sysconfdir)/profile.d/debuginfod.sh
+@LIBDEBUGINFOD_TRUE@	$(INSTALL_DATA) profile.csh -D $(DESTDIR)$(sysconfdir)/profile.d/debuginfod.csh
+
+@LIBDEBUGINFOD_TRUE@uninstall-local:
+@LIBDEBUGINFOD_TRUE@	rm -f $(DESTDIR)$(sysconfdir)/profile.d/debuginfod.sh $(DESTDIR)$(sysconfdir)/profile.d/debuginfod.csh
 
 @MAINTAINER_MODE_TRUE@$(srcdir)/elfutils.spec.in: $(top_srcdir)/NEWS
 @MAINTAINER_MODE_TRUE@	@tmpname=$$(mktemp $${TMPDIR:-/tmp}/elfutils.XXXXXX); \
 @MAINTAINER_MODE_TRUE@	date +'* %a %b %e %Y' | tr '[\n]' '[ ]' > $$tmpname; \
-@MAINTAINER_MODE_TRUE@	getent passwd "$$(whoami)" | \
-@MAINTAINER_MODE_TRUE@	  awk 'BEGIN {FS=":"} { printf $$5; exit 0}' >> $$tmpname; \
-@MAINTAINER_MODE_TRUE@	echo -n " <$$(whoami)@gmail.com> " >> $$tmpname; \
+@MAINTAINER_MODE_TRUE@	username=$$(git config --get user.name); \
+@MAINTAINER_MODE_TRUE@	useremail=$$(git config --get user.email); \
+@MAINTAINER_MODE_TRUE@	echo -n "$$username <$$useremail> " >> $$tmpname; \
 @MAINTAINER_MODE_TRUE@	awk '\
 @MAINTAINER_MODE_TRUE@	  $$1 == "Version" && started { exit } \
 @MAINTAINER_MODE_TRUE@	  $$1 == "Version" { started=1; line=""; sub(/:/,"",$$2); \

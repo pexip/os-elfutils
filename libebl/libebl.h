@@ -30,13 +30,7 @@
 /* This is the interface for the Elfutils Backend Library.
    It is a completely UNSUPPORTED interface.  Don't use any libebl
    function directly.  These are only for internal elfutils backends
-   and tools.  There is NO source or binary compatible guarantee.
-
-   The ABI of the backend modules is not guaranteed.  Really, no guarantee
-   whatsoever.  We are enforcing this in the code.  The modules and their
-   users must match.  No third-party EBL module are supported or allowed.
-   The only reason there are separate modules is to not have the code for
-   all architectures in all the binaries.  */
+   and tools.  There is NO source or binary compatible guarantee.  */
 
 
 #ifndef _LIBEBL_H
@@ -51,8 +45,10 @@
 #include "elf-knowledge.h"
 
 
-/* Opaque type for the handle.  */
+/* Opaque type for the handle.  libasm.h defined the same thing.  */
+#ifndef _LIBASM_H
 typedef struct ebl Ebl;
+#endif
 
 
 #ifdef __cplusplus
@@ -244,14 +240,6 @@ extern ssize_t ebl_register_info (Ebl *ebl,
 				  int regno, char *name, size_t namelen,
 				  const char **prefix, const char **setname,
 				  int *bits, int *type);
-
-/* Fill in the DWARF register numbers for the registers used in system calls.
-   The SP and PC are what kernel reports call the user stack pointer and PC.
-   The CALLNO and ARGS are the system call number and incoming arguments.
-   Each of these is filled with the DWARF register number corresponding,
-   or -1 if there is none.  Returns zero when the information is available.  */
-extern int ebl_syscall_abi (Ebl *ebl, int *sp, int *pc,
-			    int *callno, int args[6]);
 
 /* Supply the ABI-specified state of DWARF CFI before CIE initial programs.
 

@@ -90,62 +90,38 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @SYMBOL_VERSIONING_TRUE@am__append_1 = -DSYMBOL_VERSIONING
+@BUILD_STATIC_TRUE@am__append_2 = $(fpic_CFLAGS)
 subdir = libebl
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/biarch.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(noinst_HEADERS) \
-	$(pkginclude_HEADERS) $(am__DIST_COMMON)
+	$(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  test -z "$$files" \
-    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-         $(am__cd) "$$dir" && rm -f $$files; }; \
-  }
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgincludedir)"
-LIBRARIES = $(lib_LIBRARIES)
+LIBRARIES = $(noinst_LIBRARIES)
 AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libebl_a_AR = $(AR) $(ARFLAGS)
 libebl_a_LIBADD =
-am__objects_1 = eblopenbackend.$(OBJEXT) eblclosebackend.$(OBJEXT) \
-	eblreloctypename.$(OBJEXT) eblsegmenttypename.$(OBJEXT) \
-	eblsectiontypename.$(OBJEXT) eblmachineflagname.$(OBJEXT) \
-	eblsymboltypename.$(OBJEXT) ebldynamictagname.$(OBJEXT) \
-	eblsectionname.$(OBJEXT) eblsymbolbindingname.$(OBJEXT) \
-	eblbackendname.$(OBJEXT) eblosabiname.$(OBJEXT) \
-	eblmachineflagcheck.$(OBJEXT) \
+am_libebl_a_OBJECTS = eblopenbackend.$(OBJEXT) \
+	eblclosebackend.$(OBJEXT) eblreloctypename.$(OBJEXT) \
+	eblsegmenttypename.$(OBJEXT) eblsectiontypename.$(OBJEXT) \
+	eblmachineflagname.$(OBJEXT) eblsymboltypename.$(OBJEXT) \
+	ebldynamictagname.$(OBJEXT) eblsectionname.$(OBJEXT) \
+	eblsymbolbindingname.$(OBJEXT) eblbackendname.$(OBJEXT) \
+	eblosabiname.$(OBJEXT) eblmachineflagcheck.$(OBJEXT) \
 	eblmachinesectionflagcheck.$(OBJEXT) \
 	eblreloctypecheck.$(OBJEXT) eblrelocvaliduse.$(OBJEXT) \
 	eblrelocsimpletype.$(OBJEXT) ebldynamictagcheck.$(OBJEXT) \
@@ -159,14 +135,15 @@ am__objects_1 = eblopenbackend.$(OBJEXT) eblclosebackend.$(OBJEXT) \
 	eblnonerelocp.$(OBJEXT) eblrelativerelocp.$(OBJEXT) \
 	eblsysvhashentrysize.$(OBJEXT) eblauxvinfo.$(OBJEXT) \
 	eblcheckobjattr.$(OBJEXT) ebl_check_special_section.$(OBJEXT) \
-	ebl_syscall_abi.$(OBJEXT) eblabicfi.$(OBJEXT) \
-	eblstother.$(OBJEXT) eblinitreg.$(OBJEXT) \
+	eblabicfi.$(OBJEXT) eblstother.$(OBJEXT) eblinitreg.$(OBJEXT) \
 	ebldwarftoregno.$(OBJEXT) eblnormalizepc.$(OBJEXT) \
 	eblunwind.$(OBJEXT) eblresolvesym.$(OBJEXT) \
 	eblcheckreloctargettype.$(OBJEXT) \
 	ebl_data_marker_symbol.$(OBJEXT)
-am_libebl_a_OBJECTS = $(am__objects_1)
 libebl_a_OBJECTS = $(am_libebl_a_OBJECTS)
+libebl_pic_a_AR = $(AR) $(ARFLAGS)
+libebl_pic_a_LIBADD =
+libebl_pic_a_OBJECTS = $(am_libebl_pic_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -184,8 +161,7 @@ depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/ebl_check_special_section.Po \
 	./$(DEPDIR)/ebl_check_special_symbol.Po \
-	./$(DEPDIR)/ebl_data_marker_symbol.Po \
-	./$(DEPDIR)/ebl_syscall_abi.Po ./$(DEPDIR)/eblabicfi.Po \
+	./$(DEPDIR)/ebl_data_marker_symbol.Po ./$(DEPDIR)/eblabicfi.Po \
 	./$(DEPDIR)/eblauxvinfo.Po ./$(DEPDIR)/eblbackendname.Po \
 	./$(DEPDIR)/eblbsspltp.Po ./$(DEPDIR)/eblcheckobjattr.Po \
 	./$(DEPDIR)/eblcheckreloctargettype.Po \
@@ -227,14 +203,14 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libebl_a_SOURCES)
-DIST_SOURCES = $(libebl_a_SOURCES)
+SOURCES = $(libebl_a_SOURCES) $(libebl_pic_a_SOURCES)
+DIST_SOURCES = $(libebl_a_SOURCES) $(libebl_pic_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-HEADERS = $(noinst_HEADERS) $(pkginclude_HEADERS)
+HEADERS = $(noinst_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -272,7 +248,11 @@ CC_BIARCH = @CC_BIARCH@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
 DEPDIR = @DEPDIR@
@@ -281,33 +261,44 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GCOV = @GCOV@
+GENHTML = @GENHTML@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GREP = @GREP@
 HAVE_BISON = @HAVE_BISON@
 HAVE_BUNZIP2 = @HAVE_BUNZIP2@
+HAVE_CXX11 = @HAVE_CXX11@
 HAVE_FLEX = @HAVE_FLEX@
 HAVE_GAWK = @HAVE_GAWK@
 HAVE_VALGRIND = @HAVE_VALGRIND@
+HAVE_ZSTD = @HAVE_ZSTD@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INTLLIBS = @INTLLIBS@
+INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+LCOV = @LCOV@
 LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LIBEBL_SUBDIR = @LIBEBL_SUBDIR@
+LIBDEBUGINFOD_SONAME = @LIBDEBUGINFOD_SONAME@
+LIBICONV = @LIBICONV@
+LIBINTL = @LIBINTL@
 LIBLZMA = @LIBLZMA@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBZSTD = @LIBZSTD@
+LTLIBICONV = @LTLIBICONV@
+LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
-MODVERSION = @MODVERSION@
 MSGFMT = @MSGFMT@
 MSGFMT_015 = @MSGFMT_015@
 MSGMERGE = @MSGMERGE@
@@ -321,8 +312,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+POSUB = @POSUB@
 RANLIB = @RANLIB@
 READELF = @READELF@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -339,6 +335,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -361,6 +358,7 @@ eu_version = @eu_version@
 exec_prefix = @exec_prefix@
 fpic_CFLAGS = @fpic_CFLAGS@
 fpie_CFLAGS = @fpie_CFLAGS@
+fts_LIBS = @fts_LIBS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -370,19 +368,29 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+libarchive_CFLAGS = @libarchive_CFLAGS@
+libarchive_LIBS = @libarchive_LIBS@
+libcurl_CFLAGS = @libcurl_CFLAGS@
+libcurl_LIBS = @libcurl_LIBS@
 libdir = @libdir@
 libexecdir = @libexecdir@
+libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
+libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+obstack_LIBS = @obstack_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+sqlite3_CFLAGS = @sqlite3_CFLAGS@
+sqlite3_LIBS = @sqlite3_LIBS@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
@@ -420,37 +428,49 @@ AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	$($(*F)_no_Wunused),,-Wunused -Wextra) $(if \
 	$($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) $(if \
 	$($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
-	$($(*F)_CFLAGS) $(fpic_CFLAGS)
+	$($(*F)_CFLAGS) $(am__append_2)
+AM_CXXFLAGS = -std=c++11 -Wall -Wshadow \
+	   -Wtrampolines \
+	   $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
+	   $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+	   $(if $($(*F)_no_Werror),,-Werror) \
+	   $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
+	   $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
+	   $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
+	   $($(*F)_CXXFLAGS)
+
 COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage, $(COMPILE))
 DEFS.os = -DPIC -DSHARED $(am__append_1)
-CLEANFILES = *.gcno *.gcda $(am_libebl_pic_a_OBJECTS)
+CLEANFILES = *.gcno *.gcda
 textrel_msg = echo "WARNING: TEXTREL found in '$@'"
 @FATAL_TEXTREL_FALSE@textrel_found = $(textrel_msg)
 @FATAL_TEXTREL_TRUE@textrel_found = $(textrel_msg); exit 1
 textrel_check = if $(READELF) -d $@ | fgrep -q TEXTREL; then $(textrel_found); fi
-lib_LIBRARIES = libebl.a
-pkginclude_HEADERS = libebl.h
-gen_SOURCES = eblopenbackend.c eblclosebackend.c \
-	      eblreloctypename.c eblsegmenttypename.c \
-	      eblsectiontypename.c eblmachineflagname.c \
-	      eblsymboltypename.c ebldynamictagname.c eblsectionname.c \
-	      eblsymbolbindingname.c eblbackendname.c eblosabiname.c \
-	      eblmachineflagcheck.c eblmachinesectionflagcheck.c \
-	      eblreloctypecheck.c eblrelocvaliduse.c eblrelocsimpletype.c \
-	      ebldynamictagcheck.c eblcorenotetypename.c eblobjnotetypename.c \
-	      eblcorenote.c eblobjnote.c ebldebugscnp.c \
-	      eblgotpcreloccheck.c eblcopyrelocp.c eblsectionstripp.c \
-	      eblelfclass.c eblelfdata.c eblelfmachine.c \
-	      ebl_check_special_symbol.c eblbsspltp.c eblretval.c \
-	      eblreginfo.c eblnonerelocp.c eblrelativerelocp.c \
-	      eblsysvhashentrysize.c eblauxvinfo.c eblcheckobjattr.c \
-	      ebl_check_special_section.c ebl_syscall_abi.c eblabicfi.c \
-	      eblstother.c eblinitreg.c ebldwarftoregno.c eblnormalizepc.c \
-	      eblunwind.c eblresolvesym.c eblcheckreloctargettype.c \
-	      ebl_data_marker_symbol.c
+noinst_LIBRARIES = libebl.a libebl_pic.a
+libebl_a_SOURCES = eblopenbackend.c eblclosebackend.c eblreloctypename.c \
+		   eblsegmenttypename.c eblsectiontypename.c \
+		   eblmachineflagname.c eblsymboltypename.c \
+		   ebldynamictagname.c eblsectionname.c \
+		   eblsymbolbindingname.c eblbackendname.c eblosabiname.c \
+		   eblmachineflagcheck.c eblmachinesectionflagcheck.c \
+		   eblreloctypecheck.c eblrelocvaliduse.c \
+		   eblrelocsimpletype.c ebldynamictagcheck.c \
+		   eblcorenotetypename.c eblobjnotetypename.c eblcorenote.c \
+		   eblobjnote.c ebldebugscnp.c eblgotpcreloccheck.c \
+		   eblcopyrelocp.c eblsectionstripp.c eblelfclass.c \
+		   eblelfdata.c eblelfmachine.c ebl_check_special_symbol.c \
+		   eblbsspltp.c eblretval.c eblreginfo.c eblnonerelocp.c \
+		   eblrelativerelocp.c eblsysvhashentrysize.c eblauxvinfo.c \
+		   eblcheckobjattr.c ebl_check_special_section.c \
+		   eblabicfi.c eblstother.c eblinitreg.c \
+		   ebldwarftoregno.c eblnormalizepc.c eblunwind.c \
+		   eblresolvesym.c eblcheckreloctargettype.c \
+		   ebl_data_marker_symbol.c
 
-libebl_a_SOURCES = $(gen_SOURCES)
-noinst_HEADERS = libeblP.h ebl-hooks.h
+libebl_pic_a_SOURCES = 
+am_libebl_pic_a_OBJECTS = $(libebl_a_SOURCES:.c=.os)
+noinst_HEADERS = libebl.h libeblP.h ebl-hooks.h
+MOSTLYCLEANFILES = $(am_libebl_pic_a_OBJECTS)
 all: all-am
 
 .SUFFIXES:
@@ -485,42 +505,19 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-install-libLIBRARIES: $(lib_LIBRARIES)
-	@$(NORMAL_INSTALL)
-	@list='$(lib_LIBRARIES)'; test -n "$(libdir)" || list=; \
-	list2=; for p in $$list; do \
-	  if test -f $$p; then \
-	    list2="$$list2 $$p"; \
-	  else :; fi; \
-	done; \
-	test -z "$$list2" || { \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(libdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(libdir)" || exit 1; \
-	  echo " $(INSTALL_DATA) $$list2 '$(DESTDIR)$(libdir)'"; \
-	  $(INSTALL_DATA) $$list2 "$(DESTDIR)$(libdir)" || exit $$?; }
-	@$(POST_INSTALL)
-	@list='$(lib_LIBRARIES)'; test -n "$(libdir)" || list=; \
-	for p in $$list; do \
-	  if test -f $$p; then \
-	    $(am__strip_dir) \
-	    echo " ( cd '$(DESTDIR)$(libdir)' && $(RANLIB) $$f )"; \
-	    ( cd "$(DESTDIR)$(libdir)" && $(RANLIB) $$f ) || exit $$?; \
-	  else :; fi; \
-	done
 
-uninstall-libLIBRARIES:
-	@$(NORMAL_UNINSTALL)
-	@list='$(lib_LIBRARIES)'; test -n "$(libdir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(libdir)'; $(am__uninstall_files_from_dir)
-
-clean-libLIBRARIES:
-	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 
 libebl.a: $(libebl_a_OBJECTS) $(libebl_a_DEPENDENCIES) $(EXTRA_libebl_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libebl.a
 	$(AM_V_AR)$(libebl_a_AR) libebl.a $(libebl_a_OBJECTS) $(libebl_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libebl.a
+
+libebl_pic.a: $(libebl_pic_a_OBJECTS) $(libebl_pic_a_DEPENDENCIES) $(EXTRA_libebl_pic_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libebl_pic.a
+	$(AM_V_AR)$(libebl_pic_a_AR) libebl_pic.a $(libebl_pic_a_OBJECTS) $(libebl_pic_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libebl_pic.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -531,7 +528,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ebl_check_special_section.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ebl_check_special_symbol.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ebl_data_marker_symbol.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ebl_syscall_abi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eblabicfi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eblauxvinfo.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eblbackendname.Po@am__quote@ # am--include-marker
@@ -597,27 +593,6 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-install-pkgincludeHEADERS: $(pkginclude_HEADERS)
-	@$(NORMAL_INSTALL)
-	@list='$(pkginclude_HEADERS)'; test -n "$(pkgincludedir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgincludedir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(pkgincludedir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(pkgincludedir)'"; \
-	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(pkgincludedir)" || exit $$?; \
-	done
-
-uninstall-pkgincludeHEADERS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(pkginclude_HEADERS)'; test -n "$(pkgincludedir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(pkgincludedir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -708,9 +683,6 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LIBRARIES) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgincludedir)"; do \
-	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -731,6 +703,7 @@ install-strip:
 	    "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'" install; \
 	fi
 mostlyclean-generic:
+	-test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
 
 clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
@@ -744,13 +717,12 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/ebl_check_special_section.Po
 	-rm -f ./$(DEPDIR)/ebl_check_special_symbol.Po
 	-rm -f ./$(DEPDIR)/ebl_data_marker_symbol.Po
-	-rm -f ./$(DEPDIR)/ebl_syscall_abi.Po
 	-rm -f ./$(DEPDIR)/eblabicfi.Po
 	-rm -f ./$(DEPDIR)/eblauxvinfo.Po
 	-rm -f ./$(DEPDIR)/eblbackendname.Po
@@ -812,13 +784,13 @@ info: info-am
 
 info-am:
 
-install-data-am: install-pkgincludeHEADERS
+install-data-am:
 
 install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am: install-libLIBRARIES
+install-exec-am:
 
 install-html: install-html-am
 
@@ -844,7 +816,6 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/ebl_check_special_section.Po
 	-rm -f ./$(DEPDIR)/ebl_check_special_symbol.Po
 	-rm -f ./$(DEPDIR)/ebl_data_marker_symbol.Po
-	-rm -f ./$(DEPDIR)/ebl_syscall_abi.Po
 	-rm -f ./$(DEPDIR)/eblabicfi.Po
 	-rm -f ./$(DEPDIR)/eblauxvinfo.Po
 	-rm -f ./$(DEPDIR)/eblbackendname.Po
@@ -905,24 +876,22 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-libLIBRARIES uninstall-pkgincludeHEADERS
+uninstall-am:
 
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
-	clean-generic clean-libLIBRARIES cscopelist-am ctags ctags-am \
-	distclean distclean-compile distclean-generic distclean-tags \
-	distdir dvi dvi-am html html-am info info-am install \
-	install-am install-data install-data-am install-dvi \
+	clean-generic clean-noinstLIBRARIES cscopelist-am ctags \
+	ctags-am distclean distclean-compile distclean-generic \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am \
-	install-libLIBRARIES install-man install-pdf install-pdf-am \
-	install-pkgincludeHEADERS install-ps install-ps-am \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-libLIBRARIES \
-	uninstall-pkgincludeHEADERS
+	tags tags-am uninstall uninstall-am
 
 .PRECIOUS: Makefile
 

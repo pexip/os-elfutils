@@ -38,9 +38,6 @@
 /* Backend handle.  */
 struct ebl
 {
-  /* Machine name.  */
-  const char *name;
-
   /* Emulation name.  */
   const char *emulation;
 
@@ -80,19 +77,13 @@ struct ebl
      ebl_resolve_sym_value if available for this arch.  */
   GElf_Addr fd_addr;
   Elf_Data *fd_data;
-
-  /* Internal data.  */
-  void *dlhandle;
 };
 
 
-/* Type of the initialization functions in the backend modules.  */
-typedef const char *(*ebl_bhinit_t) (Elf *, GElf_Half, Ebl *, size_t);
-
-
-/* gettext helper macros.  */
-#undef _
-#define _(Str) dgettext ("elfutils", Str)
+/* Type of the initialization functions in the backend modules.
+   The init function returns the given Ebl * or NULL if it couldn't
+   initialize for the given Elf or machine.  */
+typedef Ebl *(*ebl_bhinit_t) (Elf *, GElf_Half, Ebl *);
 
 
 /* LEB128 constant helper macros.  */

@@ -5,5 +5,4 @@ usr/include/elfutils/libdwelf.h
 usr/include/elfutils/known-dwarf.h
 usr/lib/*/libdw.so
 usr/lib/*/libdw.a
-usr/lib/*/libebl.a
 usr/lib/*/pkgconfig/libdw.pc

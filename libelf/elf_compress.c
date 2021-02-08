@@ -44,17 +44,17 @@
 /* Cleanup and return result.  Don't leak memory.  */
 static void *
 do_deflate_cleanup (void *result, z_stream *z, void *out_buf,
-                    int ei_data, Elf_Data *cdatap)
+                    Elf_Data *cdatap)
 {
   deflateEnd (z);
   free (out_buf);
-  if (ei_data != MY_ELFDATA)
+  if (cdatap != NULL)
     free (cdatap->d_buf);
   return result;
 }
 
-#define deflate_cleanup(result) \
-    do_deflate_cleanup(result, &z, out_buf, ei_data, &cdata)
+#define deflate_cleanup(result, cdata) \
+    do_deflate_cleanup(result, &z, out_buf, cdata)
 
 /* Given a section, uses the (in-memory) Elf_Data to extract the
    original data size (including the given header size) and data
@@ -113,9 +113,8 @@ __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
   int zrc = deflateInit (&z, Z_BEST_COMPRESSION);
   if (zrc != Z_OK)
     {
-      free (out_buf);
       __libelf_seterrno (ELF_E_COMPRESS_ERROR);
-      return NULL;
+      return deflate_cleanup(NULL, NULL);
     }
 
   Elf_Data cdata;
@@ -125,9 +124,10 @@ __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
   int flush = Z_NO_FLUSH;
   do
     {
-      /* Convert to raw if different endianess.  */
+      /* Convert to raw if different endianness.  */
       cdata = *data;
-      if (ei_data != MY_ELFDATA)
+      bool convert = ei_data != MY_ELFDATA && data->d_size > 0;
+      if (convert)
 	{
 	  /* Don't do this conversion in place, we might want to keep
 	     the original data around, caller decides.  */
@@ -135,10 +135,10 @@ __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
 	  if (cdata.d_buf == NULL)
 	    {
 	      __libelf_seterrno (ELF_E_NOMEM);
-	      return deflate_cleanup (NULL);
+	      return deflate_cleanup (NULL, NULL);
 	    }
 	  if (gelf_xlatetof (scn->elf, &cdata, data, ei_data) == NULL)
-	    return deflate_cleanup (NULL);
+	    return deflate_cleanup (NULL, &cdata);
 	}
 
       z.avail_in = cdata.d_size;
@@ -164,7 +164,7 @@ __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
 	  if (zrc == Z_STREAM_ERROR)
 	    {
 	      __libelf_seterrno (ELF_E_COMPRESS_ERROR);
-	      return deflate_cleanup (NULL);
+	      return deflate_cleanup (NULL, convert ? &cdata : NULL);
 	    }
 	  used += (out_size - used) - z.avail_out;
 
@@ -172,7 +172,7 @@ __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
 	     compression forced and we are using more compressed data
 	     than original data.  */
 	  if (!force && flush == Z_FINISH && used >= *orig_size)
-	    return deflate_cleanup ((void *) -1);
+	    return deflate_cleanup ((void *) -1, convert ? &cdata : NULL);
 
 	  if (z.avail_out == 0)
 	    {
@@ -180,7 +180,7 @@ __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
 	      if (bigger == NULL)
 		{
 		  __libelf_seterrno (ELF_E_NOMEM);
-		  return deflate_cleanup (NULL);
+		  return deflate_cleanup (NULL, convert ? &cdata : NULL);
 		}
 	      out_buf = bigger;
 	      out_size += block;
@@ -188,7 +188,7 @@ __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
 	}
       while (z.avail_out == 0); /* Need more output buffer.  */
 
-      if (ei_data != MY_ELFDATA)
+      if (convert)
 	{
 	  free (cdata.d_buf);
 	  cdata.d_buf = NULL;
@@ -196,13 +196,13 @@ __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
     }
   while (flush != Z_FINISH); /* More data blocks.  */
 
-  zrc = deflateEnd (&z);
-  if (zrc != Z_OK)
+  if (zrc != Z_STREAM_END)
     {
       __libelf_seterrno (ELF_E_COMPRESS_ERROR);
-      return deflate_cleanup (NULL);
+      return deflate_cleanup (NULL, NULL);
     }
 
+  deflateEnd (&z);
   *new_size = used;
   return out_buf;
 }
@@ -220,7 +220,11 @@ __libelf_decompress (void *buf_in, size_t size_in, size_t size_out)
       return NULL;
     }
 
-  void *buf_out = malloc (size_out);
+  /* Malloc might return NULL when requestion zero size.  This is highly
+     unlikely, it would only happen when the compression was forced.
+     But we do need a non-NULL buffer to return and set as result.
+     Just make sure to always allocate at least 1 byte.  */
+  void *buf_out = malloc (size_out ?: 1);
   if (unlikely (buf_out == NULL))
     {
       __libelf_seterrno (ELF_E_NOMEM);
@@ -246,16 +250,15 @@ __libelf_decompress (void *buf_in, size_t size_in, size_t size_out)
 	}
       zrc = inflateReset (&z);
     }
-  if (likely (zrc == Z_OK))
-    zrc = inflateEnd (&z);
 
   if (unlikely (zrc != Z_OK) || unlikely (z.avail_out != 0))
     {
       free (buf_out);
+      buf_out = NULL;
       __libelf_seterrno (ELF_E_DECOMPRESS_ERROR);
-      return NULL;
     }
 
+  inflateEnd(&z);
   return buf_out;
 }
 
@@ -308,7 +311,7 @@ __libelf_reset_rawdata (Elf_Scn *scn, void *buf, size_t size, size_t align,
 {
   /* This is the new raw data, replace and possibly free old data.  */
   scn->rawdata.d.d_off = 0;
-  scn->rawdata.d.d_version = __libelf_version;
+  scn->rawdata.d.d_version = EV_CURRENT;
   scn->rawdata.d.d_buf = buf;
   scn->rawdata.d.d_size = size;
   scn->rawdata.d.d_align = align;
@@ -519,7 +522,7 @@ elf_compress (Elf_Scn *scn, int type, unsigned int flags)
 
       __libelf_reset_rawdata (scn, scn->zdata_base,
 			      scn->zdata_size, scn->zdata_align,
-			      __libelf_data_type (elf, sh_type,
+			      __libelf_data_type (&ehdr, sh_type,
 						  scn->zdata_align));
 
       return 1;

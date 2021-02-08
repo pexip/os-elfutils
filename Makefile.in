@@ -90,10 +90,13 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/biarch.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -193,6 +196,7 @@ DIST_SUBDIRS = $(SUBDIRS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/config/ar-lib $(top_srcdir)/config/compile \
 	$(top_srcdir)/config/config.guess \
+	$(top_srcdir)/config/config.rpath \
 	$(top_srcdir)/config/config.sub \
 	$(top_srcdir)/config/elfutils.spec.in \
 	$(top_srcdir)/config/install-sh $(top_srcdir)/config/missing \
@@ -255,7 +259,11 @@ CC_BIARCH = @CC_BIARCH@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -264,33 +272,44 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GCOV = @GCOV@
+GENHTML = @GENHTML@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GREP = @GREP@
 HAVE_BISON = @HAVE_BISON@
 HAVE_BUNZIP2 = @HAVE_BUNZIP2@
+HAVE_CXX11 = @HAVE_CXX11@
 HAVE_FLEX = @HAVE_FLEX@
 HAVE_GAWK = @HAVE_GAWK@
 HAVE_VALGRIND = @HAVE_VALGRIND@
+HAVE_ZSTD = @HAVE_ZSTD@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INTLLIBS = @INTLLIBS@
+INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+LCOV = @LCOV@
 LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LIBEBL_SUBDIR = @LIBEBL_SUBDIR@
+LIBDEBUGINFOD_SONAME = @LIBDEBUGINFOD_SONAME@
+LIBICONV = @LIBICONV@
+LIBINTL = @LIBINTL@
 LIBLZMA = @LIBLZMA@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBZSTD = @LIBZSTD@
+LTLIBICONV = @LTLIBICONV@
+LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
-MODVERSION = @MODVERSION@
 MSGFMT = @MSGFMT@
 MSGFMT_015 = @MSGFMT_015@
 MSGMERGE = @MSGMERGE@
@@ -304,8 +323,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+POSUB = @POSUB@
 RANLIB = @RANLIB@
 READELF = @READELF@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -322,6 +346,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -344,6 +369,7 @@ eu_version = @eu_version@
 exec_prefix = @exec_prefix@
 fpic_CFLAGS = @fpic_CFLAGS@
 fpie_CFLAGS = @fpie_CFLAGS@
+fts_LIBS = @fts_LIBS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -353,19 +379,29 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+libarchive_CFLAGS = @libarchive_CFLAGS@
+libarchive_LIBS = @libarchive_LIBS@
+libcurl_CFLAGS = @libcurl_CFLAGS@
+libcurl_LIBS = @libcurl_LIBS@
 libdir = @libdir@
 libexecdir = @libexecdir@
+libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
+libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+obstack_LIBS = @obstack_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+sqlite3_CFLAGS = @sqlite3_CFLAGS@
+sqlite3_LIBS = @sqlite3_LIBS@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
@@ -379,10 +415,8 @@ ACLOCAL_AMFLAGS = -I m4
 # Don't make make repeat.
 AM_MAKEFLAGS = --no-print-directory
 pkginclude_HEADERS = version.h
-
-# Add doc back when we have some real content.
-SUBDIRS = config m4 lib libelf libebl libdwelf libdwfl libdw libcpu libasm \
-	  backends src po tests
+SUBDIRS = config lib libelf libcpu backends libebl libdwelf libdwfl libdw \
+	  libasm debuginfod src po doc tests
 
 EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING \
 	     COPYING COPYING-GPLV2 COPYING-LGPLV3
@@ -397,6 +431,16 @@ AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-valgrind --enable-sanitize-undefined \
 	CC="$(CC)"
 
+@GCOV_TRUE@COVERAGE_OUTPUT_FILE = $(PACKAGE_NAME).lcov
+@GCOV_TRUE@COVERAGE_OUTPUT_DIRECTORY = coverage
+@GCOV_TRUE@COVERAGE_OUTPUT_INDEX_HTML = $(COVERAGE_OUTPUT_DIRECTORY)/index.html
+@GCOV_TRUE@COVERAGE_TITLE = $(PACKAGE_NAME)-$(PACKAGE_VERSION)
+@GCOV_TRUE@COVERAGE_DIRS = $(filter-out tests,$(SUBDIRS))
+@GCOV_TRUE@src_COVERAGE_DIRS = $(patsubst %,$(srcdir)/%,$(COVERAGE_DIRS))
+@GCOV_TRUE@build_COVERAGE_DIRS = $(patsubst %,$(builddir)/%,$(COVERAGE_DIRS))
+@GCOV_TRUE@all_COVERAGE_DIRS = $(sort $(src_COVERAGE_DIRS) $(build_COVERAGE_DIRS))
+@GCOV_TRUE@LCOV_DIRS_ARGS = $(patsubst %,--directory=%,$(all_COVERAGE_DIRS))
+@GCOV_TRUE@CLEANFILES = $(COVERAGE_OUTPUT_FILE)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -808,6 +852,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -816,14 +861,17 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@GCOV_FALSE@clean-local:
+@GCOV_FALSE@distclean-local:
 clean: clean-recursive
 
-clean-am: clean-generic mostlyclean-am
+clean-am: clean-generic clean-local mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-hdr distclean-tags
+distclean-am: clean-am distclean-generic distclean-hdr distclean-local \
+	distclean-tags
 
 dvi: dvi-recursive
 
@@ -889,17 +937,17 @@ uninstall-am: uninstall-pkgincludeHEADERS
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
 	am--refresh check check-am clean clean-cscope clean-generic \
-	cscope cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
-	dist-gzip dist-lzip dist-shar dist-tarZ dist-xz dist-zip \
-	distcheck distclean distclean-generic distclean-hdr \
-	distclean-tags distcleancheck distdir distuninstallcheck dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-pkgincludeHEADERS install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
+	clean-local cscope cscopelist-am ctags ctags-am dist dist-all \
+	dist-bzip2 dist-gzip dist-lzip dist-shar dist-tarZ dist-xz \
+	dist-zip distcheck distclean distclean-generic distclean-hdr \
+	distclean-local distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-pkgincludeHEADERS \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
 	pdf-am ps ps-am tags tags-am uninstall uninstall-am \
 	uninstall-pkgincludeHEADERS
@@ -912,6 +960,40 @@ distcheck-hook:
 
 rpm: dist
 	rpmbuild -ts --sign elfutils-@PACKAGE_VERSION@.tar.bz2
+
+@GCOV_TRUE@.PHONY: coverage coverage-clean
+
+@GCOV_TRUE@clean-local: coverage-clean
+@GCOV_TRUE@distclean-local: coverage-clean
+
+@GCOV_TRUE@coverage-clean:
+@GCOV_TRUE@	-rm -rf $(COVERAGE_OUTPUT_DIRECTORY)
+
+@GCOV_TRUE@coverage: $(COVERAGE_OUTPUT_INDEX_HTML)
+@GCOV_TRUE@	@echo 'file://$(abs_builddir)/$(COVERAGE_OUTPUT_INDEX_HTML)'
+
+@GCOV_TRUE@$(COVERAGE_OUTPUT_INDEX_HTML): $(COVERAGE_OUTPUT_FILE)
+@GCOV_TRUE@	LC_ALL=C $(GENHTML) \
+@GCOV_TRUE@		--legend \
+@GCOV_TRUE@		--show-details \
+@GCOV_TRUE@		--rc=genhtml_branch_coverage=1 \
+@GCOV_TRUE@		--title='$(COVERAGE_TITLE)' \
+@GCOV_TRUE@		--prefix='$(abspath $(abs_srcdir))' \
+@GCOV_TRUE@		--prefix='$(realpath $(abs_srcdir))' \
+@GCOV_TRUE@		--prefix='$(abspath $(abs_builddir)/..)' \
+@GCOV_TRUE@		--prefix='$(realpath $(abs_builddir)/..)' \
+@GCOV_TRUE@		--output-directory='$(COVERAGE_OUTPUT_DIRECTORY)' \
+@GCOV_TRUE@		$<
+
+@GCOV_TRUE@$(COVERAGE_OUTPUT_FILE):
+@GCOV_TRUE@	$(LCOV) \
+@GCOV_TRUE@		--capture \
+@GCOV_TRUE@		--no-external \
+@GCOV_TRUE@		--no-checksum \
+@GCOV_TRUE@		--rc=lcov_branch_coverage=1 \
+@GCOV_TRUE@		--gcov-tool='$(GCOV)' \
+@GCOV_TRUE@		--output-file='$@' \
+@GCOV_TRUE@		$(LCOV_DIRS_ARGS)
 
 # Tell version 3.79 and up of GNU make to not build goals in this
 # directory in parallel.
