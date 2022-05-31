@@ -1,5 +1,5 @@
 /* Standard find_debuginfo callback for libdwfl.
-   Copyright (C) 2005-2010, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2014, 2015, 2019 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -355,11 +355,15 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod,
 			      GElf_Word debuglink_crc,
 			      char **debuginfo_file_name)
 {
+  if (mod == NULL)
+    return -1;
+
   /* First try by build ID if we have one.  If that succeeds or fails
      other than just by finding nothing, that's all we do.  */
-  const unsigned char *bits;
+  const unsigned char *bits = NULL;
   GElf_Addr vaddr;
-  if (INTUSE(dwfl_module_build_id) (mod, &bits, &vaddr) > 0)
+  int bits_len;
+  if ((bits_len = INTUSE(dwfl_module_build_id) (mod, &bits, &vaddr)) > 0)
     {
       /* Dropping most arguments means we cannot rely on them in
 	 dwfl_build_id_find_debuginfo.  But leave it that way since
@@ -396,6 +400,30 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod,
 				     debuginfo_file_name);
       free (canon);
     }
+
+#ifdef ENABLE_LIBDEBUGINFOD
+  /* Still nothing? Try if we can use the debuginfod client.
+     But note that we might be looking for the alt file.
+     We use the same trick as dwfl_build_id_find_debuginfo.
+     If the debug file (dw) is already set, then we must be
+     looking for the altfile. But we cannot use the actual
+     file/path name given as hint. We'll have to lookup the
+     alt file "build-id". Because the debuginfod client only
+     handles build-ids.  */
+  if (fd < 0)
+    {
+      if (mod->dw != NULL)
+	{
+	  const char *altname;
+	  bits_len = INTUSE(dwelf_dwarf_gnu_debugaltlink) (mod->dw, &altname,
+							   (const void **)
+							   &bits);
+	}
+
+      if (bits_len > 0)
+	fd = __libdwfl_debuginfod_find_debuginfo (mod->dwfl, bits, bits_len);
+    }
+#endif
 
   return fd;
 }

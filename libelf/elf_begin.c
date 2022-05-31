@@ -71,8 +71,8 @@ file_read_ar (int fildes, void *map_address, off_t offset, size_t maxsize,
 
 
 static size_t
-get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
-	   size_t maxsize)
+get_shnum (void *map_address, unsigned char *e_ident, int fildes,
+	   int64_t offset, size_t maxsize)
 {
   size_t result;
   union
@@ -87,6 +87,13 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
     Elf64_Ehdr e64;
   } ehdr_mem;
   bool is32 = e_ident[EI_CLASS] == ELFCLASS32;
+
+  if ((is32 && maxsize < sizeof (Elf32_Ehdr))
+      || (!is32 && maxsize < sizeof (Elf64_Ehdr)))
+    {
+       __libelf_seterrno (ELF_E_INVALID_ELF);
+      return (size_t) -1l;
+    }
 
   /* Make the ELF header available.  */
   if (e_ident[EI_DATA] == MY_ELFDATA
@@ -243,6 +250,9 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 		CONVERT (size);
 	    }
 
+	  /* Although sh_size is an Elf64_Xword and can contain a 64bit
+	     value, we only expect an 32bit value max.  GElf_Word is
+	     32bit unsigned.  */
 	  if (size > ~((GElf_Word) 0))
 	    {
 	      /* Invalid value, it is too large.  */
@@ -266,7 +276,7 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 /* Create descriptor for ELF file in memory.  */
 static Elf *
 file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
-	       off_t offset, size_t maxsize, Elf_Cmd cmd, Elf *parent)
+	       int64_t offset, size_t maxsize, Elf_Cmd cmd, Elf *parent)
 {
   /* Verify the binary is of the class we can handle.  */
   if (unlikely ((e_ident[EI_CLASS] != ELFCLASS32
@@ -531,7 +541,7 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 
 Elf *
 internal_function
-__libelf_read_mmaped_file (int fildes, void *map_address,  off_t offset,
+__libelf_read_mmaped_file (int fildes, void *map_address,  int64_t offset,
 			   size_t maxsize, Elf_Cmd cmd, Elf *parent)
 {
   /* We have to find out what kind of file this is.  We handle ELF
@@ -564,7 +574,7 @@ __libelf_read_mmaped_file (int fildes, void *map_address,  off_t offset,
 
 
 static Elf *
-read_unmmaped_file (int fildes, off_t offset, size_t maxsize, Elf_Cmd cmd,
+read_unmmaped_file (int fildes, int64_t offset, size_t maxsize, Elf_Cmd cmd,
 		    Elf *parent)
 {
   /* We have to find out what kind of file this is.  We handle ELF
@@ -626,7 +636,7 @@ read_unmmaped_file (int fildes, off_t offset, size_t maxsize, Elf_Cmd cmd,
 
 /* Open a file for reading.  If possible we will try to mmap() the file.  */
 static struct Elf *
-read_file (int fildes, off_t offset, size_t maxsize,
+read_file (int fildes, int64_t offset, size_t maxsize,
 	   Elf_Cmd cmd, Elf *parent)
 {
   void *map_address = NULL;
@@ -1037,7 +1047,7 @@ dup_elf (int fildes, Elf_Cmd cmd, Elf *ref)
     }
 
   /* This is an archive.  We must create a descriptor for the archive
-     member the internal pointer of the archive file desriptor is
+     member the internal pointer of the archive file descriptor is
      pointing to.  First read the header of the next member if this
      has not happened already.  */
   if (ref->state.ar.elf_ar_hdr.ar_name == NULL
@@ -1061,7 +1071,7 @@ dup_elf (int fildes, Elf_Cmd cmd, Elf *ref)
 }
 
 
-/* Return desriptor for empty file ready for writing.  */
+/* Return descriptor for empty file ready for writing.  */
 static struct Elf *
 write_file (int fd, Elf_Cmd cmd)
 {
@@ -1108,7 +1118,7 @@ elf_begin (int fildes, Elf_Cmd cmd, Elf *ref)
 {
   Elf *retval;
 
-  if (unlikely (! __libelf_version_initialized))
+  if (unlikely (__libelf_version != EV_CURRENT))
     {
       /* Version wasn't set so far.  */
       __libelf_seterrno (ELF_E_NO_VERSION);

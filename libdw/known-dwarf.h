@@ -11,11 +11,13 @@
   DWARF_ONE_KNOWN_DW_AT (GNU_all_call_sites, DW_AT_GNU_all_call_sites) \
   DWARF_ONE_KNOWN_DW_AT (GNU_all_source_call_sites, DW_AT_GNU_all_source_call_sites) \
   DWARF_ONE_KNOWN_DW_AT (GNU_all_tail_call_sites, DW_AT_GNU_all_tail_call_sites) \
+  DWARF_ONE_KNOWN_DW_AT (GNU_bias, DW_AT_GNU_bias) \
   DWARF_ONE_KNOWN_DW_AT (GNU_call_site_data_value, DW_AT_GNU_call_site_data_value) \
   DWARF_ONE_KNOWN_DW_AT (GNU_call_site_target, DW_AT_GNU_call_site_target) \
   DWARF_ONE_KNOWN_DW_AT (GNU_call_site_target_clobbered, DW_AT_GNU_call_site_target_clobbered) \
   DWARF_ONE_KNOWN_DW_AT (GNU_call_site_value, DW_AT_GNU_call_site_value) \
   DWARF_ONE_KNOWN_DW_AT (GNU_deleted, DW_AT_GNU_deleted) \
+  DWARF_ONE_KNOWN_DW_AT (GNU_denominator, DW_AT_GNU_denominator) \
   DWARF_ONE_KNOWN_DW_AT (GNU_dwo_id, DW_AT_GNU_dwo_id) \
   DWARF_ONE_KNOWN_DW_AT (GNU_dwo_name, DW_AT_GNU_dwo_name) \
   DWARF_ONE_KNOWN_DW_AT (GNU_entry_view, DW_AT_GNU_entry_view) \
@@ -25,6 +27,7 @@
   DWARF_ONE_KNOWN_DW_AT (GNU_locks_excluded, DW_AT_GNU_locks_excluded) \
   DWARF_ONE_KNOWN_DW_AT (GNU_locviews, DW_AT_GNU_locviews) \
   DWARF_ONE_KNOWN_DW_AT (GNU_macros, DW_AT_GNU_macros) \
+  DWARF_ONE_KNOWN_DW_AT (GNU_numerator, DW_AT_GNU_numerator) \
   DWARF_ONE_KNOWN_DW_AT (GNU_odr_signature, DW_AT_GNU_odr_signature) \
   DWARF_ONE_KNOWN_DW_AT (GNU_pt_guarded, DW_AT_GNU_pt_guarded) \
   DWARF_ONE_KNOWN_DW_AT (GNU_pt_guarded_by, DW_AT_GNU_pt_guarded_by) \
@@ -212,6 +215,7 @@
   /* End of DW_CC_*.  */
 
 #define DWARF_ALL_KNOWN_DW_CFA \
+  DWARF_ONE_KNOWN_DW_CFA (AARCH64_negate_ra_state, DW_CFA_AARCH64_negate_ra_state) \
   DWARF_ONE_KNOWN_DW_CFA (GNU_args_size, DW_CFA_GNU_args_size) \
   DWARF_ONE_KNOWN_DW_CFA (GNU_negative_offset_extended, DW_CFA_GNU_negative_offset_extended) \
   DWARF_ONE_KNOWN_DW_CFA (GNU_window_save, DW_CFA_GNU_window_save) \

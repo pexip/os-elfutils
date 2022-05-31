@@ -1,7 +1,203 @@
+2020-12-20  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* .gitignore: New file.
+
+2020-12-16  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* libdwP.h (_): Remove.
+
+2020-12-12  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* dwarf.h: Fix spelling typo in comment.
+	* dwarf_begin_elf.c (dwarf_begin_elf): Likewise.
+	* dwarf_getlocation.c (attr_ok, __libdw_intern_expression): Likewise.
+	* dwarf_getsrclines.c (read_srclines): Likewise.
+	* libdw.h: Fix spelling typos in comments.
+	* libdwP.h: Likewise.
+
+2020-12-09  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* Makefile.am (noinst_PROGRAMS): Rename to noinst_DATA.
+	(libdw_so_SOURCES): Remove.
+	(MOSTLYCLEANFILES): Add libdw.so.
+
+2020-11-30  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* Makefile.am (libdw.so$(EXEEXT)): Drop $(EXEEXT) suffix.
+
+2020-11-01  Érico N. Rolim  <erico.erc@gmail.com>
+
+	* Makefile.am (libdw_so_LDLIBS): Add fts_LIBS.
+
+2020-10-28  Tom Tromey  <tom@tromey.com>
+
+	PR26773
+	* dwarf_getlocation.c (store_implicit_value): Use
+	__libdw_get_uleb128_unchecked.
+	* memory-access.h (get_sleb128_step): Assume unsigned type for
+	'var'.
+	(__libdw_get_sleb128, __libdw_get_sleb128_unchecked): Work in
+	unsigned type.  Handle final byte.
+
+2020-10-19  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_frame_register.c (dwarf_frame_register): Declare ops_mem
+	as array of (at least) 3 elements.
+	* libdw.h (dwarf_frame_register): Add extra explanation of ops_mem
+	argument.
+
+2020-10-23  Tom Tromey  <tom@tromey.com>
+
+	* memory-access.h (read_3ubyte_unaligned_inc): Call
+	read_3ubyte_unaligned.
+
+2020-09-03  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h: Add DW_CFA_AARCH64_negate_ra_state.
+	* cfi.h (struct Dwarf_CFI_s): Add e_machine field.
+	* cfi.c (execute_cfi): Recognize, but ignore
+	DW_CFA_AARCH64_negate_ra_state on aarch64.
+	* dwarf_getcfi.c (dwarf_getcfi): Set cfi e_machine.
+	* dwarf_getcfi_elf.c (allocate_cfi): Take ehdr as argument and set
+	cfi e_machine.
+	(getcfi_gnu_eh_frame): Pass ehdr to allocate_cfi.
+	(getcfi_scn_eh_frame): Likewise.
+
+2020-09-03  Mark Wielaard  <mark@klomp.org>
+
+	* libdw.map (ELFUTILS_0.126): Remove local wildcard.
+	(ELFUTILS_0.127): Likewise.
+	(ELFUTILS_0.130): Likewise.
+	(ELFUTILS_0.136): Likewise.
+	(ELFUTILS_0.138): Likewise.
+
+2020-08-25  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_getlocation.c (check_constant_offset): Rename to...
+	(is_constant_offset): .. this.
+
+2020-06-28  Mark Wielaard  <mark@klomp.org>
+
+	* linux-kernel-modules.c (intuit_kernel_bounds): Check read_address
+	returns an increasing address when searching for end.
+
+2020-06-16  Mark Wielaard  <mark@klomp.org>
+
+	* cfi.c (execute_cfi): Add missing FALLTHROUGH.
+
+2020-05-08  Mark Wielaard  <mark@klomp.org>
+
+	* libdw_visit_scopes.c (walk_children): Don't recurse into imported
+	DW_TAG_compile_units.
+
+2020-05-08  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_decl_file.c (dwarf_decl_file): Use attr CU instead of DIE
+	CU to resolve file name.
+	* dwarf_ranges.c(dwarf_ranges): Document which CU we use when.
+	* libdw.h (dwarf_attr_integrate): Extend documentation.
+
+2020-04-25  Mark Wielaard  <mark@klomp.org>
+
+	* libdw_alloc.c (__libdw_alloc_tail): Call Dwarf oom_handler()
+	when malloc fails.
+
+2020-04-17  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_begin_elf.c (check_section): Handle .gnu.debuglto_ prefix.
+
+2019-10-28  Aaron Merey  <amerey@redhat.com>
+
+	* Makefile.am (libdw_so_LDLIBS): Add -ldl for libdebuginfod.so dlopen.
+
+2019-11-10  Mark Wielaard  <mark@klomp.org>
+
+	* libdwP.h (libdw_unalloc): New define.
+	(libdw_typed_unalloc): Likewise.
+	(__libdw_thread_tail): New function declaration.
+	* libdw_alloc.c (__libdw_thread_tail): New function.
+	* dwarf_getabbrev.c (__libdw_getabbrev): Call libdw_typed_unalloc
+	when reading invalid data or when hash collission detected.
+
+2019-10-28  Jonathon Anderson  <jma14@rice.edu>
+
+	* libdw_alloc.c: Added __libdw_alloc_tail.
+	(__libdw_allocate): Switch to use the mem_tails array.
+	* libdwP.h (Dwarf): Likewise.
+	* dwarf_begin_elf.c (dwarf_begin_elf): Support for above.
+	* dwarf_end.c (dwarf_end): Likewise.
+	* atomics.h: Add support for thread_local.
+
+2019-10-28  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_sig8_hash.h: Include libdw.h. Remove COMPARE. Include
+	dynamicsizehash_concurrent.h.
+	* dwarf_sig8_hash.c: Include dynamicsizehash_concurrent.c.
+	* dwarf_formref_die.c (dwarf_formref_die): Drop NULL argument to
+	Dwarf_Sig8_Hash_find.
+
+2019-08-26  Srđan Milaković  <sm108@rice.edu@rice.edu>
+
+	* dwarf_abbrev_hash.{c,h}: Use the *_concurrent hash table.
+
+2019-11-01  Jonathon Anderson  <jma14@rice.edu>
+
+	* dwarf_begin_elf.c (valid_p): Switch calloc for malloc for fake CUs.
+	Add explicit initialization of some fields.
+	* dwarf_end.c (cu_free): Add clause to limit freeing of CU internals.
+
+2019-08-26  Jonathon Anderson  <jma14@rice.edu>
+
+	* libdw_alloc.c (__libdw_allocate): Added thread-safe stack allocator.
+	* libdwP.h (Dwarf): Likewise.
+	* dwarf_begin_elf.c (dwarf_begin_elf): Support for above.
+	* dwarf_end.c (dwarf_end): Likewise.
+	* Makefile.am: Use -pthread to provide rwlocks.
+
+2019-07-05  Omar Sandoval  <osandov@fb.com>
+
+	* Makefile.am (libdw_so_LIBS): Replace libebl.a with libebl_pic.a.
+	Move libebl_pic.a to the beginning so that libdw symbols are resolved.
+	(libdw_so_LDLIBS): Remove -ldl.
+	(libdw.so): Remove -rpath.
+	(libdw_a_LIBADD): Add libebl, libebl_backends, and libcpu objects.
+
+2019-08-25  Jonathon Anderson  <jma14@rice.edu>
+
+	* dwarf_getcfi.c (dwarf_getcfi): Set default_same_value to false.
+
+2019-08-12  Mark Wielaard  <mark@klomp.org>
+
+	* libdw.map (ELFUTILS_0.177): Add new version of dwelf_elf_begin.
+
+2019-06-28  Mark Wielaard  <mark@klomp.org>
+
+	* libdw.map (ELFUTILS_0.177): New section. Add
+	dwelf_elf_e_machine_string.
+
+2019-05-16  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h: Add DW_AT_GNU_numerator, DW_AT_GNU_denominator and
+	DW_AT_GNU_bias.
+
+2019-04-28  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_siblingof.c (dwarf_siblingof): Don't initialize addr.
+
+2019-04-28  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_getlocation.c (dwarf_getlocation_addr): Call
+	check_constant_offset with llbufs and listlens directly.
+
+2019-04-27  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_getlocation.c (store_implicit_value): Check dbg isn't
+	NULL.
+
 2019-02-02  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_nextcu.c (__libdw_next_unit): Define bytes_end.
-	Check there are enough bytes to read extended lenght, version
+	Check there are enough bytes to read extended length, version
 	and unit.
 
 2019-01-20  Mark Wielaard  <mark@klomp.org>

@@ -1,3 +1,42 @@
+2021-02-05  Mark Wielaard  <mark@klomp.org>
+
+	* printversion.c (print_version): Update copyright year.
+
+2020-12-16  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* color.c (parse_opt): Replace gettext(...) and
+	dgettext("elfutils, ...) with _(...).
+	* printversion.c (print_version): Replace gettext(...) with _(...).
+	* system.h (sgettext): Likewise.
+
+	* eu-config.h (_): New macro.
+	* xmalloc.c (_): Remove.
+
+2020-11-01  Érico N. Rolim  <erico.erc@gmail.com>
+
+	* system.h (ACCESSPERMS): Define macro if it doesn't exist.
+	(ALLPERMS): Likewise.
+	(DEFFILEMODE): Likewise.
+
+2020-06-11  Mark Wielaaard  <mark@klomp.org>
+
+	* printversion.c (print_version): Update copyright year.
+
+2019-08-25  Srđan Milaković  <sm108@rice.edu>
+
+	* dynamicsizehash_concurrent.{c,h}: New files.
+	* Makefile.am (noinst_HEADERS): Added dynamicsizehash_concurrent.h.
+
+2019-08-25  Jonathon Anderson  <jma14@rice.edu>
+
+	* stdatomic-fbsd.h: New file, taken from FreeBSD.
+	* atomics.h: New file.
+	* Makefile.am (noinst_HEADERS): Added *.h above.
+
+2019-05-03  Rosen Penev  <rosenp@gmail.com>
+
+	* color.c (parse_opt): Cast program_invocation_short_name to char *.
+
 2018-11-04  Mark Wielaard  <mark@klomp.org>
 
 	* bpf.h: Add BPF_JLT, BPF_JLE, BPF_JSLT and BPF_JSLE.

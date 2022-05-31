@@ -39,18 +39,12 @@
 #include "common-reloc.c"
 
 
-const char *
+Ebl *
 alpha_init (Elf *elf __attribute__ ((unused)),
 	    GElf_Half machine __attribute__ ((unused)),
-	    Ebl *eh,
-	    size_t ehlen)
+	    Ebl *eh)
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
-
   /* We handle it.  */
-  eh->name = "Alpha";
   alpha_init_reloc (eh);
   HOOK (eh, dynamic_tag_name);
   HOOK (eh, dynamic_tag_check);
@@ -65,5 +59,5 @@ alpha_init (Elf *elf __attribute__ ((unused)),
   HOOK (eh, auxv_info);
   eh->sysvhash_entrysize = sizeof (Elf64_Xword);
 
-  return MODVERSION;
+  return eh;
 }

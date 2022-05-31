@@ -47,7 +47,7 @@
 static int
 text_end (AsmCtx_t *ctx __attribute__ ((unused)))
 {
-  if (fclose (ctx->out.file) != 0)
+  if (fflush (ctx->out.file) != 0)
     {
       __libasm_seterrno (ASM_E_IOERROR);
       return -1;
@@ -257,7 +257,7 @@ binary_end (AsmCtx_t *ctx)
 		    xndxdata->d_off = 0;
 		  }
 
-		/* Store the real section index in the extended setion
+		/* Store the real section index in the extended section
 		   index table.  */
 		assert ((size_t) ptr < ctx->nsymbol_tab + 1);
 		xshndx[ptr] = ndx;
@@ -460,7 +460,11 @@ binary_end (AsmCtx_t *ctx)
   else
     ehdr->e_shstrndx = elf_ndxscn (shstrscn);
 
-  gelf_update_ehdr (ctx->out.elf, ehdr);
+  if (unlikely (gelf_update_ehdr (ctx->out.elf, ehdr) == 0))
+    {
+      __libasm_seterrno (ASM_E_LIBELF);
+      result = -1;
+    }
 
   /* Write out the ELF file.  */
   if (unlikely (elf_update (ctx->out.elf, ELF_C_WRITE_MMAP) < 0))

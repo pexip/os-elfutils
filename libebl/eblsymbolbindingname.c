@@ -58,13 +58,14 @@ ebl_symbol_binding_name (Ebl *ebl, int binding, char *buf, size_t len)
 	  if (binding >= STB_LOPROC && binding <= STB_HIPROC)
 	    snprintf (buf, len, "LOPROC+%d", binding - STB_LOPROC);
 	  else if (binding == STB_GNU_UNIQUE
+		   && ebl != NULL
 		   && (ident = elf_getident (ebl->elf, NULL)) != NULL
 		   && ident[EI_OSABI] == ELFOSABI_LINUX)
 	    return "GNU_UNIQUE";
 	  else if (binding >= STB_LOOS && binding <= STB_HIOS)
 	    snprintf (buf, len, "LOOS+%d", binding - STB_LOOS);
 	  else
-	    snprintf (buf, len, gettext ("<unknown>: %d"), binding);
+	    snprintf (buf, len, _("<unknown>: %d"), binding);
 
 	  res = buf;
 	}

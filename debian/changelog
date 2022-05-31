@@ -1,3 +1,76 @@
+elfutils (0.183-1) unstable; urgency=medium
+
+  * New upstream release. Changes compared to the snapshot:
+    - backends/ppc_initreg.c: include <asm/ptrace.h>.
+    - NEWS and version, and copyright updates.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 08 Feb 2021 09:56:24 +0100
+
+elfutils (0.182+20210205-1) unstable; urgency=high
+
+  * Snapshot, taken three days before the 0.183 release. Create a source
+    tarball using make dist.
+  * Make the build reproducible (Helmut Grohne). Closes: #981835, #981924.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 05 Feb 2021 19:07:32 +0100
+
+elfutils (0.182+20210203-1) unstable; urgency=medium
+
+  * Snapshot, taken five days before the 0.183 release.
+  * Update libdebuginfod1 symbols file.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 03 Feb 2021 14:59:12 +0100
+
+elfutils (0.182-3) unstable; urgency=medium
+
+  * Build with -flto-partition=none when building with -flto.
+  * Stop building with -fpermissive.
+  * tests/dwfl-proc-attach.c: Remove old glibc hack.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 06 Jan 2021 14:05:13 +0100
+
+elfutils (0.182-2) unstable; urgency=medium
+
+  * Fix FTCBFS: perform bootstrap build with dummy libdebuginfod and without
+    debuginfod (Helmut Grohne). Closes: #973981.
+  * Fix build profile pkg.elfutils.nodebuginfod. Closes: #976875.
+  * Don't use MAKEFLAGS in the packaging. Closes: #965955.
+  * Fix unwinding support for 32bit S390, taken from the trunk.
+    Thanks to Andreas Krebbel and Frank Heimes. LP: #1908756.
+  * Call dh_dwz.
+  * Bump standards version.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 31 Dec 2020 12:52:31 +0100
+
+elfutils (0.182-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Fix typo in debian/copyright. Closes: #914414.
+  * Add pkg.elfutils.nodebuginfod build profile (Helmut Grohne).
+    Closes: #966705.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 07 Nov 2020 10:22:37 +0100
+
+elfutils (0.181-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 15 Sep 2020 22:31:59 +0200
+
+elfutils (0.180-1) unstable; urgency=medium
+
+  * Transfer to team maintenance, add Kurt Roeckx and myself as uploaders.
+  * Add VCS attributes to the control file.
+  * New upstream release.
+  * Build-depend on pkg-config, libarchive-dev, libmicrohttpd-dev,
+    libcurl4-gnutls-dev, libsqlite3-dev.
+  * Build with -fpermissive.
+  * Don't package debuginfod yet.
+  * New binary packages debuginfod, libdebuginfod1, libdebuginfod-dev.
+  * Use dh_autoreconf.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 16 Jul 2020 19:34:22 +0200
+
 elfutils (0.176-1.1pexip2) pexip; urgency=medium
 
   * Rebuild in buster environment

@@ -116,14 +116,12 @@ program_transform()
 }
 
 self_test_files_exe=`echo ${abs_top_builddir}/src/addr2line \
-${abs_top_builddir}/src/elfcmp \
-${abs_top_builddir}/src/objdump \
-${abs_top_builddir}/src/readelf`
+${abs_top_builddir}/src/elfclassify \
+${abs_top_builddir}/src/stack \
+${abs_top_builddir}/src/unstrip`
 
 self_test_files_lib=`echo ${abs_top_builddir}/libelf/libelf.so \
-${abs_top_builddir}/libdw/libdw.so \
-${abs_top_builddir}/backends/libebl_i386.so \
-${abs_top_builddir}/backends/libebl_x86_64.so`
+${abs_top_builddir}/libasm/libasm.so`
 
 self_test_files_obj=`echo ${abs_top_builddir}/src/size.o \
 ${abs_top_builddir}/src/strip.o`
@@ -162,6 +160,19 @@ testrun_on_self_lib()
   exit_status=0
 
   for file in $self_test_files_lib; do
+      testrun $* $file \
+	  || { echo "*** failure in $* $file"; exit_status=1; }
+  done
+
+  # Only exit if something failed
+  if test $exit_status != 0; then exit $exit_status; fi
+}
+
+testrun_on_self_obj()
+{
+  exit_status=0
+
+  for file in $self_test_files_obj; do
       testrun $* $file \
 	  || { echo "*** failure in $* $file"; exit_status=1; }
   done
