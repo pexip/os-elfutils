@@ -39,6 +39,10 @@ dwfl_end (Dwfl *dwfl)
   if (dwfl == NULL)
     return;
 
+#ifdef ENABLE_LIBDEBUGINFOD
+  __libdwfl_debuginfod_end (dwfl->debuginfod);
+#endif
+
   if (dwfl->process)
     __libdwfl_process_free (dwfl->process);
 

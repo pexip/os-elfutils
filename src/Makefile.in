@@ -95,13 +95,16 @@ bin_PROGRAMS = readelf$(EXEEXT) nm$(EXEEXT) size$(EXEEXT) \
 	strip$(EXEEXT) elflint$(EXEEXT) findtextrel$(EXEEXT) \
 	addr2line$(EXEEXT) elfcmp$(EXEEXT) objdump$(EXEEXT) \
 	ranlib$(EXEEXT) strings$(EXEEXT) ar$(EXEEXT) unstrip$(EXEEXT) \
-	stack$(EXEEXT) elfcompress$(EXEEXT)
+	stack$(EXEEXT) elfcompress$(EXEEXT) elfclassify$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/biarch.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
@@ -128,26 +131,29 @@ am__DEPENDENCIES_1 =
 @BUILD_STATIC_TRUE@am__DEPENDENCIES_2 = ../libelf/libelf.a
 @BUILD_STATIC_FALSE@am__DEPENDENCIES_3 = ../libdw/libdw.so
 @BUILD_STATIC_TRUE@am__DEPENDENCIES_3 = ../libdw/libdw.a \
-@BUILD_STATIC_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-@BUILD_STATIC_TRUE@	$(libebl)
+@BUILD_STATIC_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 addr2line_DEPENDENCIES = $(am__DEPENDENCIES_3) $(am__DEPENDENCIES_2) \
 	$(libeu) $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 ar_SOURCES = ar.c
 ar_OBJECTS = ar.$(OBJEXT)
 ar_DEPENDENCIES = libar.a $(am__DEPENDENCIES_2) $(libeu) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+elfclassify_SOURCES = elfclassify.c
+elfclassify_OBJECTS = elfclassify.$(OBJEXT)
+elfclassify_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_3) \
+	$(libeu) $(am__DEPENDENCIES_1)
 elfcmp_SOURCES = elfcmp.c
 elfcmp_OBJECTS = elfcmp.$(OBJEXT)
-elfcmp_DEPENDENCIES = $(libebl) $(am__DEPENDENCIES_2) $(libeu) \
-	$(am__DEPENDENCIES_1)
+elfcmp_DEPENDENCIES = $(libebl) $(am__DEPENDENCIES_3) \
+	$(am__DEPENDENCIES_2) $(libeu) $(am__DEPENDENCIES_1)
 elfcompress_SOURCES = elfcompress.c
 elfcompress_OBJECTS = elfcompress.$(OBJEXT)
 elfcompress_DEPENDENCIES = $(libebl) $(am__DEPENDENCIES_2) \
 	$(am__DEPENDENCIES_3) $(libeu) $(am__DEPENDENCIES_1)
 elflint_SOURCES = elflint.c
 elflint_OBJECTS = elflint.$(OBJEXT)
-elflint_DEPENDENCIES = $(libebl) $(am__DEPENDENCIES_2) $(libeu) \
-	$(am__DEPENDENCIES_1)
+elflint_DEPENDENCIES = $(libebl) $(am__DEPENDENCIES_3) \
+	$(am__DEPENDENCIES_2) $(libeu) $(am__DEPENDENCIES_1)
 findtextrel_SOURCES = findtextrel.c
 findtextrel_OBJECTS = findtextrel.$(OBJEXT)
 findtextrel_DEPENDENCIES = $(am__DEPENDENCIES_3) $(am__DEPENDENCIES_2) \
@@ -156,15 +162,15 @@ nm_SOURCES = nm.c
 nm_OBJECTS = nm.$(OBJEXT)
 nm_DEPENDENCIES = $(am__DEPENDENCIES_3) $(libebl) \
 	$(am__DEPENDENCIES_2) $(libeu) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 objdump_SOURCES = objdump.c
 objdump_OBJECTS = objdump.$(OBJEXT)
-objdump_DEPENDENCIES = $(libasm) $(libebl) $(am__DEPENDENCIES_2) \
-	$(libeu) $(am__DEPENDENCIES_1)
+objdump_DEPENDENCIES = $(libasm) $(libebl) $(am__DEPENDENCIES_3) \
+	$(am__DEPENDENCIES_2) $(libeu) $(am__DEPENDENCIES_1)
 ranlib_SOURCES = ranlib.c
 ranlib_OBJECTS = ranlib.$(OBJEXT)
 ranlib_DEPENDENCIES = libar.a $(am__DEPENDENCIES_2) $(libeu) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 readelf_SOURCES = readelf.c
 readelf_OBJECTS = readelf.$(OBJEXT)
 readelf_DEPENDENCIES = $(am__DEPENDENCIES_3) $(libebl) \
@@ -235,10 +241,10 @@ depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/addr2line.Po ./$(DEPDIR)/ar.Po \
 	./$(DEPDIR)/arlib-argp.Po ./$(DEPDIR)/arlib.Po \
-	./$(DEPDIR)/arlib2.Po ./$(DEPDIR)/elfcmp.Po \
-	./$(DEPDIR)/elfcompress.Po ./$(DEPDIR)/elflint.Po \
-	./$(DEPDIR)/findtextrel.Po ./$(DEPDIR)/nm.Po \
-	./$(DEPDIR)/objdump.Po ./$(DEPDIR)/ranlib.Po \
+	./$(DEPDIR)/arlib2.Po ./$(DEPDIR)/elfclassify.Po \
+	./$(DEPDIR)/elfcmp.Po ./$(DEPDIR)/elfcompress.Po \
+	./$(DEPDIR)/elflint.Po ./$(DEPDIR)/findtextrel.Po \
+	./$(DEPDIR)/nm.Po ./$(DEPDIR)/objdump.Po ./$(DEPDIR)/ranlib.Po \
 	./$(DEPDIR)/readelf.Po ./$(DEPDIR)/size.Po \
 	./$(DEPDIR)/stack.Po ./$(DEPDIR)/strings.Po \
 	./$(DEPDIR)/strip.Po ./$(DEPDIR)/unstrip.Po
@@ -255,12 +261,12 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libar_a_SOURCES) addr2line.c ar.c elfcmp.c elfcompress.c \
-	elflint.c findtextrel.c nm.c objdump.c ranlib.c readelf.c \
-	size.c stack.c strings.c strip.c unstrip.c
-DIST_SOURCES = $(libar_a_SOURCES) addr2line.c ar.c elfcmp.c \
+SOURCES = $(libar_a_SOURCES) addr2line.c ar.c elfclassify.c elfcmp.c \
 	elfcompress.c elflint.c findtextrel.c nm.c objdump.c ranlib.c \
 	readelf.c size.c stack.c strings.c strip.c unstrip.c
+DIST_SOURCES = $(libar_a_SOURCES) addr2line.c ar.c elfclassify.c \
+	elfcmp.c elfcompress.c elflint.c findtextrel.c nm.c objdump.c \
+	ranlib.c readelf.c size.c stack.c strings.c strip.c unstrip.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -303,7 +309,11 @@ CC_BIARCH = @CC_BIARCH@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"' \
 	$(YYDEBUG) -DDEBUGPRED=@DEBUGPRED@ -DSRCDIR=\"$(shell cd \
@@ -314,33 +324,44 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GCOV = @GCOV@
+GENHTML = @GENHTML@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GREP = @GREP@
 HAVE_BISON = @HAVE_BISON@
 HAVE_BUNZIP2 = @HAVE_BUNZIP2@
+HAVE_CXX11 = @HAVE_CXX11@
 HAVE_FLEX = @HAVE_FLEX@
 HAVE_GAWK = @HAVE_GAWK@
 HAVE_VALGRIND = @HAVE_VALGRIND@
+HAVE_ZSTD = @HAVE_ZSTD@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INTLLIBS = @INTLLIBS@
+INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+LCOV = @LCOV@
 LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LIBEBL_SUBDIR = @LIBEBL_SUBDIR@
+LIBDEBUGINFOD_SONAME = @LIBDEBUGINFOD_SONAME@
+LIBICONV = @LIBICONV@
+LIBINTL = @LIBINTL@
 LIBLZMA = @LIBLZMA@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBZSTD = @LIBZSTD@
+LTLIBICONV = @LTLIBICONV@
+LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
-MODVERSION = @MODVERSION@
 MSGFMT = @MSGFMT@
 MSGFMT_015 = @MSGFMT_015@
 MSGMERGE = @MSGMERGE@
@@ -354,8 +375,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+POSUB = @POSUB@
 RANLIB = @RANLIB@
 READELF = @READELF@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -372,6 +398,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -394,6 +421,7 @@ eu_version = @eu_version@
 exec_prefix = @exec_prefix@
 fpic_CFLAGS = @fpic_CFLAGS@
 fpie_CFLAGS = @fpie_CFLAGS@
+fts_LIBS = @fts_LIBS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -403,19 +431,29 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+libarchive_CFLAGS = @libarchive_CFLAGS@
+libarchive_LIBS = @libarchive_LIBS@
+libcurl_CFLAGS = @libcurl_CFLAGS@
+libcurl_LIBS = @libcurl_LIBS@
 libdir = @libdir@
 libexecdir = @libexecdir@
+libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
+libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+obstack_LIBS = @obstack_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+sqlite3_CFLAGS = @sqlite3_CFLAGS@
+sqlite3_LIBS = @sqlite3_LIBS@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
@@ -456,6 +494,16 @@ AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	    $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
 	    $($(*F)_CFLAGS)
 
+AM_CXXFLAGS = -std=c++11 -Wall -Wshadow \
+	   -Wtrampolines \
+	   $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
+	   $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+	   $(if $($(*F)_no_Werror),,-Werror) \
+	   $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
+	   $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
+	   $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
+	   $($(*F)_CXXFLAGS)
+
 COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage, $(COMPILE))
 DEFS.os = -DPIC -DSHARED $(am__append_1)
 CLEANFILES = *.gcno *.gcda make-debug-archive *.gconv
@@ -471,10 +519,10 @@ bin_SCRIPTS = make-debug-archive
 @BUILD_STATIC_FALSE@libasm = ../libasm/libasm.so
 @BUILD_STATIC_TRUE@libasm = ../libasm/libasm.a
 @BUILD_STATIC_FALSE@libdw = ../libdw/libdw.so
-@BUILD_STATIC_TRUE@libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl
+@BUILD_STATIC_TRUE@libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) -ldl -lpthread
 @BUILD_STATIC_FALSE@libelf = ../libelf/libelf.so
 @BUILD_STATIC_TRUE@libelf = ../libelf/libelf.a -lz
-libebl = ../libebl/libebl.a
+libebl = ../libebl/libebl.a ../backends/libebl_backends.a ../libcpu/libcpu.a
 libeu = ../lib/libeu.a
 @DEMANGLE_TRUE@demanglelib = -lstdc++
 
@@ -490,23 +538,24 @@ objdump_no_Wstack_usage = yes
 ranlib_no_Wstack_usage = yes
 ar_no_Wstack_usage = yes
 unstrip_no_Wstack_usage = yes
-readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
-nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl \
+readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD)
+nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) $(obstack_LIBS) \
 	   $(demanglelib)
 
 size_LDADD = $(libelf) $(libeu) $(argp_LDADD)
-strip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl
-elflint_LDADD = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
+strip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
+elflint_LDADD = $(libebl) $(libdw) $(libelf) $(libeu) $(argp_LDADD)
 findtextrel_LDADD = $(libdw) $(libelf) $(libeu) $(argp_LDADD)
 addr2line_LDADD = $(libdw) $(libelf) $(libeu) $(argp_LDADD) $(demanglelib)
-elfcmp_LDADD = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
-objdump_LDADD = $(libasm) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
-ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
+elfcmp_LDADD = $(libebl) $(libdw) $(libelf) $(libeu) $(argp_LDADD)
+objdump_LDADD = $(libasm) $(libebl) $(libdw) $(libelf) $(libeu) $(argp_LDADD)
+ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD) $(obstack_LIBS)
 strings_LDADD = $(libelf) $(libeu) $(argp_LDADD)
-ar_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
-unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl
-stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl $(demanglelib)
+ar_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD) $(obstack_LIBS)
+unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
+stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) $(demanglelib)
 elfcompress_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
+elfclassify_LDADD = $(libelf) $(libdw) $(libeu) $(argp_LDADD)
 all: all-am
 
 .SUFFIXES:
@@ -599,6 +648,10 @@ addr2line$(EXEEXT): $(addr2line_OBJECTS) $(addr2line_DEPENDENCIES) $(EXTRA_addr2
 ar$(EXEEXT): $(ar_OBJECTS) $(ar_DEPENDENCIES) $(EXTRA_ar_DEPENDENCIES) 
 	@rm -f ar$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(ar_OBJECTS) $(ar_LDADD) $(LIBS)
+
+elfclassify$(EXEEXT): $(elfclassify_OBJECTS) $(elfclassify_DEPENDENCIES) $(EXTRA_elfclassify_DEPENDENCIES) 
+	@rm -f elfclassify$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(elfclassify_OBJECTS) $(elfclassify_LDADD) $(LIBS)
 
 elfcmp$(EXEEXT): $(elfcmp_OBJECTS) $(elfcmp_DEPENDENCIES) $(EXTRA_elfcmp_DEPENDENCIES) 
 	@rm -f elfcmp$(EXEEXT)
@@ -713,6 +766,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arlib-argp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arlib.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arlib2.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elfclassify.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elfcmp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elfcompress.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elflint.Po@am__quote@ # am--include-marker
@@ -881,6 +935,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/arlib-argp.Po
 	-rm -f ./$(DEPDIR)/arlib.Po
 	-rm -f ./$(DEPDIR)/arlib2.Po
+	-rm -f ./$(DEPDIR)/elfclassify.Po
 	-rm -f ./$(DEPDIR)/elfcmp.Po
 	-rm -f ./$(DEPDIR)/elfcompress.Po
 	-rm -f ./$(DEPDIR)/elflint.Po
@@ -944,6 +999,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/arlib-argp.Po
 	-rm -f ./$(DEPDIR)/arlib.Po
 	-rm -f ./$(DEPDIR)/arlib2.Po
+	-rm -f ./$(DEPDIR)/elfclassify.Po
 	-rm -f ./$(DEPDIR)/elfcmp.Po
 	-rm -f ./$(DEPDIR)/elfcompress.Po
 	-rm -f ./$(DEPDIR)/elflint.Po

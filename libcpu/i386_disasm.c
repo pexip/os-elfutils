@@ -407,7 +407,8 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
 
 	      ++curr;
 
-	      assert (last_prefix_bit != 0);
+	      if (last_prefix_bit == 0)
+		goto invalid_op;
 	      correct_prefix = last_prefix_bit;
 	    }
 
@@ -445,8 +446,8 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
 	       the input data.  */
 	    goto do_ret;
 
-	  assert (correct_prefix == 0
-		  || (prefixes & correct_prefix) != 0);
+	  if (correct_prefix != 0 && (prefixes & correct_prefix) == 0)
+	    goto invalid_op;
 	  prefixes ^= correct_prefix;
 
 	  if (0)
@@ -473,7 +474,8 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
 
 	      if (data == end)
 		{
-		  assert (prefixes != 0);
+		  if (prefixes == 0)
+		    goto invalid_op;
 		  goto print_prefix;
 		}
 
@@ -586,7 +588,7 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
 	    }
 
 	  /* We have a match.  First determine how many bytes are
-	     needed for the adressing mode.  */
+	     needed for the addressing mode.  */
 	  param_start = codep;
 	  if (instrtab[cnt].modrm)
 	    {
@@ -610,7 +612,9 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
 
 		  /* Account for displacement.  */
 		  if ((modrm & 0xc7) == 5 || (modrm & 0xc0) == 0x80
-		      || ((modrm & 0xc7) == 0x4 && (codep[0] & 0x7) == 0x5))
+		      || ((modrm & 0xc7) == 0x4
+			  && param_start < end
+			  && (codep[0] & 0x7) == 0x5))
 		    param_start += 4;
 		  else if ((modrm & 0xc0) == 0x40)
 		    param_start += 1;
@@ -821,7 +825,8 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
 			    }
 			  FALLTHROUGH;
 			default:
-			  assert (! "INVALID not handled");
+			  str = "INVALID not handled";
+			  break;
 			}
 		    }
 		  else
@@ -1030,7 +1035,7 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
 		      string_end_idx = bufcnt;
 		    }
 		  else
-		    bufcnt = string_end_idx;
+		    start_idx = bufcnt = string_end_idx;
 		  break;
 
 		case 'e':
@@ -1122,10 +1127,12 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
 	}
 
       /* Invalid (or at least unhandled) opcode.  */
+    invalid_op:
       if (prefixes != 0)
 	goto print_prefix;
-      assert (*startp == data);
-      ++data;
+      /* Make sure we get past the unrecognized opcode if we haven't yet.  */
+      if (*startp == data)
+	++data;
       ADD_STRING ("(bad)");
       addr += data - begin;
 

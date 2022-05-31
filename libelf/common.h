@@ -56,7 +56,7 @@ determine_kind (void *buf, size_t len)
 
       if (eclass > ELFCLASSNONE && eclass < ELFCLASSNUM
 	  && data > ELFDATANONE && data < ELFDATANUM
-	  && version > EV_NONE && version < EV_NUM)
+	  && version == EV_CURRENT)
 	return ELF_K_ELF;
     }
 
@@ -68,7 +68,7 @@ determine_kind (void *buf, size_t len)
 /* Allocate an Elf descriptor and fill in the generic information.  */
 static inline Elf *
 __attribute__ ((unused))
-allocate_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
+allocate_elf (int fildes, void *map_address, int64_t offset, size_t maxsize,
               Elf_Cmd cmd, Elf *parent, Elf_Kind kind, size_t extra)
 {
   Elf *result = (Elf *) calloc (1, sizeof (Elf) + extra);
@@ -133,7 +133,7 @@ libelf_release_all (Elf *elf)
 }
 
 
-/* Macro to convert endianess in place.  It determines the function it
+/* Macro to convert endianness in place.  It determines the function it
    has to use itself.  */
 #define CONVERT(Var) \
   (Var) = (sizeof (Var) == 1						      \

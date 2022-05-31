@@ -92,12 +92,17 @@ host_triplet = @host@
 @SYMBOL_VERSIONING_TRUE@am__append_1 = -DSYMBOL_VERSIONING
 @BZLIB_TRUE@am__append_2 = bzip2.c
 @LZMA_TRUE@am__append_3 = lzma.c
+@ZSTD_TRUE@am__append_4 = zstd.c
+@LIBDEBUGINFOD_TRUE@am__append_5 = debuginfod-client.c
 subdir = libdwfl
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/biarch.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(noinst_HEADERS) \
@@ -134,9 +139,12 @@ am__libdwfl_a_SOURCES_DIST = dwfl_begin.c dwfl_end.c dwfl_error.c \
 	dwfl_module_register_names.c dwfl_segment_report_module.c \
 	link_map.c core-file.c open.c image-header.c dwfl_frame.c \
 	frame_unwind.c dwfl_frame_pc.c linux-pid-attach.c \
-	linux-core-attach.c dwfl_frame_regs.c gzip.c bzip2.c lzma.c
+	linux-core-attach.c dwfl_frame_regs.c gzip.c bzip2.c lzma.c \
+	zstd.c debuginfod-client.c
 @BZLIB_TRUE@am__objects_1 = bzip2.$(OBJEXT)
 @LZMA_TRUE@am__objects_2 = lzma.$(OBJEXT)
+@ZSTD_TRUE@am__objects_3 = zstd.$(OBJEXT)
+@LIBDEBUGINFOD_TRUE@am__objects_4 = debuginfod-client.$(OBJEXT)
 am_libdwfl_a_OBJECTS = dwfl_begin.$(OBJEXT) dwfl_end.$(OBJEXT) \
 	dwfl_error.$(OBJEXT) dwfl_version.$(OBJEXT) \
 	dwfl_module.$(OBJEXT) dwfl_report_elf.$(OBJEXT) \
@@ -170,7 +178,8 @@ am_libdwfl_a_OBJECTS = dwfl_begin.$(OBJEXT) dwfl_end.$(OBJEXT) \
 	dwfl_frame.$(OBJEXT) frame_unwind.$(OBJEXT) \
 	dwfl_frame_pc.$(OBJEXT) linux-pid-attach.$(OBJEXT) \
 	linux-core-attach.$(OBJEXT) dwfl_frame_regs.$(OBJEXT) \
-	gzip.$(OBJEXT) $(am__objects_1) $(am__objects_2)
+	gzip.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3) $(am__objects_4)
 libdwfl_a_OBJECTS = $(am_libdwfl_a_OBJECTS)
 libdwfl_pic_a_AR = $(AR) $(ARFLAGS)
 libdwfl_pic_a_LIBADD =
@@ -192,9 +201,9 @@ depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/argp-std.Po ./$(DEPDIR)/bzip2.Po \
 	./$(DEPDIR)/core-file.Po ./$(DEPDIR)/cu.Po \
-	./$(DEPDIR)/derelocate.Po ./$(DEPDIR)/dwfl_addrdie.Po \
-	./$(DEPDIR)/dwfl_addrdwarf.Po ./$(DEPDIR)/dwfl_addrmodule.Po \
-	./$(DEPDIR)/dwfl_begin.Po \
+	./$(DEPDIR)/debuginfod-client.Po ./$(DEPDIR)/derelocate.Po \
+	./$(DEPDIR)/dwfl_addrdie.Po ./$(DEPDIR)/dwfl_addrdwarf.Po \
+	./$(DEPDIR)/dwfl_addrmodule.Po ./$(DEPDIR)/dwfl_begin.Po \
 	./$(DEPDIR)/dwfl_build_id_find_debuginfo.Po \
 	./$(DEPDIR)/dwfl_build_id_find_elf.Po \
 	./$(DEPDIR)/dwfl_cumodule.Po ./$(DEPDIR)/dwfl_dwarf_line.Po \
@@ -234,7 +243,8 @@ am__depfiles_remade = ./$(DEPDIR)/argp-std.Po ./$(DEPDIR)/bzip2.Po \
 	./$(DEPDIR)/linux-kernel-modules.Po \
 	./$(DEPDIR)/linux-pid-attach.Po ./$(DEPDIR)/linux-proc-maps.Po \
 	./$(DEPDIR)/lzma.Po ./$(DEPDIR)/offline.Po ./$(DEPDIR)/open.Po \
-	./$(DEPDIR)/relocate.Po ./$(DEPDIR)/segment.Po
+	./$(DEPDIR)/relocate.Po ./$(DEPDIR)/segment.Po \
+	./$(DEPDIR)/zstd.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -321,7 +331,11 @@ CC_BIARCH = @CC_BIARCH@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
 DEPDIR = @DEPDIR@
@@ -330,33 +344,44 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GCOV = @GCOV@
+GENHTML = @GENHTML@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GREP = @GREP@
 HAVE_BISON = @HAVE_BISON@
 HAVE_BUNZIP2 = @HAVE_BUNZIP2@
+HAVE_CXX11 = @HAVE_CXX11@
 HAVE_FLEX = @HAVE_FLEX@
 HAVE_GAWK = @HAVE_GAWK@
 HAVE_VALGRIND = @HAVE_VALGRIND@
+HAVE_ZSTD = @HAVE_ZSTD@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INTLLIBS = @INTLLIBS@
+INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+LCOV = @LCOV@
 LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LIBEBL_SUBDIR = @LIBEBL_SUBDIR@
+LIBDEBUGINFOD_SONAME = @LIBDEBUGINFOD_SONAME@
+LIBICONV = @LIBICONV@
+LIBINTL = @LIBINTL@
 LIBLZMA = @LIBLZMA@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBZSTD = @LIBZSTD@
+LTLIBICONV = @LTLIBICONV@
+LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
-MODVERSION = @MODVERSION@
 MSGFMT = @MSGFMT@
 MSGFMT_015 = @MSGFMT_015@
 MSGMERGE = @MSGMERGE@
@@ -370,8 +395,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+POSUB = @POSUB@
 RANLIB = @RANLIB@
 READELF = @READELF@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -388,6 +418,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -410,6 +441,7 @@ eu_version = @eu_version@
 exec_prefix = @exec_prefix@
 fpic_CFLAGS = @fpic_CFLAGS@
 fpie_CFLAGS = @fpie_CFLAGS@
+fts_LIBS = @fts_LIBS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -419,19 +451,29 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+libarchive_CFLAGS = @libarchive_CFLAGS@
+libarchive_LIBS = @libarchive_LIBS@
+libcurl_CFLAGS = @libcurl_CFLAGS@
+libcurl_LIBS = @libcurl_LIBS@
 libdir = @libdir@
 libexecdir = @libexecdir@
+libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
+libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+obstack_LIBS = @obstack_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+sqlite3_CFLAGS = @sqlite3_CFLAGS@
+sqlite3_LIBS = @sqlite3_LIBS@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
@@ -441,7 +483,8 @@ top_srcdir = @top_srcdir@
 zip_LIBS = @zip_LIBS@
 AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_srcdir)/lib -I.. -I$(srcdir) \
 	-I$(srcdir)/../libelf -I$(srcdir)/../libebl \
-	-I$(srcdir)/../libdw -I$(srcdir)/../libdwelf
+	-I$(srcdir)/../libdw -I$(srcdir)/../libdwelf \
+	-I$(srcdir)/../debuginfod
 
 # Drop the 'u' flag that automake adds by default. It is incompatible
 # with deterministic archives.
@@ -470,6 +513,16 @@ AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
 	    $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
 	    $($(*F)_CFLAGS)
+
+AM_CXXFLAGS = -std=c++11 -Wall -Wshadow \
+	   -Wtrampolines \
+	   $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
+	   $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+	   $(if $($(*F)_no_Werror),,-Werror) \
+	   $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
+	   $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
+	   $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
+	   $($(*F)_CXXFLAGS)
 
 COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage, $(COMPILE))
 DEFS.os = -DPIC -DSHARED $(am__append_1)
@@ -502,7 +555,7 @@ libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c \
 	link_map.c core-file.c open.c image-header.c dwfl_frame.c \
 	frame_unwind.c dwfl_frame_pc.c linux-pid-attach.c \
 	linux-core-attach.c dwfl_frame_regs.c gzip.c $(am__append_2) \
-	$(am__append_3)
+	$(am__append_3) $(am__append_4) $(am__append_5)
 libdwfl = $(libdw)
 libdw = ../libdw/libdw.so
 libelf = ../libelf/libelf.so
@@ -569,6 +622,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bzip2.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/core-file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cu.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debuginfod-client.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/derelocate.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwfl_addrdie.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwfl_addrdwarf.Po@am__quote@ # am--include-marker
@@ -632,6 +686,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/open.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/relocate.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/segment.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/zstd.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -806,6 +861,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/bzip2.Po
 	-rm -f ./$(DEPDIR)/core-file.Po
 	-rm -f ./$(DEPDIR)/cu.Po
+	-rm -f ./$(DEPDIR)/debuginfod-client.Po
 	-rm -f ./$(DEPDIR)/derelocate.Po
 	-rm -f ./$(DEPDIR)/dwfl_addrdie.Po
 	-rm -f ./$(DEPDIR)/dwfl_addrdwarf.Po
@@ -869,6 +925,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/open.Po
 	-rm -f ./$(DEPDIR)/relocate.Po
 	-rm -f ./$(DEPDIR)/segment.Po
+	-rm -f ./$(DEPDIR)/zstd.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -918,6 +975,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/bzip2.Po
 	-rm -f ./$(DEPDIR)/core-file.Po
 	-rm -f ./$(DEPDIR)/cu.Po
+	-rm -f ./$(DEPDIR)/debuginfod-client.Po
 	-rm -f ./$(DEPDIR)/derelocate.Po
 	-rm -f ./$(DEPDIR)/dwfl_addrdie.Po
 	-rm -f ./$(DEPDIR)/dwfl_addrdwarf.Po
@@ -981,6 +1039,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/open.Po
 	-rm -f ./$(DEPDIR)/relocate.Po
 	-rm -f ./$(DEPDIR)/segment.Po
+	-rm -f ./$(DEPDIR)/zstd.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

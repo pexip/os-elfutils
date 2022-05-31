@@ -44,7 +44,7 @@ extern "C" {
 /* Returns the name and the CRC32 of the separate debug file from the
    .gnu_debuglink section if found in the ELF.  Return NULL if the ELF
    file didn't have a .gnu_debuglink section, had malformed data in the
-   section or some other error occured.  */
+   section or some other error occurred.  */
 extern const char *dwelf_elf_gnu_debuglink (Elf *elf, GElf_Word *crc);
 
 /* Returns the name and build ID from the .gnu_debugaltlink section if
@@ -69,7 +69,7 @@ extern ssize_t dwelf_elf_gnu_build_id (Elf *elf, const void **build_idp);
    section.  The section name should start with .zdebug (but this
    isn't checked by this function).  If the section isn't compressed
    (the section data doesn't start with ZLIB) -1 is returned. If an
-   error occured -1 is returned and elf_errno is set.  */
+   error occurred -1 is returned and elf_errno is set.  */
 extern ssize_t dwelf_scn_gnu_compressed_size (Elf_Scn *scn);
 
 /* ELF/DWARF string table handling.  */
@@ -128,10 +128,17 @@ extern void dwelf_strtab_free (Dwelf_Strtab *st)
 /* Creates a read-only Elf handle from the given file handle.  The
    file may be compressed and/or contain a linux kernel image header,
    in which case it is eagerly decompressed in full and the Elf handle
-   is created as if created with elf_memory ().  On error NULL is
-   returned.  The Elf handle should be closed with elf_end ().  The
-   file handle will not be closed.  Does not return ELF_K_NONE handles.  */
+   is created as if created with elf_memory ().  On decompression or
+   file errors NULL is returned (and elf_errno will be set).  If there
+   was no error, but the file is not an ELF file, then an ELF_K_NONE
+   Elf handle is returned (just like with elf_begin).  The Elf handle
+   should be closed with elf_end ().  The file handle will not be
+   closed.  */
 extern Elf *dwelf_elf_begin (int fd);
+
+/* Returns a human readable string for the given ELF header e_machine
+   value, or NULL if the given number isn't currently known.  */
+extern const char *dwelf_elf_e_machine_string (int machine);
 
 #ifdef __cplusplus
 }

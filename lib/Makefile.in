@@ -92,10 +92,13 @@ host_triplet = @host@
 @SYMBOL_VERSIONING_TRUE@am__append_1 = -DSYMBOL_VERSIONING
 subdir = lib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/biarch.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(noinst_HEADERS) \
@@ -192,7 +195,11 @@ CC_BIARCH = @CC_BIARCH@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
 DEPDIR = @DEPDIR@
@@ -201,33 +208,44 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GCOV = @GCOV@
+GENHTML = @GENHTML@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GREP = @GREP@
 HAVE_BISON = @HAVE_BISON@
 HAVE_BUNZIP2 = @HAVE_BUNZIP2@
+HAVE_CXX11 = @HAVE_CXX11@
 HAVE_FLEX = @HAVE_FLEX@
 HAVE_GAWK = @HAVE_GAWK@
 HAVE_VALGRIND = @HAVE_VALGRIND@
+HAVE_ZSTD = @HAVE_ZSTD@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INTLLIBS = @INTLLIBS@
+INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+LCOV = @LCOV@
 LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LIBEBL_SUBDIR = @LIBEBL_SUBDIR@
+LIBDEBUGINFOD_SONAME = @LIBDEBUGINFOD_SONAME@
+LIBICONV = @LIBICONV@
+LIBINTL = @LIBINTL@
 LIBLZMA = @LIBLZMA@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBZSTD = @LIBZSTD@
+LTLIBICONV = @LTLIBICONV@
+LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
-MODVERSION = @MODVERSION@
 MSGFMT = @MSGFMT@
 MSGFMT_015 = @MSGFMT_015@
 MSGMERGE = @MSGMERGE@
@@ -241,8 +259,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+POSUB = @POSUB@
 RANLIB = @RANLIB@
 READELF = @READELF@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -259,6 +282,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -281,6 +305,7 @@ eu_version = @eu_version@
 exec_prefix = @exec_prefix@
 fpic_CFLAGS = @fpic_CFLAGS@
 fpie_CFLAGS = @fpie_CFLAGS@
+fts_LIBS = @fts_LIBS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -290,19 +315,29 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+libarchive_CFLAGS = @libarchive_CFLAGS@
+libarchive_LIBS = @libarchive_LIBS@
+libcurl_CFLAGS = @libcurl_CFLAGS@
+libcurl_LIBS = @libcurl_LIBS@
 libdir = @libdir@
 libexecdir = @libexecdir@
+libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
+libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+obstack_LIBS = @obstack_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+sqlite3_CFLAGS = @sqlite3_CFLAGS@
+sqlite3_LIBS = @sqlite3_LIBS@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
@@ -340,6 +375,16 @@ AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	$($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) $(if \
 	$($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
 	$($(*F)_CFLAGS) $(fpic_CFLAGS)
+AM_CXXFLAGS = -std=c++11 -Wall -Wshadow \
+	   -Wtrampolines \
+	   $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
+	   $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+	   $(if $($(*F)_no_Werror),,-Werror) \
+	   $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
+	   $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
+	   $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
+	   $($(*F)_CXXFLAGS)
+
 COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage, $(COMPILE))
 DEFS.os = -DPIC -DSHARED $(am__append_1)
 CLEANFILES = *.gcno *.gcda
@@ -353,9 +398,10 @@ libeu_a_SOURCES = xstrdup.c xstrndup.c xmalloc.c next_prime.c \
 		  color.c printversion.c
 
 noinst_HEADERS = fixedsizehash.h libeu.h system.h dynamicsizehash.h list.h \
-		 eu-config.h color.h printversion.h bpf.h
+		 eu-config.h color.h printversion.h bpf.h \
+		 atomics.h stdatomic-fbsd.h dynamicsizehash_concurrent.h
 
-EXTRA_DIST = dynamicsizehash.c
+EXTRA_DIST = dynamicsizehash.c dynamicsizehash_concurrent.c
 @GPROF_FALSE@xmalloc_CFLAGS = -ffunction-sections
 all: all-am
 

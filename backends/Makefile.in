@@ -15,7 +15,6 @@
 @SET_MAKE@
 
 
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -91,12 +90,16 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @SYMBOL_VERSIONING_TRUE@am__append_1 = -DSYMBOL_VERSIONING
+@BUILD_STATIC_TRUE@am__append_2 = $(fpic_CFLAGS)
 subdir = backends
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/biarch.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(noinst_HEADERS) \
@@ -110,109 +113,72 @@ AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
-libebl_aarch64_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_aarch64_pic_a_LIBADD =
-am__objects_1 = aarch64_init.$(OBJEXT) aarch64_regs.$(OBJEXT) \
-	aarch64_symbol.$(OBJEXT) aarch64_corenote.$(OBJEXT) \
-	aarch64_retval.$(OBJEXT) aarch64_cfi.$(OBJEXT) \
-	aarch64_initreg.$(OBJEXT) aarch64_unwind.$(OBJEXT)
-libebl_aarch64_pic_a_OBJECTS = $(am_libebl_aarch64_pic_a_OBJECTS)
-libebl_alpha_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_alpha_pic_a_LIBADD =
-am__objects_2 = alpha_init.$(OBJEXT) alpha_symbol.$(OBJEXT) \
+libebl_backends_a_AR = $(AR) $(ARFLAGS)
+libebl_backends_a_LIBADD =
+am__objects_1 = i386_init.$(OBJEXT) i386_symbol.$(OBJEXT) \
+	i386_corenote.$(OBJEXT) i386_cfi.$(OBJEXT) \
+	i386_retval.$(OBJEXT) i386_regs.$(OBJEXT) i386_auxv.$(OBJEXT) \
+	i386_initreg.$(OBJEXT) i386_unwind.$(OBJEXT)
+am__objects_2 = sh_init.$(OBJEXT) sh_symbol.$(OBJEXT) \
+	sh_corenote.$(OBJEXT) sh_regs.$(OBJEXT) sh_retval.$(OBJEXT)
+am__objects_3 = x86_64_init.$(OBJEXT) x86_64_symbol.$(OBJEXT) \
+	x86_64_corenote.$(OBJEXT) x86_64_cfi.$(OBJEXT) \
+	x86_64_retval.$(OBJEXT) x86_64_regs.$(OBJEXT) \
+	x86_64_initreg.$(OBJEXT) x86_64_unwind.$(OBJEXT) \
+	x32_corenote.$(OBJEXT)
+am__objects_4 = ia64_init.$(OBJEXT) ia64_symbol.$(OBJEXT) \
+	ia64_regs.$(OBJEXT) ia64_retval.$(OBJEXT)
+am__objects_5 = alpha_init.$(OBJEXT) alpha_symbol.$(OBJEXT) \
 	alpha_retval.$(OBJEXT) alpha_regs.$(OBJEXT) \
 	alpha_corenote.$(OBJEXT) alpha_auxv.$(OBJEXT)
-libebl_alpha_pic_a_OBJECTS = $(am_libebl_alpha_pic_a_OBJECTS)
-libebl_arm_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_arm_pic_a_LIBADD =
-am__objects_3 = arm_init.$(OBJEXT) arm_symbol.$(OBJEXT) \
+am__objects_6 = arm_init.$(OBJEXT) arm_symbol.$(OBJEXT) \
 	arm_regs.$(OBJEXT) arm_corenote.$(OBJEXT) arm_auxv.$(OBJEXT) \
 	arm_attrs.$(OBJEXT) arm_retval.$(OBJEXT) arm_cfi.$(OBJEXT) \
 	arm_initreg.$(OBJEXT)
-libebl_arm_pic_a_OBJECTS = $(am_libebl_arm_pic_a_OBJECTS)
-libebl_bpf_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_bpf_pic_a_LIBADD =
-am__objects_4 = bpf_init.$(OBJEXT) bpf_regs.$(OBJEXT) \
-	bpf_symbol.$(OBJEXT)
-libebl_bpf_pic_a_OBJECTS = $(am_libebl_bpf_pic_a_OBJECTS)
-libebl_i386_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_i386_pic_a_LIBADD =
-am__objects_5 = i386_init.$(OBJEXT) i386_symbol.$(OBJEXT) \
-	i386_corenote.$(OBJEXT) i386_cfi.$(OBJEXT) \
-	i386_retval.$(OBJEXT) i386_regs.$(OBJEXT) i386_auxv.$(OBJEXT) \
-	i386_syscall.$(OBJEXT) i386_initreg.$(OBJEXT) \
-	i386_unwind.$(OBJEXT)
-libebl_i386_pic_a_OBJECTS = $(am_libebl_i386_pic_a_OBJECTS)
-libebl_ia64_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_ia64_pic_a_LIBADD =
-am__objects_6 = ia64_init.$(OBJEXT) ia64_symbol.$(OBJEXT) \
-	ia64_regs.$(OBJEXT) ia64_retval.$(OBJEXT)
-libebl_ia64_pic_a_OBJECTS = $(am_libebl_ia64_pic_a_OBJECTS)
-libebl_m68k_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_m68k_pic_a_LIBADD =
-am__objects_7 = m68k_init.$(OBJEXT) m68k_symbol.$(OBJEXT) \
-	m68k_regs.$(OBJEXT) m68k_retval.$(OBJEXT) \
-	m68k_corenote.$(OBJEXT) m68k_cfi.$(OBJEXT) \
-	m68k_initreg.$(OBJEXT)
-libebl_m68k_pic_a_OBJECTS = $(am_libebl_m68k_pic_a_OBJECTS)
-libebl_ppc64_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_ppc64_pic_a_LIBADD =
-am__objects_8 = ppc64_init.$(OBJEXT) ppc64_symbol.$(OBJEXT) \
-	ppc64_retval.$(OBJEXT) ppc64_corenote.$(OBJEXT) \
-	ppc_regs.$(OBJEXT) ppc_auxv.$(OBJEXT) ppc_attrs.$(OBJEXT) \
-	ppc_syscall.$(OBJEXT) ppc_cfi.$(OBJEXT) ppc_initreg.$(OBJEXT) \
-	ppc64_unwind.$(OBJEXT) ppc64_resolve_sym.$(OBJEXT)
-libebl_ppc64_pic_a_OBJECTS = $(am_libebl_ppc64_pic_a_OBJECTS)
-libebl_ppc_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_ppc_pic_a_LIBADD =
+am__objects_7 = aarch64_init.$(OBJEXT) aarch64_regs.$(OBJEXT) \
+	aarch64_symbol.$(OBJEXT) aarch64_corenote.$(OBJEXT) \
+	aarch64_retval.$(OBJEXT) aarch64_cfi.$(OBJEXT) \
+	aarch64_initreg.$(OBJEXT) aarch64_unwind.$(OBJEXT)
+am__objects_8 = sparc_init.$(OBJEXT) sparc_symbol.$(OBJEXT) \
+	sparc_regs.$(OBJEXT) sparc_retval.$(OBJEXT) \
+	sparc_corenote.$(OBJEXT) sparc64_corenote.$(OBJEXT) \
+	sparc_auxv.$(OBJEXT) sparc_attrs.$(OBJEXT) sparc_cfi.$(OBJEXT) \
+	sparc_initreg.$(OBJEXT)
 am__objects_9 = ppc_init.$(OBJEXT) ppc_symbol.$(OBJEXT) \
 	ppc_retval.$(OBJEXT) ppc_regs.$(OBJEXT) ppc_corenote.$(OBJEXT) \
-	ppc_auxv.$(OBJEXT) ppc_attrs.$(OBJEXT) ppc_syscall.$(OBJEXT) \
-	ppc_cfi.$(OBJEXT) ppc_initreg.$(OBJEXT)
-libebl_ppc_pic_a_OBJECTS = $(am_libebl_ppc_pic_a_OBJECTS)
-libebl_riscv_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_riscv_pic_a_LIBADD =
-am__objects_10 = riscv_init.$(OBJEXT) riscv_symbol.$(OBJEXT) \
-	riscv_cfi.$(OBJEXT) riscv_regs.$(OBJEXT) \
-	riscv_initreg.$(OBJEXT) riscv_corenote.$(OBJEXT) \
-	riscv64_corenote.$(OBJEXT) riscv_retval.$(OBJEXT)
-libebl_riscv_pic_a_OBJECTS = $(am_libebl_riscv_pic_a_OBJECTS)
-libebl_s390_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_s390_pic_a_LIBADD =
+	ppc_auxv.$(OBJEXT) ppc_attrs.$(OBJEXT) ppc_cfi.$(OBJEXT) \
+	ppc_initreg.$(OBJEXT)
+am__objects_10 = ppc64_init.$(OBJEXT) ppc64_symbol.$(OBJEXT) \
+	ppc64_retval.$(OBJEXT) ppc64_corenote.$(OBJEXT) \
+	ppc64_unwind.$(OBJEXT) ppc64_resolve_sym.$(OBJEXT)
 am__objects_11 = s390_init.$(OBJEXT) s390_symbol.$(OBJEXT) \
 	s390_regs.$(OBJEXT) s390_retval.$(OBJEXT) \
 	s390_corenote.$(OBJEXT) s390x_corenote.$(OBJEXT) \
 	s390_cfi.$(OBJEXT) s390_initreg.$(OBJEXT) \
 	s390_unwind.$(OBJEXT)
-libebl_s390_pic_a_OBJECTS = $(am_libebl_s390_pic_a_OBJECTS)
-libebl_sh_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_sh_pic_a_LIBADD =
-am__objects_12 = sh_init.$(OBJEXT) sh_symbol.$(OBJEXT) \
-	sh_corenote.$(OBJEXT) sh_regs.$(OBJEXT) sh_retval.$(OBJEXT)
-libebl_sh_pic_a_OBJECTS = $(am_libebl_sh_pic_a_OBJECTS)
-libebl_sparc_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_sparc_pic_a_LIBADD =
-am__objects_13 = sparc_init.$(OBJEXT) sparc_symbol.$(OBJEXT) \
-	sparc_regs.$(OBJEXT) sparc_retval.$(OBJEXT) \
-	sparc_corenote.$(OBJEXT) sparc64_corenote.$(OBJEXT) \
-	sparc_auxv.$(OBJEXT) sparc_attrs.$(OBJEXT) sparc_cfi.$(OBJEXT) \
-	sparc_initreg.$(OBJEXT)
-libebl_sparc_pic_a_OBJECTS = $(am_libebl_sparc_pic_a_OBJECTS)
-libebl_tilegx_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_tilegx_pic_a_LIBADD =
-am__objects_14 = tilegx_init.$(OBJEXT) tilegx_symbol.$(OBJEXT) \
-	tilegx_regs.$(OBJEXT) tilegx_retval.$(OBJEXT) \
-	tilegx_corenote.$(OBJEXT)
-libebl_tilegx_pic_a_OBJECTS = $(am_libebl_tilegx_pic_a_OBJECTS)
-libebl_x86_64_pic_a_AR = $(AR) $(ARFLAGS)
-libebl_x86_64_pic_a_LIBADD =
-am__objects_15 = x86_64_init.$(OBJEXT) x86_64_symbol.$(OBJEXT) \
-	x86_64_corenote.$(OBJEXT) x86_64_cfi.$(OBJEXT) \
-	x86_64_retval.$(OBJEXT) x86_64_regs.$(OBJEXT) \
-	i386_auxv.$(OBJEXT) x86_64_syscall.$(OBJEXT) \
-	x86_64_initreg.$(OBJEXT) x86_64_unwind.$(OBJEXT) \
-	x32_corenote.$(OBJEXT)
-libebl_x86_64_pic_a_OBJECTS = $(am_libebl_x86_64_pic_a_OBJECTS)
+am__objects_12 = m68k_init.$(OBJEXT) m68k_symbol.$(OBJEXT) \
+	m68k_regs.$(OBJEXT) m68k_retval.$(OBJEXT) \
+	m68k_corenote.$(OBJEXT) m68k_cfi.$(OBJEXT) \
+	m68k_initreg.$(OBJEXT)
+am__objects_13 = bpf_init.$(OBJEXT) bpf_regs.$(OBJEXT) \
+	bpf_symbol.$(OBJEXT)
+am__objects_14 = riscv_init.$(OBJEXT) riscv_symbol.$(OBJEXT) \
+	riscv_cfi.$(OBJEXT) riscv_regs.$(OBJEXT) \
+	riscv_initreg.$(OBJEXT) riscv_corenote.$(OBJEXT) \
+	riscv64_corenote.$(OBJEXT) riscv_retval.$(OBJEXT)
+am__objects_15 = csky_attrs.$(OBJEXT) csky_init.$(OBJEXT) \
+	csky_symbol.$(OBJEXT) csky_cfi.$(OBJEXT) csky_regs.$(OBJEXT) \
+	csky_initreg.$(OBJEXT) csky_corenote.$(OBJEXT)
+am_libebl_backends_a_OBJECTS = $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_11) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
+	$(am__objects_15)
+libebl_backends_a_OBJECTS = $(am_libebl_backends_a_OBJECTS)
+libebl_backends_pic_a_AR = $(AR) $(ARFLAGS)
+libebl_backends_pic_a_LIBADD =
+libebl_backends_pic_a_OBJECTS = $(am_libebl_backends_pic_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -241,11 +207,14 @@ am__depfiles_remade = ./$(DEPDIR)/aarch64_cfi.Po \
 	./$(DEPDIR)/arm_initreg.Po ./$(DEPDIR)/arm_regs.Po \
 	./$(DEPDIR)/arm_retval.Po ./$(DEPDIR)/arm_symbol.Po \
 	./$(DEPDIR)/bpf_init.Po ./$(DEPDIR)/bpf_regs.Po \
-	./$(DEPDIR)/bpf_symbol.Po ./$(DEPDIR)/i386_auxv.Po \
-	./$(DEPDIR)/i386_cfi.Po ./$(DEPDIR)/i386_corenote.Po \
-	./$(DEPDIR)/i386_init.Po ./$(DEPDIR)/i386_initreg.Po \
-	./$(DEPDIR)/i386_regs.Po ./$(DEPDIR)/i386_retval.Po \
-	./$(DEPDIR)/i386_symbol.Po ./$(DEPDIR)/i386_syscall.Po \
+	./$(DEPDIR)/bpf_symbol.Po ./$(DEPDIR)/csky_attrs.Po \
+	./$(DEPDIR)/csky_cfi.Po ./$(DEPDIR)/csky_corenote.Po \
+	./$(DEPDIR)/csky_init.Po ./$(DEPDIR)/csky_initreg.Po \
+	./$(DEPDIR)/csky_regs.Po ./$(DEPDIR)/csky_symbol.Po \
+	./$(DEPDIR)/i386_auxv.Po ./$(DEPDIR)/i386_cfi.Po \
+	./$(DEPDIR)/i386_corenote.Po ./$(DEPDIR)/i386_init.Po \
+	./$(DEPDIR)/i386_initreg.Po ./$(DEPDIR)/i386_regs.Po \
+	./$(DEPDIR)/i386_retval.Po ./$(DEPDIR)/i386_symbol.Po \
 	./$(DEPDIR)/i386_unwind.Po ./$(DEPDIR)/ia64_init.Po \
 	./$(DEPDIR)/ia64_regs.Po ./$(DEPDIR)/ia64_retval.Po \
 	./$(DEPDIR)/ia64_symbol.Po ./$(DEPDIR)/m68k_cfi.Po \
@@ -259,31 +228,27 @@ am__depfiles_remade = ./$(DEPDIR)/aarch64_cfi.Po \
 	./$(DEPDIR)/ppc_cfi.Po ./$(DEPDIR)/ppc_corenote.Po \
 	./$(DEPDIR)/ppc_init.Po ./$(DEPDIR)/ppc_initreg.Po \
 	./$(DEPDIR)/ppc_regs.Po ./$(DEPDIR)/ppc_retval.Po \
-	./$(DEPDIR)/ppc_symbol.Po ./$(DEPDIR)/ppc_syscall.Po \
-	./$(DEPDIR)/riscv64_corenote.Po ./$(DEPDIR)/riscv_cfi.Po \
-	./$(DEPDIR)/riscv_corenote.Po ./$(DEPDIR)/riscv_init.Po \
-	./$(DEPDIR)/riscv_initreg.Po ./$(DEPDIR)/riscv_regs.Po \
-	./$(DEPDIR)/riscv_retval.Po ./$(DEPDIR)/riscv_symbol.Po \
-	./$(DEPDIR)/s390_cfi.Po ./$(DEPDIR)/s390_corenote.Po \
-	./$(DEPDIR)/s390_init.Po ./$(DEPDIR)/s390_initreg.Po \
-	./$(DEPDIR)/s390_regs.Po ./$(DEPDIR)/s390_retval.Po \
-	./$(DEPDIR)/s390_symbol.Po ./$(DEPDIR)/s390_unwind.Po \
-	./$(DEPDIR)/s390x_corenote.Po ./$(DEPDIR)/sh_corenote.Po \
-	./$(DEPDIR)/sh_init.Po ./$(DEPDIR)/sh_regs.Po \
-	./$(DEPDIR)/sh_retval.Po ./$(DEPDIR)/sh_symbol.Po \
-	./$(DEPDIR)/sparc64_corenote.Po ./$(DEPDIR)/sparc_attrs.Po \
-	./$(DEPDIR)/sparc_auxv.Po ./$(DEPDIR)/sparc_cfi.Po \
-	./$(DEPDIR)/sparc_corenote.Po ./$(DEPDIR)/sparc_init.Po \
-	./$(DEPDIR)/sparc_initreg.Po ./$(DEPDIR)/sparc_regs.Po \
-	./$(DEPDIR)/sparc_retval.Po ./$(DEPDIR)/sparc_symbol.Po \
-	./$(DEPDIR)/tilegx_corenote.Po ./$(DEPDIR)/tilegx_init.Po \
-	./$(DEPDIR)/tilegx_regs.Po ./$(DEPDIR)/tilegx_retval.Po \
-	./$(DEPDIR)/tilegx_symbol.Po ./$(DEPDIR)/x32_corenote.Po \
+	./$(DEPDIR)/ppc_symbol.Po ./$(DEPDIR)/riscv64_corenote.Po \
+	./$(DEPDIR)/riscv_cfi.Po ./$(DEPDIR)/riscv_corenote.Po \
+	./$(DEPDIR)/riscv_init.Po ./$(DEPDIR)/riscv_initreg.Po \
+	./$(DEPDIR)/riscv_regs.Po ./$(DEPDIR)/riscv_retval.Po \
+	./$(DEPDIR)/riscv_symbol.Po ./$(DEPDIR)/s390_cfi.Po \
+	./$(DEPDIR)/s390_corenote.Po ./$(DEPDIR)/s390_init.Po \
+	./$(DEPDIR)/s390_initreg.Po ./$(DEPDIR)/s390_regs.Po \
+	./$(DEPDIR)/s390_retval.Po ./$(DEPDIR)/s390_symbol.Po \
+	./$(DEPDIR)/s390_unwind.Po ./$(DEPDIR)/s390x_corenote.Po \
+	./$(DEPDIR)/sh_corenote.Po ./$(DEPDIR)/sh_init.Po \
+	./$(DEPDIR)/sh_regs.Po ./$(DEPDIR)/sh_retval.Po \
+	./$(DEPDIR)/sh_symbol.Po ./$(DEPDIR)/sparc64_corenote.Po \
+	./$(DEPDIR)/sparc_attrs.Po ./$(DEPDIR)/sparc_auxv.Po \
+	./$(DEPDIR)/sparc_cfi.Po ./$(DEPDIR)/sparc_corenote.Po \
+	./$(DEPDIR)/sparc_init.Po ./$(DEPDIR)/sparc_initreg.Po \
+	./$(DEPDIR)/sparc_regs.Po ./$(DEPDIR)/sparc_retval.Po \
+	./$(DEPDIR)/sparc_symbol.Po ./$(DEPDIR)/x32_corenote.Po \
 	./$(DEPDIR)/x86_64_cfi.Po ./$(DEPDIR)/x86_64_corenote.Po \
 	./$(DEPDIR)/x86_64_init.Po ./$(DEPDIR)/x86_64_initreg.Po \
 	./$(DEPDIR)/x86_64_regs.Po ./$(DEPDIR)/x86_64_retval.Po \
-	./$(DEPDIR)/x86_64_symbol.Po ./$(DEPDIR)/x86_64_syscall.Po \
-	./$(DEPDIR)/x86_64_unwind.Po
+	./$(DEPDIR)/x86_64_symbol.Po ./$(DEPDIR)/x86_64_unwind.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -297,28 +262,15 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libebl_aarch64_pic_a_SOURCES) \
-	$(libebl_alpha_pic_a_SOURCES) $(libebl_arm_pic_a_SOURCES) \
-	$(libebl_bpf_pic_a_SOURCES) $(libebl_i386_pic_a_SOURCES) \
-	$(libebl_ia64_pic_a_SOURCES) $(libebl_m68k_pic_a_SOURCES) \
-	$(libebl_ppc64_pic_a_SOURCES) $(libebl_ppc_pic_a_SOURCES) \
-	$(libebl_riscv_pic_a_SOURCES) $(libebl_s390_pic_a_SOURCES) \
-	$(libebl_sh_pic_a_SOURCES) $(libebl_sparc_pic_a_SOURCES) \
-	$(libebl_tilegx_pic_a_SOURCES) $(libebl_x86_64_pic_a_SOURCES)
-DIST_SOURCES = $(libebl_aarch64_pic_a_SOURCES) \
-	$(libebl_alpha_pic_a_SOURCES) $(libebl_arm_pic_a_SOURCES) \
-	$(libebl_bpf_pic_a_SOURCES) $(libebl_i386_pic_a_SOURCES) \
-	$(libebl_ia64_pic_a_SOURCES) $(libebl_m68k_pic_a_SOURCES) \
-	$(libebl_ppc64_pic_a_SOURCES) $(libebl_ppc_pic_a_SOURCES) \
-	$(libebl_riscv_pic_a_SOURCES) $(libebl_s390_pic_a_SOURCES) \
-	$(libebl_sh_pic_a_SOURCES) $(libebl_sparc_pic_a_SOURCES) \
-	$(libebl_tilegx_pic_a_SOURCES) $(libebl_x86_64_pic_a_SOURCES)
+SOURCES = $(libebl_backends_a_SOURCES) \
+	$(libebl_backends_pic_a_SOURCES)
+DIST_SOURCES = $(libebl_backends_a_SOURCES) \
+	$(libebl_backends_pic_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-DATA = $(noinst_DATA)
 HEADERS = $(noinst_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
@@ -357,7 +309,11 @@ CC_BIARCH = @CC_BIARCH@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
 DEPDIR = @DEPDIR@
@@ -366,33 +322,44 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+GCOV = @GCOV@
+GENHTML = @GENHTML@
 GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
 GREP = @GREP@
 HAVE_BISON = @HAVE_BISON@
 HAVE_BUNZIP2 = @HAVE_BUNZIP2@
+HAVE_CXX11 = @HAVE_CXX11@
 HAVE_FLEX = @HAVE_FLEX@
 HAVE_GAWK = @HAVE_GAWK@
 HAVE_VALGRIND = @HAVE_VALGRIND@
+HAVE_ZSTD = @HAVE_ZSTD@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INTLLIBS = @INTLLIBS@
+INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+LCOV = @LCOV@
 LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LIBEBL_SUBDIR = @LIBEBL_SUBDIR@
+LIBDEBUGINFOD_SONAME = @LIBDEBUGINFOD_SONAME@
+LIBICONV = @LIBICONV@
+LIBINTL = @LIBINTL@
 LIBLZMA = @LIBLZMA@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBZSTD = @LIBZSTD@
+LTLIBICONV = @LTLIBICONV@
+LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
-MODVERSION = @MODVERSION@
 MSGFMT = @MSGFMT@
 MSGFMT_015 = @MSGFMT_015@
 MSGMERGE = @MSGMERGE@
@@ -406,8 +373,13 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+POSUB = @POSUB@
 RANLIB = @RANLIB@
 READELF = @READELF@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -424,6 +396,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -446,6 +419,7 @@ eu_version = @eu_version@
 exec_prefix = @exec_prefix@
 fpic_CFLAGS = @fpic_CFLAGS@
 fpie_CFLAGS = @fpie_CFLAGS@
+fts_LIBS = @fts_LIBS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -455,19 +429,29 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+libarchive_CFLAGS = @libarchive_CFLAGS@
+libarchive_LIBS = @libarchive_LIBS@
+libcurl_CFLAGS = @libcurl_CFLAGS@
+libcurl_LIBS = @libcurl_LIBS@
 libdir = @libdir@
 libexecdir = @libexecdir@
+libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
+libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+obstack_LIBS = @obstack_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
+sqlite3_CFLAGS = @sqlite3_CFLAGS@
+sqlite3_LIBS = @sqlite3_LIBS@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
@@ -498,107 +482,73 @@ ARFLAGS = cr
 # warning
 @HAVE_IMPLICIT_FALLTHROUGH_WARNING_TRUE@IMPLICIT_FALLTHROUGH_WARNING = -Wimplicit-fallthrough=5
 AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
-	    -Wold-style-definition -Wstrict-prototypes -Wtrampolines \
-	    $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
-	    $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
-	    $(if $($(*F)_no_Werror),,-Werror) \
-	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
-	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
-	    $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
-	    $($(*F)_CFLAGS)
+	-Wold-style-definition -Wstrict-prototypes -Wtrampolines \
+	$(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
+	$(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+	$(if $($(*F)_no_Werror),,-Werror) $(if \
+	$($(*F)_no_Wunused),,-Wunused -Wextra) $(if \
+	$($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) $(if \
+	$($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
+	$($(*F)_CFLAGS) $(am__append_2)
+AM_CXXFLAGS = -std=c++11 -Wall -Wshadow \
+	   -Wtrampolines \
+	   $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
+	   $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+	   $(if $($(*F)_no_Werror),,-Werror) \
+	   $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
+	   $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
+	   $(if $($(*F)_no_Wpacked_not_aligned),-Wno-packed-not-aligned,) \
+	   $($(*F)_CXXFLAGS)
 
 COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage, $(COMPILE))
 DEFS.os = -DPIC -DSHARED $(am__append_1)
-CLEANFILES = *.gcno *.gcda $(foreach m,$(modules), libebl_$(m).map \
-	libebl_$(m).so $(am_libebl_$(m)_pic_a_OBJECTS))
+CLEANFILES = *.gcno *.gcda
 textrel_msg = echo "WARNING: TEXTREL found in '$@'"
 @FATAL_TEXTREL_FALSE@textrel_found = $(textrel_msg)
 @FATAL_TEXTREL_TRUE@textrel_found = $(textrel_msg); exit 1
 textrel_check = if $(READELF) -d $@ | fgrep -q TEXTREL; then $(textrel_found); fi
+noinst_LIBRARIES = libebl_backends.a libebl_backends_pic.a
 modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
-	  tilegx m68k bpf riscv
+	  m68k bpf riscv csky
 
-libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
-	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
-	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
-	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
-	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a
-
-noinst_LIBRARIES = $(libebl_pic)
-noinst_DATA = $(libebl_pic:_pic.a=.so)
-libelf = ../libelf/libelf.so
-libdw = ../libdw/libdw.so
-libeu = ../lib/libeu.a
 i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c i386_cfi.c \
-	    i386_retval.c i386_regs.c i386_auxv.c i386_syscall.c \
+	    i386_retval.c i386_regs.c i386_auxv.c \
 	    i386_initreg.c i386_unwind.c
 
-cpu_i386 = ../libcpu/libcpu_i386.a
-libebl_i386_pic_a_SOURCES = $(i386_SRCS)
-am_libebl_i386_pic_a_OBJECTS = $(i386_SRCS:.c=.os)
 sh_SRCS = sh_init.c sh_symbol.c sh_corenote.c sh_regs.c sh_retval.c
-libebl_sh_pic_a_SOURCES = $(sh_SRCS)
-am_libebl_sh_pic_a_OBJECTS = $(sh_SRCS:.c=.os)
 x86_64_SRCS = x86_64_init.c x86_64_symbol.c x86_64_corenote.c x86_64_cfi.c \
-	      x86_64_retval.c x86_64_regs.c i386_auxv.c x86_64_syscall.c \
-	      x86_64_initreg.c x86_64_unwind.c x32_corenote.c
+	      x86_64_retval.c x86_64_regs.c x86_64_initreg.c \
+	      x86_64_unwind.c x32_corenote.c
 
-cpu_x86_64 = ../libcpu/libcpu_x86_64.a
-libebl_x86_64_pic_a_SOURCES = $(x86_64_SRCS)
-am_libebl_x86_64_pic_a_OBJECTS = $(x86_64_SRCS:.c=.os)
 ia64_SRCS = ia64_init.c ia64_symbol.c ia64_regs.c ia64_retval.c
-libebl_ia64_pic_a_SOURCES = $(ia64_SRCS)
-am_libebl_ia64_pic_a_OBJECTS = $(ia64_SRCS:.c=.os)
 alpha_SRCS = alpha_init.c alpha_symbol.c alpha_retval.c alpha_regs.c \
 	     alpha_corenote.c alpha_auxv.c
 
-libebl_alpha_pic_a_SOURCES = $(alpha_SRCS)
-am_libebl_alpha_pic_a_OBJECTS = $(alpha_SRCS:.c=.os)
 arm_SRCS = arm_init.c arm_symbol.c arm_regs.c arm_corenote.c \
 	   arm_auxv.c arm_attrs.c arm_retval.c arm_cfi.c arm_initreg.c
 
-libebl_arm_pic_a_SOURCES = $(arm_SRCS)
-am_libebl_arm_pic_a_OBJECTS = $(arm_SRCS:.c=.os)
 aarch64_SRCS = aarch64_init.c aarch64_regs.c aarch64_symbol.c	\
 	       aarch64_corenote.c aarch64_retval.c aarch64_cfi.c \
 	       aarch64_initreg.c aarch64_unwind.c
 
-libebl_aarch64_pic_a_SOURCES = $(aarch64_SRCS)
-am_libebl_aarch64_pic_a_OBJECTS = $(aarch64_SRCS:.c=.os)
 sparc_SRCS = sparc_init.c sparc_symbol.c sparc_regs.c sparc_retval.c \
 	     sparc_corenote.c sparc64_corenote.c sparc_auxv.c sparc_attrs.c \
              sparc_cfi.c sparc_initreg.c
 
-libebl_sparc_pic_a_SOURCES = $(sparc_SRCS)
-am_libebl_sparc_pic_a_OBJECTS = $(sparc_SRCS:.c=.os)
 ppc_SRCS = ppc_init.c ppc_symbol.c ppc_retval.c ppc_regs.c \
-	   ppc_corenote.c ppc_auxv.c ppc_attrs.c ppc_syscall.c \
+	   ppc_corenote.c ppc_auxv.c ppc_attrs.c \
 	   ppc_cfi.c ppc_initreg.c
 
-libebl_ppc_pic_a_SOURCES = $(ppc_SRCS)
-am_libebl_ppc_pic_a_OBJECTS = $(ppc_SRCS:.c=.os)
-ppc64_SRCS = ppc64_init.c ppc64_symbol.c ppc64_retval.c \
-	     ppc64_corenote.c ppc_regs.c ppc_auxv.c ppc_attrs.c ppc_syscall.c \
-	     ppc_cfi.c ppc_initreg.c ppc64_unwind.c ppc64_resolve_sym.c
+ppc64_SRCS = ppc64_init.c ppc64_symbol.c ppc64_retval.c ppc64_corenote.c \
+	     ppc64_unwind.c ppc64_resolve_sym.c
 
-libebl_ppc64_pic_a_SOURCES = $(ppc64_SRCS)
-am_libebl_ppc64_pic_a_OBJECTS = $(ppc64_SRCS:.c=.os)
 s390_SRCS = s390_init.c s390_symbol.c s390_regs.c s390_retval.c \
 	    s390_corenote.c s390x_corenote.c s390_cfi.c s390_initreg.c \
 	    s390_unwind.c
 
-libebl_s390_pic_a_SOURCES = $(s390_SRCS)
-am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
-tilegx_SRCS = tilegx_init.c tilegx_symbol.c tilegx_regs.c \
-              tilegx_retval.c tilegx_corenote.c
-
-libebl_tilegx_pic_a_SOURCES = $(tilegx_SRCS)
-am_libebl_tilegx_pic_a_OBJECTS = $(tilegx_SRCS:.c=.os)
 m68k_SRCS = m68k_init.c m68k_symbol.c m68k_regs.c \
 	    m68k_retval.c m68k_corenote.c m68k_cfi.c m68k_initreg.c
 
-libebl_m68k_pic_a_SOURCES = $(m68k_SRCS)
-am_libebl_m68k_pic_a_OBJECTS = $(m68k_SRCS:.c=.os)
 
 # m68k prstatus core notes are described by a packed structure
 # which has not naturally aligned fields. Since we don't access
@@ -607,16 +557,23 @@ am_libebl_m68k_pic_a_OBJECTS = $(m68k_SRCS:.c=.os)
 # an issue.
 m68k_corenote_no_Wpacked_not_aligned = yes
 bpf_SRCS = bpf_init.c bpf_regs.c bpf_symbol.c
-cpu_bpf = ../libcpu/libcpu_bpf.a
-libebl_bpf_pic_a_SOURCES = $(bpf_SRCS)
-am_libebl_bpf_pic_a_OBJECTS = $(bpf_SRCS:.c=.os)
 riscv_SRCS = riscv_init.c riscv_symbol.c riscv_cfi.c riscv_regs.c \
 	     riscv_initreg.c riscv_corenote.c riscv64_corenote.c riscv_retval.c
 
-libebl_riscv_pic_a_SOURCES = $(riscv_SRCS)
-am_libebl_riscv_pic_a_OBJECTS = $(riscv_SRCS:.c=.os)
+csky_SRCS = csky_attrs.c csky_init.c csky_symbol.c csky_cfi.c \
+	    csky_regs.c csky_initreg.c csky_corenote.c
+
+libebl_backends_a_SOURCES = $(i386_SRCS) $(sh_SRCS) $(x86_64_SRCS) \
+			    $(ia64_SRCS) $(alpha_SRCS) $(arm_SRCS) \
+			    $(aarch64_SRCS) $(sparc_SRCS) $(ppc_SRCS) \
+			    $(ppc64_SRCS) $(s390_SRCS) \
+			    $(m68k_SRCS) $(bpf_SRCS) $(riscv_SRCS) $(csky_SRCS)
+
+libebl_backends_pic_a_SOURCES = 
+am_libebl_backends_pic_a_OBJECTS = $(libebl_backends_a_SOURCES:.c=.os)
 noinst_HEADERS = libebl_CPU.h common-reloc.c linux-core-note.c x86_corenote.c
-EXTRA_DIST = $(foreach m,$(modules),$($(m)_SRCS)) $(modules:=_reloc.def)
+EXTRA_DIST = $(modules:=_reloc.def)
+MOSTLYCLEANFILES = $(am_libebl_backends_pic_a_OBJECTS)
 all: all-am
 
 .SUFFIXES:
@@ -655,80 +612,15 @@ $(am__aclocal_m4_deps):
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
 
-libebl_aarch64_pic.a: $(libebl_aarch64_pic_a_OBJECTS) $(libebl_aarch64_pic_a_DEPENDENCIES) $(EXTRA_libebl_aarch64_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_aarch64_pic.a
-	$(AM_V_AR)$(libebl_aarch64_pic_a_AR) libebl_aarch64_pic.a $(libebl_aarch64_pic_a_OBJECTS) $(libebl_aarch64_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_aarch64_pic.a
+libebl_backends.a: $(libebl_backends_a_OBJECTS) $(libebl_backends_a_DEPENDENCIES) $(EXTRA_libebl_backends_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libebl_backends.a
+	$(AM_V_AR)$(libebl_backends_a_AR) libebl_backends.a $(libebl_backends_a_OBJECTS) $(libebl_backends_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libebl_backends.a
 
-libebl_alpha_pic.a: $(libebl_alpha_pic_a_OBJECTS) $(libebl_alpha_pic_a_DEPENDENCIES) $(EXTRA_libebl_alpha_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_alpha_pic.a
-	$(AM_V_AR)$(libebl_alpha_pic_a_AR) libebl_alpha_pic.a $(libebl_alpha_pic_a_OBJECTS) $(libebl_alpha_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_alpha_pic.a
-
-libebl_arm_pic.a: $(libebl_arm_pic_a_OBJECTS) $(libebl_arm_pic_a_DEPENDENCIES) $(EXTRA_libebl_arm_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_arm_pic.a
-	$(AM_V_AR)$(libebl_arm_pic_a_AR) libebl_arm_pic.a $(libebl_arm_pic_a_OBJECTS) $(libebl_arm_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_arm_pic.a
-
-libebl_bpf_pic.a: $(libebl_bpf_pic_a_OBJECTS) $(libebl_bpf_pic_a_DEPENDENCIES) $(EXTRA_libebl_bpf_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_bpf_pic.a
-	$(AM_V_AR)$(libebl_bpf_pic_a_AR) libebl_bpf_pic.a $(libebl_bpf_pic_a_OBJECTS) $(libebl_bpf_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_bpf_pic.a
-
-libebl_i386_pic.a: $(libebl_i386_pic_a_OBJECTS) $(libebl_i386_pic_a_DEPENDENCIES) $(EXTRA_libebl_i386_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_i386_pic.a
-	$(AM_V_AR)$(libebl_i386_pic_a_AR) libebl_i386_pic.a $(libebl_i386_pic_a_OBJECTS) $(libebl_i386_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_i386_pic.a
-
-libebl_ia64_pic.a: $(libebl_ia64_pic_a_OBJECTS) $(libebl_ia64_pic_a_DEPENDENCIES) $(EXTRA_libebl_ia64_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_ia64_pic.a
-	$(AM_V_AR)$(libebl_ia64_pic_a_AR) libebl_ia64_pic.a $(libebl_ia64_pic_a_OBJECTS) $(libebl_ia64_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_ia64_pic.a
-
-libebl_m68k_pic.a: $(libebl_m68k_pic_a_OBJECTS) $(libebl_m68k_pic_a_DEPENDENCIES) $(EXTRA_libebl_m68k_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_m68k_pic.a
-	$(AM_V_AR)$(libebl_m68k_pic_a_AR) libebl_m68k_pic.a $(libebl_m68k_pic_a_OBJECTS) $(libebl_m68k_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_m68k_pic.a
-
-libebl_ppc64_pic.a: $(libebl_ppc64_pic_a_OBJECTS) $(libebl_ppc64_pic_a_DEPENDENCIES) $(EXTRA_libebl_ppc64_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_ppc64_pic.a
-	$(AM_V_AR)$(libebl_ppc64_pic_a_AR) libebl_ppc64_pic.a $(libebl_ppc64_pic_a_OBJECTS) $(libebl_ppc64_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_ppc64_pic.a
-
-libebl_ppc_pic.a: $(libebl_ppc_pic_a_OBJECTS) $(libebl_ppc_pic_a_DEPENDENCIES) $(EXTRA_libebl_ppc_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_ppc_pic.a
-	$(AM_V_AR)$(libebl_ppc_pic_a_AR) libebl_ppc_pic.a $(libebl_ppc_pic_a_OBJECTS) $(libebl_ppc_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_ppc_pic.a
-
-libebl_riscv_pic.a: $(libebl_riscv_pic_a_OBJECTS) $(libebl_riscv_pic_a_DEPENDENCIES) $(EXTRA_libebl_riscv_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_riscv_pic.a
-	$(AM_V_AR)$(libebl_riscv_pic_a_AR) libebl_riscv_pic.a $(libebl_riscv_pic_a_OBJECTS) $(libebl_riscv_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_riscv_pic.a
-
-libebl_s390_pic.a: $(libebl_s390_pic_a_OBJECTS) $(libebl_s390_pic_a_DEPENDENCIES) $(EXTRA_libebl_s390_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_s390_pic.a
-	$(AM_V_AR)$(libebl_s390_pic_a_AR) libebl_s390_pic.a $(libebl_s390_pic_a_OBJECTS) $(libebl_s390_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_s390_pic.a
-
-libebl_sh_pic.a: $(libebl_sh_pic_a_OBJECTS) $(libebl_sh_pic_a_DEPENDENCIES) $(EXTRA_libebl_sh_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_sh_pic.a
-	$(AM_V_AR)$(libebl_sh_pic_a_AR) libebl_sh_pic.a $(libebl_sh_pic_a_OBJECTS) $(libebl_sh_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_sh_pic.a
-
-libebl_sparc_pic.a: $(libebl_sparc_pic_a_OBJECTS) $(libebl_sparc_pic_a_DEPENDENCIES) $(EXTRA_libebl_sparc_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_sparc_pic.a
-	$(AM_V_AR)$(libebl_sparc_pic_a_AR) libebl_sparc_pic.a $(libebl_sparc_pic_a_OBJECTS) $(libebl_sparc_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_sparc_pic.a
-
-libebl_tilegx_pic.a: $(libebl_tilegx_pic_a_OBJECTS) $(libebl_tilegx_pic_a_DEPENDENCIES) $(EXTRA_libebl_tilegx_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_tilegx_pic.a
-	$(AM_V_AR)$(libebl_tilegx_pic_a_AR) libebl_tilegx_pic.a $(libebl_tilegx_pic_a_OBJECTS) $(libebl_tilegx_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_tilegx_pic.a
-
-libebl_x86_64_pic.a: $(libebl_x86_64_pic_a_OBJECTS) $(libebl_x86_64_pic_a_DEPENDENCIES) $(EXTRA_libebl_x86_64_pic_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libebl_x86_64_pic.a
-	$(AM_V_AR)$(libebl_x86_64_pic_a_AR) libebl_x86_64_pic.a $(libebl_x86_64_pic_a_OBJECTS) $(libebl_x86_64_pic_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libebl_x86_64_pic.a
+libebl_backends_pic.a: $(libebl_backends_pic_a_OBJECTS) $(libebl_backends_pic_a_DEPENDENCIES) $(EXTRA_libebl_backends_pic_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libebl_backends_pic.a
+	$(AM_V_AR)$(libebl_backends_pic_a_AR) libebl_backends_pic.a $(libebl_backends_pic_a_OBJECTS) $(libebl_backends_pic_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libebl_backends_pic.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -762,6 +654,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bpf_init.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bpf_regs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bpf_symbol.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_attrs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_cfi.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_corenote.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_init.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_initreg.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_regs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_symbol.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_auxv.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_cfi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_corenote.Po@am__quote@ # am--include-marker
@@ -770,7 +669,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_regs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_retval.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_symbol.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_syscall.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_unwind.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ia64_init.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ia64_regs.Po@am__quote@ # am--include-marker
@@ -798,7 +696,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ppc_regs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ppc_retval.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ppc_symbol.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ppc_syscall.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv64_corenote.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_cfi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/riscv_corenote.Po@am__quote@ # am--include-marker
@@ -831,11 +728,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sparc_regs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sparc_retval.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sparc_symbol.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tilegx_corenote.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tilegx_init.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tilegx_regs.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tilegx_retval.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tilegx_symbol.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x32_corenote.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x86_64_cfi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x86_64_corenote.Po@am__quote@ # am--include-marker
@@ -844,7 +736,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x86_64_regs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x86_64_retval.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x86_64_symbol.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x86_64_syscall.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x86_64_unwind.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -954,10 +845,12 @@ distdir-am: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES) $(DATA) $(HEADERS)
+all-am: Makefile $(LIBRARIES) $(HEADERS)
 installdirs:
+install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
@@ -974,6 +867,7 @@ install-strip:
 	    "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'" install; \
 	fi
 mostlyclean-generic:
+	-test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
 
 clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
@@ -1016,6 +910,13 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/bpf_init.Po
 	-rm -f ./$(DEPDIR)/bpf_regs.Po
 	-rm -f ./$(DEPDIR)/bpf_symbol.Po
+	-rm -f ./$(DEPDIR)/csky_attrs.Po
+	-rm -f ./$(DEPDIR)/csky_cfi.Po
+	-rm -f ./$(DEPDIR)/csky_corenote.Po
+	-rm -f ./$(DEPDIR)/csky_init.Po
+	-rm -f ./$(DEPDIR)/csky_initreg.Po
+	-rm -f ./$(DEPDIR)/csky_regs.Po
+	-rm -f ./$(DEPDIR)/csky_symbol.Po
 	-rm -f ./$(DEPDIR)/i386_auxv.Po
 	-rm -f ./$(DEPDIR)/i386_cfi.Po
 	-rm -f ./$(DEPDIR)/i386_corenote.Po
@@ -1024,7 +925,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/i386_regs.Po
 	-rm -f ./$(DEPDIR)/i386_retval.Po
 	-rm -f ./$(DEPDIR)/i386_symbol.Po
-	-rm -f ./$(DEPDIR)/i386_syscall.Po
 	-rm -f ./$(DEPDIR)/i386_unwind.Po
 	-rm -f ./$(DEPDIR)/ia64_init.Po
 	-rm -f ./$(DEPDIR)/ia64_regs.Po
@@ -1052,7 +952,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/ppc_regs.Po
 	-rm -f ./$(DEPDIR)/ppc_retval.Po
 	-rm -f ./$(DEPDIR)/ppc_symbol.Po
-	-rm -f ./$(DEPDIR)/ppc_syscall.Po
 	-rm -f ./$(DEPDIR)/riscv64_corenote.Po
 	-rm -f ./$(DEPDIR)/riscv_cfi.Po
 	-rm -f ./$(DEPDIR)/riscv_corenote.Po
@@ -1085,11 +984,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/sparc_regs.Po
 	-rm -f ./$(DEPDIR)/sparc_retval.Po
 	-rm -f ./$(DEPDIR)/sparc_symbol.Po
-	-rm -f ./$(DEPDIR)/tilegx_corenote.Po
-	-rm -f ./$(DEPDIR)/tilegx_init.Po
-	-rm -f ./$(DEPDIR)/tilegx_regs.Po
-	-rm -f ./$(DEPDIR)/tilegx_retval.Po
-	-rm -f ./$(DEPDIR)/tilegx_symbol.Po
 	-rm -f ./$(DEPDIR)/x32_corenote.Po
 	-rm -f ./$(DEPDIR)/x86_64_cfi.Po
 	-rm -f ./$(DEPDIR)/x86_64_corenote.Po
@@ -1098,7 +992,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/x86_64_regs.Po
 	-rm -f ./$(DEPDIR)/x86_64_retval.Po
 	-rm -f ./$(DEPDIR)/x86_64_symbol.Po
-	-rm -f ./$(DEPDIR)/x86_64_syscall.Po
 	-rm -f ./$(DEPDIR)/x86_64_unwind.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -1171,6 +1064,13 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/bpf_init.Po
 	-rm -f ./$(DEPDIR)/bpf_regs.Po
 	-rm -f ./$(DEPDIR)/bpf_symbol.Po
+	-rm -f ./$(DEPDIR)/csky_attrs.Po
+	-rm -f ./$(DEPDIR)/csky_cfi.Po
+	-rm -f ./$(DEPDIR)/csky_corenote.Po
+	-rm -f ./$(DEPDIR)/csky_init.Po
+	-rm -f ./$(DEPDIR)/csky_initreg.Po
+	-rm -f ./$(DEPDIR)/csky_regs.Po
+	-rm -f ./$(DEPDIR)/csky_symbol.Po
 	-rm -f ./$(DEPDIR)/i386_auxv.Po
 	-rm -f ./$(DEPDIR)/i386_cfi.Po
 	-rm -f ./$(DEPDIR)/i386_corenote.Po
@@ -1179,7 +1079,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/i386_regs.Po
 	-rm -f ./$(DEPDIR)/i386_retval.Po
 	-rm -f ./$(DEPDIR)/i386_symbol.Po
-	-rm -f ./$(DEPDIR)/i386_syscall.Po
 	-rm -f ./$(DEPDIR)/i386_unwind.Po
 	-rm -f ./$(DEPDIR)/ia64_init.Po
 	-rm -f ./$(DEPDIR)/ia64_regs.Po
@@ -1207,7 +1106,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/ppc_regs.Po
 	-rm -f ./$(DEPDIR)/ppc_retval.Po
 	-rm -f ./$(DEPDIR)/ppc_symbol.Po
-	-rm -f ./$(DEPDIR)/ppc_syscall.Po
 	-rm -f ./$(DEPDIR)/riscv64_corenote.Po
 	-rm -f ./$(DEPDIR)/riscv_cfi.Po
 	-rm -f ./$(DEPDIR)/riscv_corenote.Po
@@ -1240,11 +1138,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/sparc_regs.Po
 	-rm -f ./$(DEPDIR)/sparc_retval.Po
 	-rm -f ./$(DEPDIR)/sparc_symbol.Po
-	-rm -f ./$(DEPDIR)/tilegx_corenote.Po
-	-rm -f ./$(DEPDIR)/tilegx_init.Po
-	-rm -f ./$(DEPDIR)/tilegx_regs.Po
-	-rm -f ./$(DEPDIR)/tilegx_retval.Po
-	-rm -f ./$(DEPDIR)/tilegx_symbol.Po
 	-rm -f ./$(DEPDIR)/x32_corenote.Po
 	-rm -f ./$(DEPDIR)/x86_64_cfi.Po
 	-rm -f ./$(DEPDIR)/x86_64_corenote.Po
@@ -1253,7 +1146,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/x86_64_regs.Po
 	-rm -f ./$(DEPDIR)/x86_64_retval.Po
 	-rm -f ./$(DEPDIR)/x86_64_symbol.Po
-	-rm -f ./$(DEPDIR)/x86_64_syscall.Po
 	-rm -f ./$(DEPDIR)/x86_64_unwind.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
@@ -1301,35 +1193,6 @@ uninstall-am:
 
 print-%:
 	@echo $*=$($*)
-
-libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw) $(libeu)
-	@rm -f $(@:.so=.map)
-	$(AM_V_at)echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' \
-	  > $(@:.so=.map)
-	$(AM_V_CCLD)$(LINK) $(dso_LDFLAGS) -o $(@:.map=.so) \
-		-Wl,--whole-archive $< $(cpu_$*) -Wl,--no-whole-archive \
-		-Wl,--version-script,$(@:.so=.map),--no-undefined \
-		-Wl,--as-needed $(libelf) $(libdw) $(libeu)
-	@$(textrel_check)
-
-libebl_i386.so: $(cpu_i386)
-libebl_x86_64.so: $(cpu_x86_64)
-libebl_bpf.so: $(cpu_bpf)
-
-install: install-am install-ebl-modules
-install-ebl-modules:
-	$(mkinstalldirs) $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)
-	for m in $(modules); do \
-	  $(INSTALL_PROGRAM) libebl_$${m}.so $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)/libebl_$${m}-$(PACKAGE_VERSION).so; \
-	  ln -fs libebl_$${m}-$(PACKAGE_VERSION).so $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)/libebl_$${m}.so; \
-	done
-
-uninstall: uninstall-am
-	for m in $(modules); do \
-	  rm -f $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)/libebl_$${m}-$(PACKAGE_VERSION).so; \
-	  rm -f $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)/libebl_$${m}.so; \
-	done
-	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
