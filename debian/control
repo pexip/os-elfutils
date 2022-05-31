@@ -7,7 +7,7 @@ Build-Conflicts: autoconf2.13, automake1.4
 Standards-Version: 4.1.0
 Section: libs
 Homepage: https://sourceware.org/elfutils/
-XS-Pexip-Upstream: http://ftp.debian.org/debian/ buster
+XS-Pexip-Upstream: http://deb.debian.org/debian/ bullseye
 
 Package: elfutils
 Section: utils
