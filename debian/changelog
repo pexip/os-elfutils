@@ -1,3 +1,9 @@
+elfutils (0.183-1pexip1) pexip; urgency=medium
+
+  * Initial bullseye build
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 02 Jun 2022 14:42:10 +0100
+
 elfutils (0.183-1) unstable; urgency=medium
 
   * New upstream release. Changes compared to the snapshot:
