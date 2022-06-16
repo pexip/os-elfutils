@@ -1,5 +1,6 @@
 Source: elfutils
 Priority: optional
+Maintainer: Pexip AS <packaging@pexip.com>
 XSBC-Pexip-Original-Maintainer: Debian Elfutils Maintainers <debian-gcc@lists.debian.org>
 XSBC-Pexip-Original-Uploaders: Kurt Roeckx <kurt@roeckx.be>,
   Matthias Klose <doko@debian.org>
