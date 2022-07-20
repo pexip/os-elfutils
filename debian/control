@@ -14,7 +14,7 @@ Build-Depends: debhelper (>= 11),
   flex, bison,
   pkg-config,
   libarchive-dev <!pkg.elfutils.nodebuginfod>,
-  libmicrohttpd-dev <!pkg.elfutils.nodebuginfod>, libcurl4-gnutls-dev <!pkg.elfutils.nodebuginfod>, libsqlite3-dev <!pkg.elfutils.nodebuginfod>,
+  libmicrohttpd-dev <!pkg.elfutils.nodebuginfod>, libcurl4-openssl-dev <!pkg.elfutils.nodebuginfod>, libsqlite3-dev <!pkg.elfutils.nodebuginfod>,
 Build-Conflicts: autoconf2.13
 Standards-Version: 4.5.1
 Section: libs
