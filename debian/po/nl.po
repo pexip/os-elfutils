@@ -1,0 +1,49 @@
+# Dutch translation of elfutils debconf templates.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the elfutils package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Frans Spiesschaert <Frans.Spiesschaert@yucom.be>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: elfutils_0.185-2\n"
+"Report-Msgid-Bugs-To: elfutils@packages.debian.org\n"
+"POT-Creation-Date: 2021-03-06 18:23-0500\n"
+"PO-Revision-Date: 2021-08-18 21:59+0200\n"
+"Last-Translator: Frans Spiesschaert <Frans.Spiesschaert@yucom.be>\n"
+"Language-Team: Debian Dutch l10n Team <debian-l10n-dutch@lists.debian.org>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.2.1\n"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid "Connect to Debian's debuginfod server to download debug symbols?"
+msgstr ""
+"Verbinding maken met de debuginfod-server van Debian om debug-symbolen te "
+"downloaden?"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid ""
+"While debugging programs (with GDB, for example) or using debuginfo-consumer "
+"applications, it is possible to connect to Debian's debuginfod server and "
+"download the necessary debug information for the program you are debugging "
+"on-the-fly, without the need to configure the debian-debug apt repository "
+"nor installing any dbgsym packages.  This service is maintained by Debian, "
+"and the only information you will have to send to it is the Build-ID hash of "
+"the program(s)/library(ies) being debugged."
+msgstr ""
+"Tijdens het debuggen van programma's (bijvoorbeeld met GDB) of het gebruik "
+"van debuginfo-consumer-applicaties is het mogelijk om verbinding te maken "
+"met de debuginfod-server van Debian en de nodige debug-informatie te "
+"downloaden voor het programma dat u aan het debuggen bent, zonder dat het "
+"nodig is om de apt-bron debian-debug te configureren of dbgsym-pakketten te "
+"installeren. Deze service wordt onderhouden door Debian, en de enige "
+"informatie die u ernaar hoeft te sturen, is de Build-ID-hash van de "
+"programma('s)/bibliotheek(en) die u wilt debuggen."

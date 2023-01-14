@@ -1,3 +1,211 @@
+elfutils (0.188-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add debconf template translation
+    - Dutch translation.
+      Thanks to Frans Spiesschaert (Closes: #994141)
+    - French translation.
+      Thanks Jean-Pierre Giraud (Closes: #994667)
+    - German translation.
+      Thanks Helge Kreutzmann (Closes: #997891)
+    - Portuguese translation.
+      Thanks Américo Monteiro (Closes: #1001920)
+    - Spanish translation.
+      Thanks Camaleón (Closes: #1003517)
+    - Brazilian Portuguese translation.
+      Thanks Paulo Henrique de Lima Santana (Closes: #1025512)
+
+ -- Helge Kreutzmann <debian@helgefjell.de>  Sat, 14 Jan 2023 14:54:50 +0100
+
+elfutils (0.188-2) unstable; urgency=medium
+
+  [ Bastian Germann ]
+  * d/copyright: Convert to machine-readable format, adding missing
+    licenses.  (Closes: #1019937)
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Wed, 21 Dec 2022 15:13:47 -0500
+
+elfutils (0.188-1) unstable; urgency=medium
+
+  * New upstream release.
+  * d/p/{hurd-hacks.diff,kfreebsd-debuginfod,kfreebsd-mremap-stub}:
+    Refresh patches against new upstream version.
+  * d/{libdebuginfod1,libdw1}.symbols: Add new symbols.
+  * d/rules: Remove debuginfod.service.8 during installation.
+    Currently, we don't install debuginfod.service.
+  * Rename upstream's signing key file.
+    - d/u/signing-key.asc: Rename from d/upstream-signing-key.pgp.
+    - d/s/included-binaries: Remove.
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Sun, 13 Nov 2022 20:52:25 -0500
+
+elfutils (0.187-4) unstable; urgency=medium
+
+  * Fix Ubuntu upgrade path for libdebuginfod-common. (LP: #1990638)
+    - d/libdebuginfod-common.postinst: Split Ubuntu-specific code into a
+      separate function.  Clean up ucf/ucfr configuration files when
+      upgrading from libdebuginfod-common versions before 0.187-3.  Create
+      links for the debuginfod shell snippets directly.
+    - d/libdebuginfod-common.postrm: Handle Debian and Ubuntu purge
+      differently.
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Sat, 24 Sep 2022 16:34:05 -0400
+
+elfutils (0.187-3) unstable; urgency=medium
+
+  * Always install debuginfod shell snippets in Ubuntu.
+    - d/libdebuginfod-common.config: Remove snippet to db_input the Ubuntu
+      question.
+    - d/libdebuginfod-common.postinst: Always install debuginfod shell
+      snippets in Ubuntu.
+    - d/libdebuginfod-common.templates: Remove
+      libdebuginfod/useubuntudebuginfod question.
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Wed, 21 Sep 2022 19:08:05 -0400
+
+elfutils (0.187-2) unstable; urgency=medium
+
+  * Pass --sysconfdir to configure and install elfutils.urls.
+    - d/rules: Pass --sysconfdir to configure; don't delete elfutils.urls.
+    - d/libdebuginfod-common.install: Adjust paths and install
+      elfutils.urls.
+  * d/rules: Cleanup debuginfod code and support Ubuntu's debuginfod.
+  * d/libdebuginfod-common.templates: New question for Ubuntu's debuginfod.
+  * d/libdebuginfod-common.config: Ask about Ubuntu's debuginfod.
+  * d/libdebuginfod-common.post{inst,rm}: Cleanup code, fix problems
+    and support Ubuntu.
+    Thanks to наб <nabijaczleweli@nabijaczleweli.xyz> (Closes: #987787)
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Fri, 02 Sep 2022 17:11:29 -0400
+
+elfutils (0.187-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 04 May 2022 01:08:42 +0200
+
+elfutils (0.186-1build1) jammy; urgency=medium
+
+  * No-change rebuild for ppc64el baseline bump.
+
+ -- Łukasz 'sil2100' Zemczak <lukasz.zemczak@ubuntu.com>  Wed, 23 Mar 2022 14:51:35 +0100
+
+elfutils (0.186-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Don't yet install elfutils.urls.
+  * Update symbols file.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 17 Nov 2021 21:49:08 +0100
+
+elfutils (0.185-2) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Matthias Klose <doko@debian.org>  Sun, 15 Aug 2021 18:27:02 +0200
+
+elfutils (0.185-1) experimental; urgency=medium
+
+  * New upstream release.
+  * Refresh patches.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 25 May 2021 20:31:36 +0200
+
+elfutils (0.184-1) experimental; urgency=medium
+
+  * New upstream release.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 17 May 2021 12:10:27 +0200
+
+elfutils (0.183-8) experimental; urgency=medium
+
+  * libdebuginfod1: Relax dependency on libdebuginfod-common. Closes: #986375.
+  * libdebuginfod-common: Update package description. Closes: #987036.
+  * Always install the shell snippets into /etc/profile.d/.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 17 Apr 2021 09:58:41 +0200
+
+elfutils (0.183-7) experimental; urgency=medium
+
+  [ Sergio Durigan Junior ]
+  * d/rules: Populate binary-indep with proper build instructions.
+  * d/control: Remove ${shlibs:Depends} from libdebuginfod-common.
+
+  [ Matthias Klose ]
+  * d/rules: Move dh_install to the install target.
+  * d/rules: Add -a/-i options to the dh_ commands.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 15 Apr 2021 17:49:43 +0200
+
+elfutils (0.183-6) experimental; urgency=medium
+
+  * d/libdebuginfod-common.install: Remove file.
+  * d/rules:
+    Implement logic to decide whether to install the debuginfod shell
+    snippets under /etc/profile.d/ based on the existence of a debuginfod
+    service available for the current distribution.  This is needed mostly
+    for Ubuntu and other derivatives which don't have debuginfod services
+    available yet.
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Fri, 26 Mar 2021 01:14:28 -0400
+
+elfutils (0.183-5) experimental; urgency=medium
+
+  * d/libdebuginfod-common.install:
+    Install the debuginfod profile.d snippets under
+    /usr/share/libdebuginfod-common/ instead of directly under
+    /etc/profile.d/.
+  * d/libdebuginfod-common.config:
+    Check for the "debuginfod.sh" snippet under
+    /usr/share/libdebuginfod-common/.
+  * d/libdebuginfod-common.postinst:
+    Perform modifications in the debuginfod shell snippets that now live
+    under /usr/share/libdebuginfod-common/, before moving them (using ucf)
+    to /etc/profile.d/. (Closes: #985044)
+  * d/libdebuginfod-common.postrm:
+    New postrm file which takes care of purging the debuginfod shell
+    snippets under /etc/profile.d/.
+  * d/control: Make libdebuginfod-common depend on ucf.
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Fri, 19 Mar 2021 15:58:25 -0400
+
+elfutils (0.183-4) experimental; urgency=medium
+
+  * Apply KFreeBSD patches (Christoph Berg), not forwarded.
+  * Fix build on the Hurd.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 09 Mar 2021 20:10:42 +0100
+
+elfutils (0.183-2) unstable; urgency=medium
+
+  * d/control:
+    - B-D on lsb-release.
+    - B-D on po-debconf.
+    - Create new libdebuginfod-common package.
+    - Add myself to Uploaders.
+  * d/rules:
+    - Use https://debuginfod.debian.net as our default service.
+      Also, revamp the code responsible for determining libdebuginfod
+      configuration flags.
+    - Invoke dh_installdebconf.
+  * d/libdebuginfod-common.templates: Create a debconf template.
+    Also, create d/po/POTFILES.in and d/po/templates.pot.
+    This template is for the question of whether the user accepts GDB or
+    another debuginfo consumer program to connect to Debian's debuginfod
+    server.
+  * d/libdebuginfod-common.config: Ask if the user accepts to use Debian's
+    debuginfod.
+  * d/libdebuginfod-common.postinst: Act upon the user's answer to the
+    debconf question.
+    If the user has accepted to use Debian's debuginfod, then the script
+    confirms the value of the DEBUGINFOD_URLS environment variable present
+    in the shell excerpts under /etc/profile.d.  Otherwise, the script
+    will set the variable to an empty value, disabling the remote
+    connection to the debuginfod server. (Closes: #983434)
+  * d/libdebuginfod-common.install: Install the profile.d snippets.
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Sun, 28 Feb 2021 21:07:16 -0500
+
 elfutils (0.183-1) unstable; urgency=medium
 
   * New upstream release. Changes compared to the snapshot:

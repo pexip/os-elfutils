@@ -1,5 +1,5 @@
 
-#line 3 "i386_lex.c"
+#line 2 "i386_lex.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -808,7 +808,6 @@ char *yytext;
 #endif
 
 #include <ctype.h>
-#include <libintl.h>
 
 #include <libeu.h>
 #include "system.h"
@@ -817,9 +816,9 @@ char *yytext;
 
 static void eat_to_eol (void);
 static void invalid_char (int ch);
-#line 821 "i386_lex.c"
+#line 819 "i386_lex.c"
 
-#line 823 "i386_lex.c"
+#line 821 "i386_lex.c"
 
 #define INITIAL 0
 #define MAIN 1
@@ -1040,10 +1039,10 @@ YY_DECL
 		}
 
 	{
-#line 57 "i386_lex.l"
+#line 56 "i386_lex.l"
 
 
-#line 1047 "i386_lex.c"
+#line 1045 "i386_lex.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1109,119 +1108,119 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 59 "i386_lex.l"
+#line 58 "i386_lex.l"
 { return kMASK; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 61 "i386_lex.l"
+#line 60 "i386_lex.l"
 { return kPREFIX; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 62 "i386_lex.l"
+#line 61 "i386_lex.l"
 { return kSUFFIX; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 64 "i386_lex.l"
+#line 63 "i386_lex.l"
 { return kSYNONYM; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 66 "i386_lex.l"
+#line 65 "i386_lex.l"
 { i386_lval.num = strtoul (yytext, NULL, 10);
 				  return kNUMBER; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 69 "i386_lex.l"
+#line 68 "i386_lex.l"
 { BEGIN (MAIN); return kPERCPERC; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 72 "i386_lex.l"
+#line 71 "i386_lex.l"
 { return '0'; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 73 "i386_lex.l"
+#line 72 "i386_lex.l"
 { return '1'; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 75 "i386_lex.l"
+#line 74 "i386_lex.l"
 { i386_lval.str = xstrndup (yytext + 1,
 							    yyleng - 2);
 				  return kBITFIELD; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 79 "i386_lex.l"
+#line 78 "i386_lex.l"
 { i386_lval.str = (void *) -1l;
 				  return kID; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 82 "i386_lex.l"
+#line 81 "i386_lex.l"
 { i386_lval.str = xstrndup (yytext, yyleng);
 				  return kID; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 85 "i386_lex.l"
+#line 84 "i386_lex.l"
 { return ','; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 87 "i386_lex.l"
+#line 86 "i386_lex.l"
 { return ':'; }
 	YY_BREAK
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 89 "i386_lex.l"
+#line 88 "i386_lex.l"
 { /* IGNORE */ }
 	YY_BREAK
 case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
-#line 91 "i386_lex.l"
+#line 90 "i386_lex.l"
 { return '\n'; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 93 "i386_lex.l"
+#line 92 "i386_lex.l"
 { eat_to_eol (); }
 	YY_BREAK
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 95 "i386_lex.l"
+#line 94 "i386_lex.l"
 { /* IGNORE */ }
 	YY_BREAK
 case 18:
 /* rule 18 can match eol */
 YY_RULE_SETUP
-#line 97 "i386_lex.l"
+#line 96 "i386_lex.l"
 { return kSPACE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 99 "i386_lex.l"
+#line 98 "i386_lex.l"
 { i386_lval.ch = *yytext; return kCHAR; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 101 "i386_lex.l"
+#line 100 "i386_lex.l"
 { invalid_char (*yytext); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 104 "i386_lex.l"
+#line 103 "i386_lex.l"
 ECHO;
 	YY_BREAK
-#line 1225 "i386_lex.c"
+#line 1223 "i386_lex.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(MAIN):
 	yyterminate();
@@ -2242,7 +2241,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 104 "i386_lex.l"
+#line 103 "i386_lex.l"
 
 
 static void

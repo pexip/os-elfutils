@@ -31,7 +31,6 @@
 #endif
 
 #include <assert.h>
-#include <dlfcn.h>
 #include <libelfP.h>
 #include <dwarf.h>
 #include <stdlib.h>
@@ -169,7 +168,7 @@ static const char *default_section_type_name (int ignore, char *buf,
 					      size_t len);
 static const char *default_section_name (int ignore, int ignore2, char *buf,
 					 size_t len);
-static const char *default_machine_flag_name (Elf64_Word *ignore);
+static const char *default_machine_flag_name (Elf64_Word orig, Elf64_Word *ignore);
 static bool default_machine_flag_check (Elf64_Word flags);
 static bool default_machine_section_flag_check (GElf_Xword flags);
 static const char *default_symbol_type_name (int ignore, char *buf,
@@ -274,7 +273,7 @@ openbackend (Elf *elf, const char *emulation, GElf_Half machine)
   /* First allocate the data structure for the result.  We do this
      here since this assures that the structure is always large
      enough.  */
-  result = (Ebl *) calloc (1, sizeof (Ebl));
+  result = calloc (1, sizeof (Ebl));
   if (result == NULL)
     {
       // XXX uncomment
@@ -450,7 +449,8 @@ default_section_name (int ignore __attribute__ ((unused)),
 }
 
 static const char *
-default_machine_flag_name (Elf64_Word *ignore __attribute__ ((unused)))
+default_machine_flag_name (Elf64_Word orig __attribute__ ((unused)),
+			   Elf64_Word *ignore __attribute__ ((unused)))
 {
   return NULL;
 }
@@ -616,9 +616,9 @@ default_debugscn_p (const char *name)
 				   / sizeof (dwarf_scn_names[0]));
   for (size_t cnt = 0; cnt < ndwarf_scn_names; ++cnt)
     if (strcmp (name, dwarf_scn_names[cnt]) == 0
-	|| (strncmp (name, ".zdebug", strlen (".zdebug")) == 0
+	|| (startswith (name, ".zdebug")
 	    && strcmp (&name[2], &dwarf_scn_names[cnt][1]) == 0)
-	|| (strncmp (name, ".gnu.debuglto_", strlen (".gnu.debuglto_")) == 0
+	|| (startswith (name, ".gnu.debuglto_")
 	    && strcmp (&name[14], dwarf_scn_names[cnt]) == 0))
       return true;
 

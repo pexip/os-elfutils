@@ -14,3 +14,6 @@ disable_werror.patch
 riscv-retval-workaround.patch
 #disable-some-tests.diff
 remove-old-glibc-hack.diff
+kfreebsd-debuginfod
+kfreebsd-mremap-stub
+hurd-hacks.diff

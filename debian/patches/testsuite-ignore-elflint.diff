@@ -4,8 +4,6 @@ binutils don't pass elflint. However elfutils shouldn't FTBFS because of this.
 So we run the tests on all archs to see what breaks, but if it breaks we ignore
 the result (exitcode 77 means: this test was skipped).
 
-Index: b/tests/run-elflint-self.sh
-===================================================================
 --- a/tests/run-elflint-self.sh
 +++ b/tests/run-elflint-self.sh
 @@ -18,5 +18,5 @@
@@ -15,11 +13,9 @@ Index: b/tests/run-elflint-self.sh
 -testrun_on_self ${abs_top_builddir}/src/elflint --quiet --gnu-ld
 +testrun_on_self_skip ${abs_top_builddir}/src/elflint --quiet --gnu-ld
  testrun_on_self_compressed ${abs_top_builddir}/src/elflint --quiet --gnu-ld
-Index: b/tests/test-subr.sh
-===================================================================
 --- a/tests/test-subr.sh
 +++ b/tests/test-subr.sh
-@@ -170,3 +170,18 @@ testrun_on_self_quiet()
+@@ -212,3 +212,18 @@ testrun_on_self_quiet()
    # Only exit if something failed
    if test $exit_status != 0; then exit $exit_status; fi
  }

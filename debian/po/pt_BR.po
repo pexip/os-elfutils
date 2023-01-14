@@ -1,0 +1,44 @@
+# Debconf translation for elfutils.
+# Copyright (C) 2021 Sergio Durigan Junior <sergiodj@debian.org>
+# This file is distributed under the same license as the elfutils package.
+# Sergio Durigan Junior <sergiodj@debian.org>, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: elfutils\n"
+"Report-Msgid-Bugs-To: elfutils@packages.debian.org\n"
+"POT-Creation-Date: 2021-03-06 18:23-0500\n"
+"PO-Revision-Date: 2021-03-21 02:57-0400\n"
+"Last-Translator: Sergio Durigan Junior <sergiodj@debian.org>\n"
+"Language-Team: Brazilian Portuguese <debian-l10n-portuguese@lists.debian.org>\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid "Connect to Debian's debuginfod server to download debug symbols?"
+msgstr "Conectar-se ao servidor debuginfod do Debian para baixar símbolos de depuração?"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid ""
+"While debugging programs (with GDB, for example) or using debuginfo-consumer "
+"applications, it is possible to connect to Debian's debuginfod server and "
+"download the necessary debug information for the program you are debugging "
+"on-the-fly, without the need to configure the debian-debug apt repository "
+"nor installing any dbgsym packages.  This service is maintained by Debian, "
+"and the only information you will have to send to it is the Build-ID hash of "
+"the program(s)/library(ies) being debugged."
+msgstr ""
+"Enquanto você estiver depurando programas (com o GDB, por exemplo) ou "
+"utilizando algum outro aplicativo consumidor de informações de "
+"depuração, é possível conectar-se ao servidor debuginfod do Debian e "
+"baixar simultaneamente as informações de depuração necessárias para o "
+"programa sendo depurado, sem que seja necessário configurar o "
+"repositório debian-debug nem instalar quaisquer pacotes dbgsym. Este "
+"serviço é mantido pelo Debian, e a única informação que será enviada a "
+"ele é a assinatura Build-ID do(s) programa(s)/biblioteca(s) sendo "
+"depurado(s)."

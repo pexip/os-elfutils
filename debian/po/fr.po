@@ -1,0 +1,49 @@
+# elfutils debconf templates French translation
+# Copyright (C) 2021
+# This file is distributed under the same license as the elfutils package.
+#
+# Translators:
+# Jean-Pierre Giraud <jean-pierregiraud@neuf.fr>, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: elfutils\n"
+"Report-Msgid-Bugs-To: elfutils@packages.debian.org\n"
+"POT-Creation-Date: 2021-03-06 18:23-0500\n"
+"PO-Revision-Date: 2021-09-19 11:12+0100\n"
+"Last-Translator: Jean-Pierre Giraud <jean-pierregiraud@neuf.fr>\n"
+"Language-Team: French <debian-l10n-french@lists.debian.org>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid "Connect to Debian's debuginfod server to download debug symbols?"
+msgstr ""
+"Faut-il se connecter au serveur debuginfod de Debian pour télécharger les "
+"symboles de débogage ?"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid ""
+"While debugging programs (with GDB, for example) or using debuginfo-consumer "
+"applications, it is possible to connect to Debian's debuginfod server and "
+"download the necessary debug information for the program you are debugging "
+"on-the-fly, without the need to configure the debian-debug apt repository "
+"nor installing any dbgsym packages.  This service is maintained by Debian, "
+"and the only information you will have to send to it is the Build-ID hash of "
+"the program(s)/library(ies) being debugged."
+msgstr ""
+"Lors du débogage de programmes (avec GDB par exemple) ou de l'utilisation "
+"d'applications se servant de debuginfo, il est possible de se connecter au "
+"serveur debuginfod de Debian et de télécharger les informations de débogage "
+"nécessaires pour le programme que vous déboguez à la volée, sans avoir "
+"besoin de configurer le dépôt APT debian-debug ou d'installer un paquet "
+"dbgsym. Ce service est entretenu par Debian et la seule information que vous "
+"aurez à lui envoyer est l'empreinte numérique du « Build-ID » des "
+"programmes ou bibliothèques débogués."

@@ -426,6 +426,7 @@
   DWARF_ONE_KNOWN_DW_LLE_GNU (end_of_list_entry, DW_LLE_GNU_end_of_list_entry) \
   DWARF_ONE_KNOWN_DW_LLE_GNU (start_end_entry, DW_LLE_GNU_start_end_entry) \
   DWARF_ONE_KNOWN_DW_LLE_GNU (start_length_entry, DW_LLE_GNU_start_length_entry) \
+  DWARF_ONE_KNOWN_DW_LLE_GNU (view_pair, DW_LLE_GNU_view_pair) \
   /* End of DW_LLE_GNU_*.  */
 
 #define DWARF_ALL_KNOWN_DW_LNCT \
@@ -437,6 +438,8 @@
   /* End of DW_LNCT_*.  */
 
 #define DWARF_ALL_KNOWN_DW_LNE \
+  DWARF_ONE_KNOWN_DW_LNE (NVIDIA_inlined_call, DW_LNE_NVIDIA_inlined_call) \
+  DWARF_ONE_KNOWN_DW_LNE (NVIDIA_set_function_name, DW_LNE_NVIDIA_set_function_name) \
   DWARF_ONE_KNOWN_DW_LNE (define_file, DW_LNE_define_file) \
   DWARF_ONE_KNOWN_DW_LNE (end_sequence, DW_LNE_end_sequence) \
   DWARF_ONE_KNOWN_DW_LNE (set_address, DW_LNE_set_address) \
@@ -677,6 +680,16 @@
   DWARF_ONE_KNOWN_DW_RLE (startx_endx, DW_RLE_startx_endx) \
   DWARF_ONE_KNOWN_DW_RLE (startx_length, DW_RLE_startx_length) \
   /* End of DW_RLE_*.  */
+
+#define DWARF_ALL_KNOWN_DW_SECT_INFO \
+  DWARF_ONE_KNOWN_DW_SECT_INFO (, DW_SECT_INFO_) \
+  DWARF_ONE_KNOWN_DW_SECT_INFO (, DW_SECT_INFO_) \
+  DWARF_ONE_KNOWN_DW_SECT_INFO (, DW_SECT_INFO_) \
+  DWARF_ONE_KNOWN_DW_SECT_INFO (, DW_SECT_INFO_) \
+  DWARF_ONE_KNOWN_DW_SECT_INFO (, DW_SECT_INFO_) \
+  DWARF_ONE_KNOWN_DW_SECT_INFO (, DW_SECT_INFO_) \
+  DWARF_ONE_KNOWN_DW_SECT_INFO (, DW_SECT_INFO_) \
+  /* End of DW_SECT_INFO_*.  */
 
 #define DWARF_ALL_KNOWN_DW_TAG \
   DWARF_ONE_KNOWN_DW_TAG (GNU_BINCL, DW_TAG_GNU_BINCL) \
