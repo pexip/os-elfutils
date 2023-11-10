@@ -30,8 +30,9 @@
 # include <config.h>
 #endif
 
+#include <system.h>
+
 #include "libdwflP.h"
-#include <unistd.h>
 
 /* Set STATE->pc_set from STATE->regs according to the backend.  Return true on
    success, false on error.  */
@@ -172,7 +173,7 @@ dwfl_attach_state (Dwfl *dwfl, Elf *elf, pid_t pid,
 	     is called from dwfl_linux_proc_attach with elf == NULL.
 	     __libdwfl_module_getebl will call __libdwfl_getelf which
 	     will call the find_elf callback.  */
-	  if (strncmp (mod->name, "[vdso: ", 7) == 0
+	  if (startswith (mod->name, "[vdso: ")
 	      || strcmp (strrchr (mod->name, ' ') ?: "",
 			 " (deleted)") == 0)
 	    continue;

@@ -33,7 +33,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <fnmatch.h>
-#include <libintl.h>
 #include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -225,7 +224,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
   do									      \
     {									      \
       if (unlikely (!(call)))						      \
-	error (EXIT_FAILURE, 0, msg, elf_errmsg (-1));			      \
+	error_exit (0, msg, elf_errmsg (-1));				      \
     } while (0)
 
 /* Copy INELF to newly-created OUTELF, exit via error for any problems.  */
@@ -316,7 +315,7 @@ make_directories (const char *path)
       if (errno == ENOENT)
         make_directories (dir);
       else
-        error (EXIT_FAILURE, errno, _("cannot create directory '%s'"), dir);
+        error_exit (errno, _("cannot create directory '%s'"), dir);
     }
   free (dir);
 }
@@ -432,6 +431,19 @@ update_sh_size (Elf_Scn *outscn, const Elf_Data *data)
   update_shdr (outscn, newshdr);
 }
 
+static inline void
+adjust_reloc (GElf_Xword *info,
+	      size_t map[], size_t map_size)
+{
+  size_t ndx = GELF_R_SYM (*info);
+  if (ndx != STN_UNDEF)
+    {
+      if (ndx > map_size)
+	error_exit (0, "bad symbol ndx section");
+      *info = GELF_R_INFO (map[ndx - 1], GELF_R_TYPE (*info));
+    }
+}
+
 /* Update relocation sections using the symbol table.  */
 static void
 adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
@@ -439,28 +451,18 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
 {
   Elf_Data *data = elf_getdata (outscn, NULL);
 
-  inline void adjust_reloc (GElf_Xword *info)
-    {
-      size_t ndx = GELF_R_SYM (*info);
-      if (ndx != STN_UNDEF)
-	{
-	  if (ndx > map_size)
-	    error (EXIT_FAILURE, 0, "bad symbol ndx section");
-	  *info = GELF_R_INFO (map[ndx - 1], GELF_R_TYPE (*info));
-	}
-    }
-
   switch (shdr->sh_type)
     {
     case SHT_REL:
       if (shdr->sh_entsize == 0)
-	error (EXIT_FAILURE, 0, "REL section cannot have zero sh_entsize");
+	error_exit (0, "REL section cannot have zero sh_entsize");
 
       for (size_t i = 0; i < shdr->sh_size / shdr->sh_entsize; ++i)
 	{
 	  GElf_Rel rel_mem;
 	  GElf_Rel *rel = gelf_getrel (data, i, &rel_mem);
-	  adjust_reloc (&rel->r_info);
+	  ELF_CHECK (rel != NULL, _("gelf_getrel failed: %s"));
+	  adjust_reloc (&rel->r_info, map, map_size);
 	  ELF_CHECK (gelf_update_rel (data, i, rel),
 		     _("cannot update relocation: %s"));
 	}
@@ -468,13 +470,14 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
 
     case SHT_RELA:
       if (shdr->sh_entsize == 0)
-	error (EXIT_FAILURE, 0, "RELA section cannot have zero sh_entsize");
+	error_exit (0, "RELA section cannot have zero sh_entsize");
 
       for (size_t i = 0; i < shdr->sh_size / shdr->sh_entsize; ++i)
 	{
 	  GElf_Rela rela_mem;
 	  GElf_Rela *rela = gelf_getrela (data, i, &rela_mem);
-	  adjust_reloc (&rela->r_info);
+	  ELF_CHECK (rela != NULL, _("gelf_getrela failed: %s"));
+	  adjust_reloc (&rela->r_info, map, map_size);
 	  ELF_CHECK (gelf_update_rela (data, i, rela),
 		     _("cannot update relocation: %s"));
 	}
@@ -497,13 +500,13 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
       /* We must expand the table and rejigger its contents.  */
       {
 	if (shdr->sh_entsize == 0)
-	  error (EXIT_FAILURE, 0, "HASH section cannot have zero sh_entsize");
+	  error_exit (0, "HASH section cannot have zero sh_entsize");
 	if (symshdr->sh_entsize == 0)
-	  error (EXIT_FAILURE, 0, "Symbol table cannot have zero sh_entsize");
+	  error_exit (0, "Symbol table cannot have zero sh_entsize");
 	const size_t nsym = symshdr->sh_size / symshdr->sh_entsize;
 	const size_t onent = shdr->sh_size / shdr->sh_entsize;
 	if (data->d_size != shdr->sh_size)
-	  error (EXIT_FAILURE, 0, "HASH section has inconsistent size");
+	  error_exit (0, "HASH section has inconsistent size");
 
 #define CONVERT_HASH(Hash_Word)						      \
 	{								      \
@@ -513,7 +516,7 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
 	  const Hash_Word *const old_bucket = &old_hash[2];		      \
 	  const Hash_Word *const old_chain = &old_bucket[nbucket];	      \
 	  if (onent != 2 + nbucket + nchain)				      \
-	    error (EXIT_FAILURE, 0, "HASH section has inconsistent entsize"); \
+	    error_exit (0, "HASH section has inconsistent entsize");	      \
 									      \
 	  const size_t nent = 2 + nbucket + nsym;			      \
 	  Hash_Word *const new_hash = xcalloc (nent, sizeof new_hash[0]);     \
@@ -558,10 +561,9 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
       /* We must expand the table and move its elements around.  */
       {
 	if (shdr->sh_entsize == 0)
-	  error (EXIT_FAILURE, 0,
-		 "GNU_versym section cannot have zero sh_entsize");
+	  error_exit (0, "GNU_versym section cannot have zero sh_entsize");
 	if (symshdr->sh_entsize == 0)
-	  error (EXIT_FAILURE, 0, "Symbol table cannot have zero sh_entsize");
+	  error_exit (0, "Symbol table cannot have zero sh_entsize");
 	const size_t nent = symshdr->sh_size / symshdr->sh_entsize;
 	const size_t onent = shdr->sh_size / shdr->sh_entsize;
 	assert (nent >= onent);
@@ -587,9 +589,9 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
       break;
 
     default:
-      error (EXIT_FAILURE, 0,
-	     _("unexpected section type in [%zu] with sh_link to symtab"),
-	     elf_ndxscn (inscn));
+      error_exit (0,
+		  _("unexpected section type in [%zu] with sh_link to symtab"),
+		  elf_ndxscn (inscn));
     }
 }
 
@@ -628,7 +630,7 @@ add_new_section_symbols (Elf_Scn *old_symscn, size_t old_shnum,
   GElf_Shdr *shdr = gelf_getshdr (symscn, &shdr_mem);
   ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
   if (shdr->sh_entsize == 0)
-    error (EXIT_FAILURE, 0, "Symbol table section cannot have zero sh_entsize");
+    error_exit (0, "Symbol table section cannot have zero sh_entsize");
 
   const size_t nsym = shdr->sh_size / shdr->sh_entsize;
   size_t symndx_map[nsym - 1];
@@ -861,8 +863,8 @@ collect_symbols (Elf *outelf, bool rel, Elf_Scn *symscn, Elf_Scn *strscn,
       if (sym->st_name >= strdata->d_size
 	  || memrchr (strdata->d_buf + sym->st_name, '\0',
 		      strdata->d_size - sym->st_name) == NULL)
-	error (EXIT_FAILURE, 0,
-	       _("invalid string offset in symbol [%zu]"), i);
+	error_exit (0,
+		    _("invalid string offset in symbol [%zu]"), i);
 
       struct symbol *s = &table[i - 1];
       s->map = &map[i - 1];
@@ -944,13 +946,13 @@ compare_symbols_output (const void *a, const void *b)
 	  /* binutils always puts section symbols in section index order.  */
 	  CMP (shndx);
 	  else if (s1 != s2)
-	    error (EXIT_FAILURE, 0, "section symbols in unexpected order");
+	    error_exit (0, "section symbols in unexpected order");
 	}
 
       /* Nothing really matters, so preserve the original order.  */
       CMP (map);
       else if (s1 != s2)
-	error (EXIT_FAILURE, 0, "found two identical symbols");
+	error_exit (0, "found two identical symbols");
     }
 
   return cmp;
@@ -1020,8 +1022,8 @@ static inline const char *
 get_section_name (size_t ndx, const GElf_Shdr *shdr, const Elf_Data *shstrtab)
 {
   if (shdr->sh_name >= shstrtab->d_size)
-    error (EXIT_FAILURE, 0, _("cannot read section [%zu] name: %s"),
-	   ndx, elf_errmsg (-1));
+    error_exit (0, _("cannot read section [%zu] name: %s"),
+		ndx, elf_errmsg (-1));
   return shstrtab->d_buf + shdr->sh_name;
 }
 
@@ -1035,33 +1037,47 @@ get_group_sig (Elf *elf, GElf_Shdr *shdr)
 
   Elf_Scn *symscn = elf_getscn (elf, shdr->sh_link);
   if (symscn == NULL)
-    error (EXIT_FAILURE, 0, _("bad sh_link for group section: %s"),
-	   elf_errmsg (-1));
+    error_exit (0, _("bad sh_link for group section: %s"),
+		elf_errmsg (-1));
 
   GElf_Shdr symshdr_mem;
   GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
   if (symshdr == NULL)
-    error (EXIT_FAILURE, 0, _("couldn't get shdr for group section: %s"),
-	   elf_errmsg (-1));
+    error_exit (0, _("couldn't get shdr for group section: %s"),
+		elf_errmsg (-1));
 
   Elf_Data *symdata = elf_getdata (symscn, NULL);
   if (symdata == NULL)
-    error (EXIT_FAILURE, 0, _("bad data for group symbol section: %s"),
-	   elf_errmsg (-1));
+    error_exit (0, _("bad data for group symbol section: %s"),
+		elf_errmsg (-1));
 
   GElf_Sym sym_mem;
   GElf_Sym *sym = gelf_getsym (symdata, shdr->sh_info, &sym_mem);
   if (sym == NULL)
-    error (EXIT_FAILURE, 0, _("couldn't get symbol for group section: %s"),
-	   elf_errmsg (-1));
+    error_exit (0, _("couldn't get symbol for group section: %s"),
+		elf_errmsg (-1));
 
   const char *sig = elf_strptr (elf, symshdr->sh_link, sym->st_name);
   if (sig == NULL)
-    error (EXIT_FAILURE, 0, _("bad symbol name for group section: %s"),
-	   elf_errmsg (-1));
+    error_exit (0, _("bad symbol name for group section: %s"),
+		elf_errmsg (-1));
 
   return sig;
 }
+
+static inline bool
+check_match (bool match, Elf_Scn *scn, const char *name)
+{
+  if (!match)
+    {
+      error (0, 0, _("cannot find matching section for [%zu] '%s'"),
+	     elf_ndxscn (scn), name);
+      return true;
+    }
+
+  return false;
+}
+
 
 /* Fix things up when prelink has moved some allocated sections around
    and the debuginfo file's section headers no longer match up.
@@ -1136,8 +1152,8 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
       bool class32 = ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32;
       size_t shsize = class32 ? sizeof (Elf32_Shdr) : sizeof (Elf64_Shdr);
       if (unlikely (shnum == 0 || shnum > SIZE_MAX / shsize + 1))
-	error (EXIT_FAILURE, 0, _("overflow with shnum = %zu in '%s' section"),
-	       (size_t) shnum, ".gnu.prelink_undo");
+	error_exit (0, _("overflow with shnum = %zu in '%s' section"),
+		    (size_t) shnum, ".gnu.prelink_undo");
 
       --shnum;
 
@@ -1147,8 +1163,8 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
       src.d_type = ELF_T_SHDR;
       if ((size_t) (src.d_buf - undodata->d_buf) > undodata->d_size
 	  || undodata->d_size - (src.d_buf - undodata->d_buf) != src.d_size)
-	error (EXIT_FAILURE, 0, _("invalid contents in '%s' section"),
-	       ".gnu.prelink_undo");
+	error_exit (0, _("invalid contents in '%s' section"),
+		    ".gnu.prelink_undo");
 
       const size_t shdr_bytes = shnum * shsize;
       void *shdr = xmalloc (shdr_bytes);
@@ -1198,16 +1214,6 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
     }
 
   bool fail = false;
-  inline void check_match (bool match, Elf_Scn *scn, const char *name)
-    {
-      if (!match)
-	{
-	  fail = true;
-	  error (0, 0, _("cannot find matching section for [%zu] '%s'"),
-		 elf_ndxscn (scn), name);
-	}
-    }
-
   Elf_Scn *scn = NULL;
   while ((scn = elf_nextscn (debug, scn)) != NULL)
     {
@@ -1238,7 +1244,7 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
       for (size_t i = 0; shdr != NULL && i < nalloc; ++i)
 	if (sections[i].outscn == scn)
 	  shdr = NULL;
-      check_match (shdr == NULL, scn, name);
+      fail |= check_match (shdr == NULL, scn, name);
     }
 
   if (fail)
@@ -1294,7 +1300,7 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
 	    }
 	}
 
-      check_match (undo_sec == NULL, scn, name);
+      fail |= check_match (undo_sec == NULL, scn, name);
     }
 
   free (undo_sections);
@@ -1355,7 +1361,7 @@ new_shstrtab (Elf *unstripped, size_t unstripped_shnum,
   ELF_CHECK (elf_flagdata (strtab_data, ELF_C_SET, ELF_F_DIRTY),
 	     _("cannot update section header string table data: %s"));
   if (dwelf_strtab_finalize (strtab, strtab_data) == NULL)
-    error (EXIT_FAILURE, 0, "Not enough memory to create string table");
+    error_exit (0, "Not enough memory to create string table");
 
   /* Update the sh_name fields of sections we aren't modifying later.  */
   for (size_t i = 0; i < unstripped_shnum - 1; ++i)
@@ -1397,11 +1403,11 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
 	     _("cannot get section count: %s"));
 
   if (unlikely (stripped_shnum > unstripped_shnum))
-    error (EXIT_FAILURE, 0, _("\
+    error_exit (0, _("\
 more sections in stripped file than debug file -- arguments reversed?"));
 
   if (unlikely (stripped_shnum == 0))
-    error (EXIT_FAILURE, 0, _("no sections in stripped file"));
+    error_exit (0, _("no sections in stripped file"));
 
   /* Used as sanity check for allocated section offset, if the section
      offset needs to be preserved.  We want to know the max size of the
@@ -1424,8 +1430,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
       sections[i].name = elf_strptr (stripped, stripped_shstrndx,
 				     shdr->sh_name);
       if (sections[i].name == NULL)
-	error (EXIT_FAILURE, 0, _("cannot read section [%zu] name: %s"),
-	       elf_ndxscn (scn), elf_errmsg (-1));
+	error_exit (0, _("cannot read section [%zu] name: %s"),
+		    elf_ndxscn (scn), elf_errmsg (-1));
       sections[i].scn = scn;
       sections[i].outscn = NULL;
       sections[i].strent = NULL;
@@ -1444,29 +1450,6 @@ more sections in stripped file than debug file -- arguments reversed?"));
       --nalloc;
       if (sections[nalloc].shdr.sh_type == SHT_SYMTAB)
 	stripped_symtab = &sections[nalloc];
-    }
-
-  /* Locate a matching unallocated section in SECTIONS.  */
-  inline struct section *find_unalloc_section (const GElf_Shdr *shdr,
-					       const char *name,
-					       const char *sig)
-    {
-      size_t l = nalloc, u = stripped_shnum - 1;
-      while (l < u)
-	{
-	  size_t i = (l + u) / 2;
-	  struct section *sec = &sections[i];
-	  int cmp = compare_unalloc_sections (shdr, &sec->shdr,
-					      name, sec->name,
-					      sig, sec->sig);
-	  if (cmp < 0)
-	    u = i;
-	  else if (cmp > 0)
-	    l = i + 1;
-	  else
-	    return sec;
-	}
-      return NULL;
     }
 
   Elf_Data *shstrtab = elf_getdata (elf_getscn (unstripped,
@@ -1530,9 +1513,27 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	}
       else
 	{
-	  /* Look for the section that matches.  */
-	  sec = find_unalloc_section (shdr, name,
-				      get_group_sig (unstripped, shdr));
+	  /* Locate a matching unallocated section in SECTIONS.  */
+	  const char *sig = get_group_sig (unstripped, shdr);
+	  size_t l = nalloc, u = stripped_shnum - 1;
+	  while (l < u)
+	    {
+	      size_t i = (l + u) / 2;
+	      struct section *section = &sections[i];
+	      int cmp = compare_unalloc_sections (shdr, &section->shdr,
+						  name, section->name,
+						  sig, section->sig);
+	      if (cmp < 0)
+		u = i;
+	      else if (cmp > 0)
+		l = i + 1;
+	      else
+		{
+		  sec = section;
+		  break;
+		}
+	    }
+
 	  if (sec == NULL)
 	    {
 	      /* An additional unallocated section is fine if not SHT_NOBITS.
@@ -1549,9 +1550,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	}
 
       if (sec == NULL)
-	error (EXIT_FAILURE, 0,
-	       _("cannot find matching section for [%zu] '%s'"),
-	       elf_ndxscn (scn), name);
+	error_exit (0, _("cannot find matching section for [%zu] '%s'"),
+		    elf_ndxscn (scn), name);
 
       sec->outscn = scn;
     }
@@ -1686,17 +1686,17 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	if (sec->shdr.sh_link != SHN_UNDEF)
 	  {
 	    if (sec->shdr.sh_link > ndx_sec_num)
-	      error (EXIT_FAILURE, 0,
-		     "section [%zd] has invalid sh_link %" PRId32,
-		     elf_ndxscn (sec->scn), sec->shdr.sh_link);
+	      error_exit (0,
+			  "section [%zd] has invalid sh_link %" PRId32,
+			  elf_ndxscn (sec->scn), sec->shdr.sh_link);
 	    shdr_mem.sh_link = ndx_section[sec->shdr.sh_link - 1];
 	  }
 	if (SH_INFO_LINK_P (&sec->shdr) && sec->shdr.sh_info != 0)
 	  {
 	    if (sec->shdr.sh_info > ndx_sec_num)
-	      error (EXIT_FAILURE, 0,
-		     "section [%zd] has invalid sh_info %" PRId32,
-		     elf_ndxscn (sec->scn), sec->shdr.sh_info);
+	      error_exit (0,
+			  "section [%zd] has invalid sh_info %" PRId32,
+			  elf_ndxscn (sec->scn), sec->shdr.sh_info);
 	    shdr_mem.sh_info = ndx_section[sec->shdr.sh_info - 1];
 	  }
 
@@ -1714,9 +1714,9 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	if (stripped_ehdr->e_type != ET_REL && (shdr_mem.sh_flags & SHF_ALLOC))
 	  {
 	    if (max_off > 0 && sec->shdr.sh_offset > (Elf64_Off) max_off)
-		error (EXIT_FAILURE, 0,
-		       "allocated section offset too large [%zd] %" PRIx64,
-		       elf_ndxscn (sec->scn), sec->shdr.sh_offset);
+		error_exit (0,
+			    "allocated section offset too large [%zd] %" PRIx64,
+			    elf_ndxscn (sec->scn), sec->shdr.sh_offset);
 
 	    shdr_mem.sh_offset = sec->shdr.sh_offset;
 	    placed[elf_ndxscn (sec->outscn) - 1] = true;
@@ -1737,8 +1737,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	    Elf_Data *shndxdata = NULL;	/* XXX */
 
 	    if (shdr_mem.sh_entsize == 0)
-	      error (EXIT_FAILURE, 0,
-		     "SYMTAB section cannot have zero sh_entsize");
+	      error_exit (0,
+			  "SYMTAB section cannot have zero sh_entsize");
 	    for (size_t i = 1; i < shdr_mem.sh_size / shdr_mem.sh_entsize; ++i)
 	      {
 		GElf_Sym sym_mem;
@@ -1753,8 +1753,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
 		if (shndx != SHN_UNDEF && shndx < SHN_LORESERVE)
 		  {
 		    if (shndx >= stripped_shnum)
-		      error (EXIT_FAILURE, 0,
-			     _("symbol [%zu] has invalid section index"), i);
+		      error_exit (0,
+				  _("symbol [%zu] has invalid section index"), i);
 
 		    shndx = ndx_section[shndx - 1];
 		    if (shndx < SHN_LORESERVE)
@@ -1785,8 +1785,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	    Elf32_Word *shndx = (Elf32_Word *) outdata->d_buf;
 	    for (size_t i = 1; i < shdr_mem.sh_size / sizeof (Elf32_Word); ++i)
 	      if (shndx[i]  == SHN_UNDEF || shndx[i] >= stripped_shnum)
-		error (EXIT_FAILURE, 0,
-		       _("group has invalid section index [%zd]"), i);
+		error_exit (0,
+			    _("group has invalid section index [%zd]"), i);
 	      else
 		shndx[i] = ndx_section[shndx[i] - 1];
 	  }
@@ -1812,8 +1812,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
       GElf_Shdr *shdr = gelf_getshdr (unstripped_symtab, &shdr_mem);
       ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
       if (shdr->sh_entsize == 0)
-	error (EXIT_FAILURE, 0,
-	       "unstripped SYMTAB section cannot have zero sh_entsize");
+	error_exit (0,
+		    "unstripped SYMTAB section cannot have zero sh_entsize");
       const size_t unstripped_nsym = shdr->sh_size / shdr->sh_entsize;
 
       /* First collect all the symbols from both tables.  */
@@ -1933,7 +1933,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	}
 
       if (dwelf_strtab_finalize (symstrtab, symstrdata) == NULL)
-	error (EXIT_FAILURE, 0, "Not enough memory to create symbol table");
+	error_exit (0, "Not enough memory to create symbol table");
 
       elf_flagdata (symstrdata, ELF_C_SET, ELF_F_DIRTY);
 
@@ -2191,7 +2191,7 @@ DWARF data in '%s' not adjusted for prelinking bias; consider prelink -u"),
 			(stripped_ehdr->e_type == ET_REL
 			 ? DEFFILEMODE : ACCESSPERMS));
       if (outfd < 0)
-	error (EXIT_FAILURE, errno, _("cannot open '%s'"), output_file);
+	error_exit (errno, _("cannot open '%s'"), output_file);
       Elf *outelf = elf_begin (outfd, ELF_C_WRITE, NULL);
       ELF_CHECK (outelf != NULL, _("cannot create ELF descriptor: %s"));
 
@@ -2220,8 +2220,20 @@ open_file (const char *file, bool writable)
 {
   int fd = open (file, writable ? O_RDWR : O_RDONLY);
   if (fd < 0)
-    error (EXIT_FAILURE, errno, _("cannot open '%s'"), file);
+    error_exit (errno, _("cannot open '%s'"), file);
   return fd;
+}
+
+/* Warn, and exit if not forced to continue, if some ELF header
+   sanity check for the stripped and unstripped files failed.  */
+static void
+warn (const char *msg, bool force,
+      const char *stripped_file, const char *unstripped_file)
+{
+  error (force ? 0 : EXIT_FAILURE, 0, "%s'%s' and '%s' %s%s.",
+	 force ? _("WARNING: ") : "",
+	 stripped_file, unstripped_file, msg,
+	 force ? "" : _(", use --force"));
 }
 
 /* Handle a pair of files we need to open by name.  */
@@ -2229,17 +2241,6 @@ static void
 handle_explicit_files (const char *output_file, bool create_dirs, bool force,
 		       const char *stripped_file, const char *unstripped_file)
 {
-
-  /* Warn, and exit if not forced to continue, if some ELF header
-     sanity check for the stripped and unstripped files failed.  */
-  void warn (const char *msg)
-  {
-    error (force ? 0 : EXIT_FAILURE, 0, "%s'%s' and '%s' %s%s.",
-	   force ? _("WARNING: ") : "",
-	   stripped_file, unstripped_file, msg,
-	   force ? "" : _(", use --force"));
-  }
-
   int stripped_fd = open_file (stripped_file, false);
   Elf *stripped = elf_begin (stripped_fd, ELF_C_READ, NULL);
   GElf_Ehdr stripped_ehdr;
@@ -2260,16 +2261,20 @@ handle_explicit_files (const char *output_file, bool create_dirs, bool force,
 
       if (memcmp (stripped_ehdr.e_ident,
 		  unstripped_ehdr.e_ident, EI_NIDENT) != 0)
-	warn (_("ELF header identification (e_ident) different"));
+	warn (_("ELF header identification (e_ident) different"), force,
+	      stripped_file, unstripped_file);
 
       if (stripped_ehdr.e_type != unstripped_ehdr.e_type)
-	warn (_("ELF header type (e_type) different"));
+	warn (_("ELF header type (e_type) different"), force,
+	      stripped_file, unstripped_file);
 
       if (stripped_ehdr.e_machine != unstripped_ehdr.e_machine)
-	warn (_("ELF header machine type (e_machine) different"));
+	warn (_("ELF header machine type (e_machine) different"), force,
+	      stripped_file, unstripped_file);
 
       if (stripped_ehdr.e_phnum < unstripped_ehdr.e_phnum)
-	warn (_("stripped program header (e_phnum) smaller than unstripped"));
+	warn (_("stripped program header (e_phnum) smaller than unstripped"),
+	      force, stripped_file, unstripped_file);
     }
 
   handle_file (output_file, create_dirs, stripped, &stripped_ehdr, unstripped);
@@ -2298,13 +2303,13 @@ handle_dwfl_module (const char *output_file, bool create_dirs, bool force,
       const char *modname = dwfl_module_info (mod, NULL, NULL, NULL,
 					      NULL, NULL, &file, NULL);
       if (file == NULL)
-	error (EXIT_FAILURE, 0,
-	       _("cannot find stripped file for module '%s': %s"),
-	       modname, dwfl_errmsg (-1));
+	error_exit (0,
+		    _("cannot find stripped file for module '%s': %s"),
+		    modname, dwfl_errmsg (-1));
       else
-	error (EXIT_FAILURE, 0,
-	       _("cannot open stripped file '%s' for module '%s': %s"),
-	       modname, file, dwfl_errmsg (-1));
+	error_exit (0,
+		    _("cannot open stripped file '%s' for module '%s': %s"),
+		    modname, file, dwfl_errmsg (-1));
     }
 
   Elf *debug = dwarf_getelf (dwfl_module_getdwarf (mod, &bias));
@@ -2317,13 +2322,13 @@ handle_dwfl_module (const char *output_file, bool create_dirs, bool force,
       const char *modname = dwfl_module_info (mod, NULL, NULL, NULL,
 					      NULL, NULL, NULL, &file);
       if (file == NULL)
-	error (EXIT_FAILURE, 0,
-	       _("cannot find debug file for module '%s': %s"),
-	       modname, dwfl_errmsg (-1));
+	error_exit (0,
+		    _("cannot find debug file for module '%s': %s"),
+		    modname, dwfl_errmsg (-1));
       else
-	error (EXIT_FAILURE, 0,
-	       _("cannot open debug file '%s' for module '%s': %s"),
-	       modname, file, dwfl_errmsg (-1));
+	error_exit (0,
+		    _("cannot open debug file '%s' for module '%s': %s"),
+		    modname, file, dwfl_errmsg (-1));
     }
 
   if (debug == stripped)
@@ -2335,8 +2340,8 @@ handle_dwfl_module (const char *output_file, bool create_dirs, bool force,
 	  const char *file;
 	  const char *modname = dwfl_module_info (mod, NULL, NULL, NULL,
 						  NULL, NULL, &file, NULL);
-	  error (EXIT_FAILURE, 0, _("module '%s' file '%s' is not stripped"),
-		 modname, file);
+	  error_exit (0, _("module '%s' file '%s' is not stripped"),
+		      modname, file);
 	}
     }
 
@@ -2365,10 +2370,10 @@ handle_dwfl_module (const char *output_file, bool create_dirs, bool force,
 	 get sh_addr values assigned have them, even ones not used in DWARF.
 	 They might still be used in the symbol table.  */
       if (dwfl_module_relocations (mod) < 0)
-	error (EXIT_FAILURE, 0,
-	       _("cannot cache section addresses for module '%s': %s"),
-	       dwfl_module_info (mod, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-	       dwfl_errmsg (-1));
+	error_exit (0,
+		    _("cannot cache section addresses for module '%s': %s"),
+		    dwfl_module_info (mod, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+		    dwfl_errmsg (-1));
     }
 
   handle_file (output_file, create_dirs, stripped, &stripped_ehdr, debug);
@@ -2393,11 +2398,11 @@ handle_output_dir_module (const char *output_dir, Dwfl_Module *mod, bool force,
   if (file == NULL && ignore)
     return;
 
-  char *output_file;
-  if (asprintf (&output_file, "%s/%s", output_dir, modnames ? name : file) < 0)
-    error (EXIT_FAILURE, 0, _("memory exhausted"));
+  char *output_file = xasprintf ("%s/%s", output_dir, modnames ? name : file);
 
   handle_dwfl_module (output_file, true, force, mod, all, ignore, relocate);
+
+  free (output_file);
 }
 
 
@@ -2492,22 +2497,19 @@ static void
 handle_implicit_modules (const struct arg_info *info)
 {
   struct match_module_info mmi = { info->args, NULL, info->match_files };
-  inline ptrdiff_t next (ptrdiff_t offset)
-    {
-      return dwfl_getmodules (info->dwfl, &match_module, &mmi, offset);
-    }
-  ptrdiff_t offset = next (0);
+  ptrdiff_t offset = dwfl_getmodules (info->dwfl, &match_module, &mmi, 0);
   if (offset == 0)
-    error (EXIT_FAILURE, 0, _("no matching modules found"));
+    error_exit (0, _("no matching modules found"));
 
   if (info->list)
     do
       list_module (mmi.found);
-    while ((offset = next (offset)) > 0);
+    while ((offset = dwfl_getmodules (info->dwfl, &match_module, &mmi,
+				      offset)) > 0);
   else if (info->output_dir == NULL)
     {
-      if (next (offset) != 0)
-	error (EXIT_FAILURE, 0, _("matched more than one module"));
+      if (dwfl_getmodules (info->dwfl, &match_module, &mmi, offset) != 0)
+	error_exit (0, _("matched more than one module"));
       handle_dwfl_module (info->output_file, false, info->force, mmi.found,
 			  info->all, info->ignore, info->relocate);
     }
@@ -2516,7 +2518,8 @@ handle_implicit_modules (const struct arg_info *info)
       handle_output_dir_module (info->output_dir, mmi.found, info->force,
 				info->all, info->ignore,
 				info->modnames, info->relocate);
-    while ((offset = next (offset)) > 0);
+    while ((offset = dwfl_getmodules (info->dwfl, &match_module, &mmi,
+				      offset)) > 0);
 }
 
 int
@@ -2598,9 +2601,7 @@ or - if no debuginfo was found, or . if FILE contains the debug information.\
 
       if (info.output_dir != NULL)
 	{
-	  char *file;
-	  if (asprintf (&file, "%s/%s", info.output_dir, info.args[0]) < 0)
-	    error (EXIT_FAILURE, 0, _("memory exhausted"));
+	  char *file = xasprintf ("%s/%s", info.output_dir, info.args[0]);
 	  handle_explicit_files (file, true, info.force,
 				 info.args[0], info.args[1]);
 	  free (file);

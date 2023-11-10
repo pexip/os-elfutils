@@ -1,5 +1,6 @@
 /* Declarations for common convenience functions.
    Copyright (C) 2006-2011 Red Hat, Inc.
+   Copyright (C) 2022 Mark J. Wielaard <mark@klomp.org>
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -29,21 +30,46 @@
 #ifndef LIB_SYSTEM_H
 #define LIB_SYSTEM_H	1
 
+#include <config.h>
+
 #include <errno.h>
-#include <error.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <sys/param.h>
-#include <endian.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stdlib.h>
+
+/* System dependend headers */
 #include <byteswap.h>
+#include <endian.h>
+#include <sys/mman.h>
+#include <sys/param.h>
 #include <unistd.h>
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+#if defined(HAVE_ERROR_H)
+#include <error.h>
+#elif defined(HAVE_ERR_H)
+extern int error_message_count;
+void error(int status, int errnum, const char *format, ...);
+#else
+#error "err.h or error.h must be available"
+#endif
+
+/* error (EXIT_FAILURE, ...) should be noreturn but on some systems it
+   isn't.  This may cause warnings about code that should not be reachable.
+   So have an explicit error_exit wrapper that is noreturn (because it
+   calls exit explicitly).  */
+#define error_exit(errnum,...) do { \
+    error (EXIT_FAILURE,errnum,__VA_ARGS__); \
+    exit (EXIT_FAILURE); \
+  } while (0)
+
+#if BYTE_ORDER == LITTLE_ENDIAN
 # define LE32(n)	(n)
 # define LE64(n)	(n)
 # define BE32(n)	bswap_32 (n)
 # define BE64(n)	bswap_64 (n)
-#elif __BYTE_ORDER == __BIG_ENDIAN
+#elif BYTE_ORDER == BIG_ENDIAN
 # define BE32(n)	(n)
 # define BE64(n)	(n)
 # define LE32(n)	bswap_32 (n)
@@ -68,6 +94,27 @@
 #define mempcpy(dest, src, n) \
     ((void *) ((char *) memcpy (dest, src, n) + (size_t) n))
 #endif
+
+#if !HAVE_DECL_REALLOCARRAY
+static inline void *
+reallocarray (void *ptr, size_t nmemb, size_t size)
+{
+  if (size > 0 && nmemb > SIZE_MAX / size)
+    {
+      errno = ENOMEM;
+      return NULL;
+    }
+  return realloc (ptr, nmemb * size);
+}
+#endif
+
+/* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
+
+static inline int
+startswith (const char *str, const char *prefix)
+{
+  return strncmp (str, prefix, strlen (prefix)) == 0;
+}
 
 /* A special gettext function we use if the strings are too short.  */
 #define sgettext(Str) \
@@ -104,7 +151,7 @@ pwrite_retry (int fd, const void *buf, size_t len, off_t off)
 
   do
     {
-      ssize_t ret = TEMP_FAILURE_RETRY (pwrite (fd, buf + recvd, len - recvd,
+      ssize_t ret = TEMP_FAILURE_RETRY (pwrite (fd, ((char *)buf) + recvd, len - recvd,
 						off + recvd));
       if (ret <= 0)
 	return ret < 0 ? ret : recvd;
@@ -123,7 +170,7 @@ write_retry (int fd, const void *buf, size_t len)
 
   do
     {
-      ssize_t ret = TEMP_FAILURE_RETRY (write (fd, buf + recvd, len - recvd));
+      ssize_t ret = TEMP_FAILURE_RETRY (write (fd, ((char *)buf) + recvd, len - recvd));
       if (ret <= 0)
 	return ret < 0 ? ret : recvd;
 
@@ -141,7 +188,7 @@ pread_retry (int fd, void *buf, size_t len, off_t off)
 
   do
     {
-      ssize_t ret = TEMP_FAILURE_RETRY (pread (fd, buf + recvd, len - recvd,
+      ssize_t ret = TEMP_FAILURE_RETRY (pread (fd, ((char *)buf) + recvd, len - recvd,
 					       off + recvd));
       if (ret <= 0)
 	return ret < 0 ? ret : recvd;
