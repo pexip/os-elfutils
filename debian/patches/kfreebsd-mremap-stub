@@ -1,0 +1,19 @@
+Index: elfutils-0.188/libelf/elf_update.c
+===================================================================
+--- elfutils-0.188.orig/libelf/elf_update.c	2022-11-13 15:20:31.189166291 -0500
++++ elfutils-0.188/libelf/elf_update.c	2022-11-13 15:20:31.189166291 -0500
+@@ -37,6 +37,14 @@
+ 
+ #include "libelfP.h"
+ 
++#if defined(__FreeBSD_kernel__) || defined(__gnu_hurd__)
++void *mremap(void *old_address, size_t old_size,
++             size_t new_size, int flags, ... /* void *new_address */)
++{
++  errno = ENOMEM;
++  return MAP_FAILED;
++}
++#endif
+ 
+ static int64_t
+ write_file (Elf *elf, int64_t size, int change_bo, size_t shnum)

@@ -12,6 +12,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+DISTRO = $(shell lsb_release -is)
 
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
@@ -42,6 +43,26 @@ endif
 CFLAGS := $(patsubst -O%,-O3, $(CFLAGS))
 CXXFLAGS := $(patsubst -O%,-O3, $(CXXFLAGS))
 
+# debuginfod configuration flags.
+ifneq (,$(filter pkg.elfutils.nodebuginfod,$(DEB_BUILD_PROFILES)))
+  conf_debuginfod = \
+	--disable-libdebuginfod \
+	--disable-debuginfod
+else
+  conf_debuginfod = \
+	--enable-libdebuginfod \
+	--enable-debuginfod
+
+  ifeq ($(DISTRO),Debian)
+    conf_debuginfod += \
+	--enable-debuginfod-urls="https://debuginfod.debian.net"
+  else ifeq ($(DISTRO),Ubuntu)
+    conf_debuginfod += \
+	--enable-debuginfod-urls="https://debuginfod.ubuntu.com"
+  endif
+endif
+
+
 stamps/configure:
 	dh_testdir
 	dh_autoreconf
@@ -55,10 +76,10 @@ ifneq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
 endif
 	CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
 		./configure $(confflags) --prefix=/usr \
+		--sysconfdir=/etc \
 		--libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
 		--program-prefix=eu- --disable-silent-rules \
-		--$(if $(filter pkg.elfutils.nodebuginfod,$(DEB_BUILD_PROFILES)),dis,en)able-libdebuginfod \
-		--$(if $(filter pkg.elfutils.nodebuginfod,$(DEB_BUILD_PROFILES)),dis,en)able-debuginfod
+		$(conf_debuginfod)
 	touch $@
 
 build: stamps/build
@@ -96,10 +117,29 @@ install: build
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	# We do not provide a libebl anymore, use libdw instead.
 	rm -f debian/tmp/usr/include/elfutils/libebl.h
+	# We don't install the systemd service file.
+	rm -f debian/tmp/usr/share/man/man8/debuginfod.service.8
+
+	dh_install --sourcedir=debian/tmp
+	rm -f debian/elfutils/usr/bin/debuginfod*
+	dh_missing --fail-missing --sourcedir=debian/tmp
 
 # Build architecture-independent files here.
 build-indep: build
 binary-indep: build-indep install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs -i ChangeLog
+	dh_installdocs -i
+
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdebconf -i
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
 # We have nothing to do.
 
 # Build architecture-dependent files here.
@@ -107,8 +147,8 @@ build-arch: build
 binary-arch: build-arch install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs ChangeLog
-	dh_installdocs
+	dh_installchangelogs -a ChangeLog
+	dh_installdocs -a ChangeLog
 
 	: # FIXME: package those ...
 #	find debian/tmp -name '*debuginfod*' | xargs -r rm -f
@@ -116,18 +156,11 @@ binary-arch: build-arch install
 #	rm -f debian/tmp/usr/share/man/man1/eu-readelf.1
 #	rm -f debian/tmp/usr/share/man/man3/elf_*.3
 
-	: # these are empty envvar settings ...
-	rm -rf debian/tmp/usr/etc/profile.d
-
-	dh_install --sourcedir=debian/tmp
-	rm -f debian/elfutils/usr/bin/debuginfod*
-	dh_missing --fail-missing --sourcedir=debian/tmp
-
-	dh_dwz
-	dh_strip
-	dh_strip_nondeterminism
-	dh_compress
-	dh_fixperms
+	dh_dwz -a
+	dh_strip -a
+	dh_strip_nondeterminism -a
+	dh_compress -a
+	dh_fixperms -a
 	dpkg-gensymbols -Pdebian/libdw1/ -plibdw1 -c4
 	dpkg-gensymbols -Pdebian/libasm1/ -plibasm1 -c4
 	dpkg-gensymbols -Pdebian/libelf1/ -plibelf1 -c4
@@ -135,11 +168,12 @@ binary-arch: build-arch install
 	dh_makeshlibs -plibasm1 -V "libasm1 (>= 0.132)"
 	dh_makeshlibs -plibdw1 -V "libdw1 (>= 0.138)"
 	dh_makeshlibs -plibdebuginfod1
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	dh_installdebconf -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
 
 binary: binary-indep binary-arch
 
