@@ -4,19 +4,23 @@ Maintainer: Debian Elfutils Maintainers <debian-gcc@lists.debian.org>
 Uploaders: Kurt Roeckx <kurt@roeckx.be>,
   Matthias Klose <doko@debian.org>,
   Sergio Durigan Junior <sergiodj@debian.org>,
-Build-Depends: debhelper (>= 11),
+Build-Depends: dpkg-dev (>= 1.22.5), debhelper (>= 11),
   autoconf, automake, lsb-release,
   bzip2, zlib1g-dev, zlib1g-dev:native, libbz2-dev, liblzma-dev,
+  libzstd-dev, zstd <!nocheck>,
   m4, gettext, po-debconf,
   gawk, dpkg-dev (>= 1.16.1~),
   gcc-multilib [any-amd64 sparc64] <!nocheck>,
   libc6-dbg [powerpc powerpcspe ppc64 ppc64el armel armhf arm64 sparc64 riscv64],
   flex, bison,
-  pkg-config,
+  pkgconf,
   libarchive-dev <!pkg.elfutils.nodebuginfod>,
-  libmicrohttpd-dev <!pkg.elfutils.nodebuginfod>, libcurl4-gnutls-dev <!pkg.elfutils.nodebuginfod>, libsqlite3-dev <!pkg.elfutils.nodebuginfod>,
+  libjson-c-dev <!pkg.elfutils.nodebuginfod>,
+  libmicrohttpd-dev <!pkg.elfutils.nodebuginfod>,
+  libcurl4-gnutls-dev <!pkg.elfutils.nodebuginfod>,
+  libsqlite3-dev <!pkg.elfutils.nodebuginfod>,
 Build-Conflicts: autoconf2.13
-Standards-Version: 4.5.1
+Standards-Version: 4.7.0
 Section: libs
 Homepage: https://sourceware.org/elfutils/
 Vcs-Browser: https://salsa.debian.org/toolchain-team/elfutils
@@ -27,7 +31,7 @@ Section: utils
 Architecture: any
 Multi-Arch: foreign
 Depends: ${shlibs:Depends}, ${misc:Depends},
-  libelf1 (= ${binary:Version}), libdw1 (= ${binary:Version})
+  libelf1t64 (= ${binary:Version}), libdw1t64 (= ${binary:Version})
 Description: collection of utilities to handle ELF objects
  Elfutils is a collection of utilities, including eu-ld (a linker),
  eu-nm (for listing symbols from object files), eu-size (for listing the
@@ -35,13 +39,16 @@ Description: collection of utilities to handle ELF objects
  symbols), eu-readelf (to see the raw ELF file structures), and eu-elflint
  (to check for well-formed ELF files).
 
-Package: libelf1
+Package: libelf1t64
+Provides: ${t64:Provides}
+Replaces: libelf1
+Breaks: libelf1 (<< ${source:Version})
 Architecture: any
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
 Description: library to read and write ELF files
- The libelf1 package provides a shared library which allows reading and
+ The libelf1t64 package provides a shared library which allows reading and
  writing ELF files on a high level.  Third party programs depend on
  this package to read internals of ELF files.  The programs of the
  elfutils package use it also to generate new ELF files.
@@ -52,10 +59,11 @@ Package: libelf-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libelf1 (= ${binary:Version}), ${misc:Depends}, zlib1g-dev
+Depends: libelf1t64 (= ${binary:Version}), ${misc:Depends},
+  zlib1g-dev, libzstd-dev
 Conflicts: libelfg0-dev
-Description: libelf1 development libraries and header files
- libelf1 provides a shared library which allows reading and writing of ELF
+Description: libelf1t64 development libraries and header files
+ libelf1t64 provides a shared library which allows reading and writing of ELF
  files on a high level.
  .
  This package contains development libraries and header files for libelf1.
@@ -64,10 +72,10 @@ Package: libdw-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libelf-dev, libdw1 (= ${binary:Version}), ${misc:Depends},
+Depends: libelf-dev, libdw1t64 (= ${binary:Version}), ${misc:Depends},
   zlib1g-dev, liblzma-dev
-Description: libdw1 development libraries and header files
- libdw1 provides a library that provides access to DWARF debug information
+Description: libdw1t64 development libraries and header files
+ libdw1t64 provides a library that provides access to DWARF debug information
  stored inside ELF files.
  .
  This package contains development libraries and header files for libdw1.
@@ -75,25 +83,31 @@ Description: libdw1 development libraries and header files
  It also contains a static version of libdw.  Only link to the static version
  for special cases and when you don't need anything from the ebl backends.
 
-Package: libdw1
+Package: libdw1t64
+Provides: ${t64:Provides}
+Replaces: libdw1
+Breaks: libdw1 (<< ${source:Version})
 Architecture: any
 Multi-Arch: same
-Depends: ${shlibs:Depends}, libelf1 (= ${binary:Version}), ${misc:Depends}
+Depends: ${shlibs:Depends}, libelf1t64 (= ${binary:Version}), ${misc:Depends}
 Pre-Depends: ${misc:Pre-Depends}
 Description: library that provides access to the DWARF debug information
- libdw1 provides a library that provides access to DWARF debug information
+ libdw1t64 provides a library that provides access to DWARF debug information
  stored inside ELF files.
  .
  This library is part of elfutils.
 
-Package: libasm1
+Package: libasm1t64
+Provides: ${t64:Provides}
+Replaces: libasm1
+Breaks: libasm1 (<< ${source:Version})
 Architecture: any
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends},
-  libelf1 (= ${binary:Version}), libdw1 (= ${binary:Version})
+  libelf1t64 (= ${binary:Version}), libdw1t64 (= ${binary:Version})
 Pre-Depends: ${misc:Pre-Depends}
 Description: library with a programmable assembler interface
- The libasm1 package provides a library with a programmable assembler
+ The libasm1t64 package provides a library with a programmable assembler
  interface.  It allows you to create ELF files on a low level.
  .
  This library is part of elfutils.
@@ -102,19 +116,22 @@ Package: libasm-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libasm1 (= ${binary:Version}), libelf-dev, ${misc:Depends}
+Depends: libasm1t64 (= ${binary:Version}), libelf-dev, ${misc:Depends}
 Conflicts: libelfsh0-dev, libasm0-dev
 Description: libasm development libraries and header files
- libasm1 allows you to create ELF files on a low level.
+ libasm1t64 allows you to create ELF files on a low level.
  .
  This package contains development libraries and header files for libasm1.
 
-Package: libdebuginfod1
+Package: libdebuginfod1t64
+Provides: ${t64:Provides}
+Replaces: libdebuginfod1
+Breaks: libdebuginfod1 (<< ${source:Version})
 Build-Profiles: <!pkg.elfutils.nodebuginfod>
 Architecture: any
 Multi-Arch: same
 Depends: ${shlibs:Depends}, ${misc:Depends},
-  libelf1 (= ${binary:Version}), libdw1 (= ${binary:Version}),
+  libelf1t64 (= ${binary:Version}), libdw1t64 (= ${binary:Version}),
   libdebuginfod-common (>= ${source:Version})
 Pre-Depends: ${misc:Pre-Depends}
 Description: library to interact with debuginfod (development files)
@@ -128,9 +145,9 @@ Build-Profiles: <!pkg.elfutils.nodebuginfod>
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libdebuginfod1 (= ${binary:Version}), ${misc:Depends}, libelf-dev,
+Depends: libdebuginfod1t64 (= ${binary:Version}), ${misc:Depends}, libelf-dev,
 Description: libdebuginfod development libraries and header files
- libasm1 allows you to interact with debuginfod.
+ libasm1t64 allows you to interact with debuginfod.
  .
  This package contains development libraries and header files for
  libdebuginfod1.
@@ -139,7 +156,8 @@ Package: debuginfod
 Build-Profiles: <!pkg.elfutils.nodebuginfod>
 Section: devel
 Architecture: any
-Depends: libdebuginfod1 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Depends: libdebuginfod1t64 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Recommends: libarchive-tools
 Description: debuginfo-related http file-server daemon
  Server, client tool and library to index and fetch ELF/DWARF files
  addressed by build-id through HTTP.

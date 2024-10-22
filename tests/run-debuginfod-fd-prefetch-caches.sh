@@ -50,7 +50,7 @@ export DEBUGINFOD_CACHE_PATH=${PWD}/.client_cache
 rm -rf $DEBUGINFOD_CACHE_PATH
 rm -rf $DB
 # Testing prefetch fd maximum (Set mb maximums to be beyond consideration)
-# Set --fdcache-mintmp=0 so we don't accidentially trigger an fdcache
+# Set --fdcache-mintmp=0 so we don't accidentally trigger an fdcache
 # emergency flush for filling tmpdir
 env LD_LIBRARY_PATH=$ldpath DEBUGINFOD_URLS= ${abs_builddir}/../debuginfod/debuginfod $VERBOSE -p $PORT1 -d $DB \
     --fdcache-fds=$FDCACHE_FDS --fdcache-prefetch-fds=$PREFETCH_FDS  -vvvvv -g 0 -t 0 \
@@ -99,6 +99,9 @@ kill $PID1
 wait $PID1
 PID1=0
 
+# Since we now only limit the fd cache every 10 seconds, it can temporarily go
+# over the limit.  That makes this part of the test unreliable.
+if false; then
 #########
 # Test mb limit on fd cache
 #########
@@ -148,3 +151,4 @@ kill $PID1
 wait $PID1
 PID1=0
 exit 0
+fi

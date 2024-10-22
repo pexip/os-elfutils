@@ -91,13 +91,13 @@ host_triplet = @host@
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
-	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
-	$(top_srcdir)/m4/host-cpu-c-abi.m4 $(top_srcdir)/m4/iconv.m4 \
-	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/build-to-host.m4 \
+	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/host-cpu-c-abi.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -265,6 +265,7 @@ CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_IMA_CERT_PATH = @DEBUGINFOD_IMA_CERT_PATH@
 DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = @DEFS@
@@ -317,6 +318,7 @@ MSGFMT = @MSGFMT@
 MSGMERGE = @MSGMERGE@
 MSGMERGE_FOR_MSGFMT_OPTION = @MSGMERGE_FOR_MSGFMT_OPTION@
 NM = @NM@
+NO_UNDEFINED = @NO_UNDEFINED@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -343,6 +345,8 @@ XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
+ZSTD_COMPRESS_CFLAGS = @ZSTD_COMPRESS_CFLAGS@
+ZSTD_COMPRESS_LIBS = @ZSTD_COMPRESS_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -363,6 +367,7 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
+crypto_LIBS = @crypto_LIBS@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
@@ -382,6 +387,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+jsonc_CFLAGS = @jsonc_CFLAGS@
+jsonc_LIBS = @jsonc_LIBS@
 libarchive_CFLAGS = @libarchive_CFLAGS@
 libarchive_LIBS = @libarchive_LIBS@
 libcurl_CFLAGS = @libcurl_CFLAGS@
@@ -391,7 +398,10 @@ libexecdir = @libexecdir@
 libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
 libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
+localedir_c = @localedir_c@
+localedir_c_make = @localedir_c_make@
 localstatedir = @localstatedir@
+lzma_LIBS = @lzma_LIBS@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 obstack_LIBS = @obstack_LIBS@
@@ -402,6 +412,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+rpm_LIBS = @rpm_LIBS@
 runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
@@ -414,6 +425,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 zip_LIBS = @zip_LIBS@
+zstd_LIBS = @zstd_LIBS@
 ACLOCAL_AMFLAGS = -I m4
 
 # automake already tells which subdir is being entered.
@@ -423,8 +435,8 @@ pkginclude_HEADERS = version.h
 SUBDIRS = config lib libelf libcpu backends libebl libdwelf libdwfl libdw \
 	  libasm debuginfod src po doc tests
 
-EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING \
-	     COPYING COPYING-GPLV2 COPYING-LGPLV3
+EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING SECURITY \
+	     COPYING COPYING-GPLV2 COPYING-LGPLV3 CONDUCT
 
 
 # Make sure the test install uses lib64 when $LIB will yield lib64.
@@ -445,6 +457,8 @@ AM_DISTCHECK_CONFIGURE_FLAGS = \
 @GCOV_TRUE@all_COVERAGE_DIRS = $(sort $(src_COVERAGE_DIRS) $(build_COVERAGE_DIRS))
 @GCOV_TRUE@LCOV_DIRS_ARGS = $(patsubst %,--directory=%,$(all_COVERAGE_DIRS))
 @GCOV_TRUE@CLEANFILES = $(COVERAGE_OUTPUT_FILE)
+@GCOV_TRUE@@LCOV_OLD_FALSE@ignore_errors = --ignore-errors empty,negative
+@GCOV_TRUE@@LCOV_OLD_TRUE@ignore_errors = 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -970,6 +984,11 @@ distcheck-hook:
 rpm: dist
 	rpmbuild -ts elfutils-@PACKAGE_VERSION@.tar.bz2
 
+rpmbuild: dist
+	mkdir -p rpmbuild
+	rpmbuild -ta elfutils-@PACKAGE_VERSION@.tar.bz2 \
+		--define "_topdir $(shell pwd)/rpmbuild"
+
 @GCOV_TRUE@.PHONY: coverage coverage-clean
 
 @GCOV_TRUE@clean-local: coverage-clean
@@ -985,6 +1004,7 @@ rpm: dist
 @GCOV_TRUE@	LC_ALL=C $(GENHTML) \
 @GCOV_TRUE@		--legend \
 @GCOV_TRUE@		--show-details \
+@GCOV_TRUE@		$(ignore_errors) \
 @GCOV_TRUE@		--rc=genhtml_branch_coverage=1 \
 @GCOV_TRUE@		--title='$(COVERAGE_TITLE)' \
 @GCOV_TRUE@		--prefix='$(abspath $(abs_srcdir))' \
@@ -999,6 +1019,7 @@ rpm: dist
 @GCOV_TRUE@		--capture \
 @GCOV_TRUE@		--no-external \
 @GCOV_TRUE@		--no-checksum \
+@GCOV_TRUE@		$(ignore_errors) \
 @GCOV_TRUE@		--rc=lcov_branch_coverage=1 \
 @GCOV_TRUE@		--gcov-tool='$(GCOV)' \
 @GCOV_TRUE@		--output-file='$@' \

@@ -1,5 +1,6 @@
 /* Internal interfaces for libelf.
    Copyright (C) 1998-2010, 2015, 2016 Red Hat, Inc.
+   Copyright (C) 2023 Mark J. Wielaard <mark@klomp.org>
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -32,6 +33,7 @@
 
 #include <ar.h>
 #include <gelf.h>
+#include "eu-search.h"
 
 #include <errno.h>
 #include <stdbool.h>
@@ -62,6 +64,7 @@
 #define ELF32_FSZ_SWORD  4
 #define ELF32_FSZ_XWORD  8
 #define ELF32_FSZ_SXWORD 8
+#define ELF32_FSZ_RELR   4
 
 /* Same for 64 bits objects.  */
 #define ELF64_FSZ_ADDR   8
@@ -71,6 +74,7 @@
 #define ELF64_FSZ_SWORD  4
 #define ELF64_FSZ_XWORD  8
 #define ELF64_FSZ_SXWORD 8
+#define ELF64_FSZ_RELR   8
 
 
 /* This is an extension of the ELF_F_* enumeration.  The values here are
@@ -262,11 +266,7 @@ typedef struct Elf_ScnList
 typedef struct Elf_Data_Chunk
 {
   Elf_Data_Scn data;
-  union
-  {
-    Elf_Scn dummy_scn;
-    struct Elf_Data_Chunk *next;
-  };
+  Elf_Scn dummy_scn;
   int64_t offset;		/* The original raw offset in the Elf image.  */
 } Elf_Data_Chunk;
 
@@ -324,7 +324,8 @@ struct Elf
       Elf_ScnList *scns_last;	/* Last element in the section list.
 				   If NULL the data has not yet been
 				   read from the file.  */
-      Elf_Data_Chunk *rawchunks; /* List of elf_getdata_rawchunk results.  */
+      search_tree rawchunk_tree;  /* Tree and lock for elf_getdata_rawchunk
+				     results.  */
       unsigned int scnincr;	/* Number of sections allocate the last
 				   time.  */
       int ehdr_flags;		/* Flags (dirty) for ELF header.  */
@@ -343,7 +344,8 @@ struct Elf
       Elf_ScnList *scns_last;	/* Last element in the section list.
 				   If NULL the data has not yet been
 				   read from the file.  */
-      Elf_Data_Chunk *rawchunks; /* List of elf_getdata_rawchunk results.  */
+      search_tree rawchunk_tree;  /* Tree and lock for
+				     elf_getdata_rawchunk results.  */
       unsigned int scnincr;	/* Number of sections allocate the last
 				   time.  */
       int ehdr_flags;		/* Flags (dirty) for ELF header.  */
@@ -368,7 +370,8 @@ struct Elf
       Elf_ScnList *scns_last;	/* Last element in the section list.
 				   If NULL the data has not yet been
 				   read from the file.  */
-      Elf_Data_Chunk *rawchunks; /* List of elf_getdata_rawchunk results.  */
+      search_tree rawchunk_tree;  /* Tree and lock for
+				     elf_getdata_rawchunk results.  */
       unsigned int scnincr;	/* Number of sections allocate the last
 				   time.  */
       int ehdr_flags;		/* Flags (dirty) for ELF header.  */
@@ -515,6 +518,8 @@ extern Elf32_Shdr *__elf32_getshdr_rdlock (Elf_Scn *__scn) internal_function;
 extern Elf64_Shdr *__elf64_getshdr_rdlock (Elf_Scn *__scn) internal_function;
 extern Elf32_Shdr *__elf32_getshdr_wrlock (Elf_Scn *__scn) internal_function;
 extern Elf64_Shdr *__elf64_getshdr_wrlock (Elf_Scn *__scn) internal_function;
+extern Elf32_Chdr *__elf32_getchdr_wrlock (Elf_Scn *__scn) internal_function;
+extern Elf64_Chdr *__elf64_getchdr_wrlock (Elf_Scn *__scn) internal_function;
 extern Elf_Scn *__elf_getscn_internal (Elf *__elf, size_t __index)
      attribute_hidden;
 extern Elf_Scn *__elf_nextscn_internal (Elf *__elf, Elf_Scn *__scn)
@@ -523,6 +528,8 @@ extern int __elf_scnshndx_internal (Elf_Scn *__scn) attribute_hidden;
 extern Elf_Data *__elf_getdata_internal (Elf_Scn *__scn, Elf_Data *__data)
      attribute_hidden;
 extern Elf_Data *__elf_getdata_rdlock (Elf_Scn *__scn, Elf_Data *__data)
+     internal_function;
+extern Elf_Data *__elf_getdata_wrlock (Elf_Scn *__scn, Elf_Data *__data)
      internal_function;
 extern Elf_Data *__elf_rawdata_internal (Elf_Scn *__scn, Elf_Data *__data)
      attribute_hidden;
@@ -574,10 +581,10 @@ extern uint32_t __libelf_crc32 (uint32_t crc, unsigned char *buf, size_t len)
 
 extern void * __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
 				 size_t *orig_size, size_t *orig_addralign,
-				 size_t *size, bool force)
+				 size_t *size, bool force, bool use_zstd)
      internal_function;
 
-extern void * __libelf_decompress (void *buf_in, size_t size_in,
+extern void * __libelf_decompress (int chtype, void *buf_in, size_t size_in,
 				   size_t size_out) internal_function;
 extern void * __libelf_decompress_elf (Elf_Scn *scn,
 				       size_t *size_out, size_t *addralign)
@@ -614,4 +621,7 @@ extern void __libelf_reset_rawdata (Elf_Scn *scn, void *buf, size_t size,
 #define INVALID_NDX(ndx, type, data) \
   unlikely ((data)->d_size / sizeof (type) <= (unsigned int) (ndx))
 
+#define ELF64_MIPS_R_TYPE1(i)          ((i) & 0xff)
+#define ELF64_MIPS_R_TYPE2(i)           (((i) >> 8) & 0xff)
+#define ELF64_MIPS_R_TYPE3(i)           (((i) >> 16) & 0xff)
 #endif  /* libelfP.h */

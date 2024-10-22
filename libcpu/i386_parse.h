@@ -87,7 +87,7 @@ extern int i386_debug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 215 "i386_parse.y"
+#line 217 "i386_parse.y"
 
   unsigned long int num;
   char *str;

@@ -28,8 +28,7 @@
    not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
-#include "../libelf/libelfP.h"	/* For NOTE_ALIGN4 and NOTE_ALIGN8.  */
-#undef	_
+#include "libelfP.h"	/* For NOTE_ALIGN4 and NOTE_ALIGN8.  */
 #include "libdwflP.h"
 #include "common.h"
 
@@ -289,6 +288,7 @@ read_portion (struct read_state *read_state,
 
 int
 dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
+			    const char *executable,
 			    Dwfl_Memory_Callback *memory_callback,
 			    void *memory_callback_arg,
 			    Dwfl_Module_Callback *read_eagerly,
@@ -441,17 +441,6 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 		    start + phoff, xlatefrom.d_size))
     goto out;
 
-  /* ph_buffer_size will be zero if we got everything from the initial
-     buffer, otherwise it will be the size of the new buffer that
-     could be read.  */
-  if (ph_buffer_size != 0)
-    {
-      phnum = ph_buffer_size / phentsize;
-      if (phnum == 0)
-	goto out;
-      xlatefrom.d_size = ph_buffer_size;
-    }
-
   xlatefrom.d_buf = ph_buffer;
 
   bool class32 = ei_class == ELFCLASS32;
@@ -533,17 +522,11 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
               /* We calculate from the p_offset of the note segment,
                because we don't yet know the bias for its p_vaddr.  */
               const GElf_Addr note_vaddr = start + offset;
-              void *data;
-              size_t data_size;
+              void *data = NULL;
+              size_t data_size = 0;
               if (read_portion (&read_state, &data, &data_size,
 				start, segment, note_vaddr, filesz))
                 continue; /* Next header */
-
-              /* data_size will be zero if we got everything from the initial
-                 buffer, otherwise it will be the size of the new buffer that
-                 could be read.  */
-              if (data_size != 0)
-                filesz = data_size;
 
 	      if (filesz > SIZE_MAX / sizeof (Elf32_Nhdr))
 		continue;
@@ -736,7 +719,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	      bias += fixup;
 	      if (module->name[0] != '\0')
 		{
-		  name = basename (module->name);
+		  name = xbasename (module->name);
 		  name_is_final = true;
 		}
 	      break;
@@ -755,16 +738,33 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	        && invalid_elf (module->elf, module->disk_file_has_build_id,
 				&build_id))
 	      {
-		elf_end (module->elf);
-		close (module->fd);
-		module->elf = NULL;
-		module->fd = -1;
+		/* If MODULE's build-id doesn't match the disk file's
+		   build-id, close ELF only if MODULE and ELF refer to
+		   different builds of files with the same name.  This
+		   prevents premature closure of the correct ELF in cases
+		   where segments of a module are non-contiguous in memory.  */
+		if (name != NULL && module->name[0] != '\0'
+		    && strcmp (xbasename (module->name), xbasename (name)) == 0)
+		  {
+		    elf_end (module->elf);
+		    close (module->fd);
+		    module->elf = NULL;
+		    module->fd = -1;
+		  }
 	      }
-	    if (module->elf != NULL)
+	    else if (module->elf != NULL)
 	      {
-		/* Ignore this found module if it would conflict in address
-		   space with any already existing module of DWFL.  */
+		/* This module has already been reported.  */
 		skip_this_module = true;
+	      }
+	    else
+	      {
+		/* Only report this module if we haven't already done so.  */
+		for (Dwfl_Module *mod = dwfl->modulelist; mod != NULL;
+		     mod = mod->next)
+		  if (mod->low_addr == module_start
+		      && mod->high_addr == module_end)
+		    skip_this_module = true;
 	      }
 	  }
       if (skip_this_module)
@@ -779,7 +779,24 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       name = file_note_name;
       name_is_final = true;
       bool invalid = false;
-      fd = open (name, O_RDONLY);
+
+      /* We were not handed specific executable hence try to look for it in
+	 sysroot if it is set.  */
+      if (dwfl->sysroot && !executable)
+        {
+	  int r;
+	  char *n;
+
+	  r = asprintf (&n, "%s%s", dwfl->sysroot, name);
+	  if (r > 0)
+	    {
+	      fd = open (n, O_RDONLY);
+	      free (n);
+	    }
+        }
+      else
+	  fd = open (name, O_RDONLY);
+
       if (fd >= 0)
 	{
 	  Dwfl_Error error = __libdw_open_file (&fd, &elf, true, false);
@@ -799,10 +816,6 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	}
     }
 
-  /* Our return value now says to skip the segments contained
-     within the module.  */
-  ndx = addr_segndx (dwfl, segment, module_end, true);
-
   /* Examine its .dynamic section to get more interesting details.
      If it has DT_SONAME, we'll use that as the module name.
      If it has a DT_DEBUG, then it's actually a PIE rather than a DSO.
@@ -821,12 +834,6 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       && ! read_portion (&read_state, &dyn_data, &dyn_data_size,
 			 start, segment, dyn_vaddr, dyn_filesz))
     {
-      /* dyn_data_size will be zero if we got everything from the initial
-         buffer, otherwise it will be the size of the new buffer that
-         could be read.  */
-      if (dyn_data_size != 0)
-	dyn_filesz = dyn_data_size;
-
       if ((dyn_filesz / dyn_entsize) == 0
 	  || dyn_filesz > (SIZE_MAX / dyn_entsize))
 	goto out;
@@ -953,6 +960,8 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       ndx = -1;
       goto out;
     }
+  else
+    ndx++;
 
   /* We have reported the module.  Now let the caller decide whether we
      should read the whole thing in right now.  */

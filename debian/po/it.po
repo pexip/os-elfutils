@@ -1,0 +1,45 @@
+# elfutils po-debconf italian translation.
+# Copyright (C) 2023 elfutils' copyright holder
+# This file is distributed under the same license as the elfutils package.
+# Ceppo <ceppo@oziosi.org>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: elfutils\n"
+"Report-Msgid-Bugs-To: elfutils@packages.debian.org\n"
+"POT-Creation-Date: 2021-03-06 18:23-0500\n"
+"PO-Revision-Date: 2023-07-11 00:00+0000\n"
+"Last-Translator: Ceppo <ceppo@oziosi.org>\n"
+"Language-Team: Italian <debian-i10n-italian@lists.debian.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid "Connect to Debian's debuginfod server to download debug symbols?"
+msgstr ""
+"Connettersi al server debuginfod di Debian per scaricare i simboli di debug?"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid ""
+"While debugging programs (with GDB, for example) or using debuginfo-consumer "
+"applications, it is possible to connect to Debian's debuginfod server and "
+"download the necessary debug information for the program you are debugging "
+"on-the-fly, without the need to configure the debian-debug apt repository "
+"nor installing any dbgsym packages.  This service is maintained by Debian, "
+"and the only information you will have to send to it is the Build-ID hash of "
+"the program(s)/library(ies) being debugged."
+msgstr ""
+"Mentre si effettua il debug di programmi (con GDB, ad esempio) o si usano "
+"applicazioni che utilizzano debuginfo, è possibile connettersi al server "
+"debuginfod di Debian e scaricare al momento le informazioni di debug per il "
+"programma di cui si sta effettuando il debug, senza bisogno di configurare "
+"il repository apt debian-debug né di installare alcun pacchetto dbgsym. "
+"Questo servizio è mantenuto da Debian e l'unica informazione che sarà "
+"necessario inviare è l'hash del Build-ID del programma/libreria di cui si "
+"sta effettuando il debug."

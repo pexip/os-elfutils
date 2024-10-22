@@ -1,3 +1,4 @@
 usr/bin
 usr/share/man/man1/eu-elfclassify.1
 usr/share/man/man1/eu-readelf.1
+usr/share/man/man1/eu-srcfiles.1

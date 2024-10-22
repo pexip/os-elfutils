@@ -95,13 +95,13 @@ host_triplet = @host@
 subdir = libdw
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
-	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
-	$(top_srcdir)/m4/host-cpu-c-abi.m4 $(top_srcdir)/m4/iconv.m4 \
-	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/build-to-host.m4 \
+	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/host-cpu-c-abi.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(include_HEADERS) \
@@ -215,7 +215,7 @@ am_libdw_a_OBJECTS = dwarf_begin.$(OBJEXT) dwarf_begin_elf.$(OBJEXT) \
 	dwarf_default_lower_bound.$(OBJEXT) \
 	dwarf_die_addr_die.$(OBJEXT) dwarf_get_units.$(OBJEXT) \
 	libdw_find_split_unit.$(OBJEXT) dwarf_cu_info.$(OBJEXT) \
-	dwarf_next_lines.$(OBJEXT)
+	dwarf_next_lines.$(OBJEXT) dwarf_cu_dwp_section_info.$(OBJEXT)
 libdw_a_OBJECTS = $(am_libdw_a_OBJECTS)
 libdw_pic_a_AR = $(AR) $(ARFLAGS)
 libdw_pic_a_LIBADD =
@@ -246,9 +246,10 @@ am__depfiles_remade = ./$(DEPDIR)/cfi.Po ./$(DEPDIR)/cie.Po \
 	./$(DEPDIR)/dwarf_bitsize.Po ./$(DEPDIR)/dwarf_bytesize.Po \
 	./$(DEPDIR)/dwarf_cfi_addrframe.Po \
 	./$(DEPDIR)/dwarf_cfi_end.Po ./$(DEPDIR)/dwarf_child.Po \
-	./$(DEPDIR)/dwarf_cu_die.Po ./$(DEPDIR)/dwarf_cu_getdwarf.Po \
-	./$(DEPDIR)/dwarf_cu_info.Po ./$(DEPDIR)/dwarf_cuoffset.Po \
-	./$(DEPDIR)/dwarf_decl_column.Po \
+	./$(DEPDIR)/dwarf_cu_die.Po \
+	./$(DEPDIR)/dwarf_cu_dwp_section_info.Po \
+	./$(DEPDIR)/dwarf_cu_getdwarf.Po ./$(DEPDIR)/dwarf_cu_info.Po \
+	./$(DEPDIR)/dwarf_cuoffset.Po ./$(DEPDIR)/dwarf_decl_column.Po \
 	./$(DEPDIR)/dwarf_decl_file.Po ./$(DEPDIR)/dwarf_decl_line.Po \
 	./$(DEPDIR)/dwarf_default_lower_bound.Po \
 	./$(DEPDIR)/dwarf_die_addr_die.Po ./$(DEPDIR)/dwarf_diecu.Po \
@@ -386,6 +387,7 @@ CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_IMA_CERT_PATH = @DEBUGINFOD_IMA_CERT_PATH@
 DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
@@ -438,6 +440,7 @@ MSGFMT = @MSGFMT@
 MSGMERGE = @MSGMERGE@
 MSGMERGE_FOR_MSGFMT_OPTION = @MSGMERGE_FOR_MSGFMT_OPTION@
 NM = @NM@
+NO_UNDEFINED = @NO_UNDEFINED@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -464,6 +467,8 @@ XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
+ZSTD_COMPRESS_CFLAGS = @ZSTD_COMPRESS_CFLAGS@
+ZSTD_COMPRESS_LIBS = @ZSTD_COMPRESS_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -484,6 +489,7 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
+crypto_LIBS = @crypto_LIBS@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
@@ -503,6 +509,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+jsonc_CFLAGS = @jsonc_CFLAGS@
+jsonc_LIBS = @jsonc_LIBS@
 libarchive_CFLAGS = @libarchive_CFLAGS@
 libarchive_LIBS = @libarchive_LIBS@
 libcurl_CFLAGS = @libcurl_CFLAGS@
@@ -512,7 +520,10 @@ libexecdir = @libexecdir@
 libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
 libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
+localedir_c = @localedir_c@
+localedir_c_make = @localedir_c_make@
 localstatedir = @localstatedir@
+lzma_LIBS = @lzma_LIBS@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 obstack_LIBS = @obstack_LIBS@
@@ -523,6 +534,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+rpm_LIBS = @rpm_LIBS@
 runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
@@ -535,8 +547,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 zip_LIBS = @zip_LIBS@
-AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_srcdir)/lib -I.. \
-	-I$(srcdir)/../libelf -I$(srcdir)/../libdwelf -pthread
+zstd_LIBS = @zstd_LIBS@
+AM_CPPFLAGS = -iquote . -I$(srcdir) -I$(top_srcdir)/lib -I.. \
+	-I$(srcdir)/../libebl -I$(srcdir)/../libelf \
+	-I$(srcdir)/../libdwelf -pthread
 
 # Drop the 'u' flag that automake adds by default. It is incompatible
 # with deterministic archives.
@@ -563,12 +577,14 @@ ARFLAGS = cr
 @HAVE_TRAMPOLINES_WARNING_TRUE@TRAMPOLINES_WARNING = -Wtrampolines
 @HAVE_NO_PACKED_NOT_ALIGNED_WARNING_FALSE@NO_PACKED_NOT_ALIGNED_WARNING = 
 @HAVE_NO_PACKED_NOT_ALIGNED_WARNING_TRUE@NO_PACKED_NOT_ALIGNED_WARNING = -Wno-packed-not-aligned
+@HAVE_USE_AFTER_FREE3_WARNING_FALSE@USE_AFTER_FREE3_WARNING = 
+@HAVE_USE_AFTER_FREE3_WARNING_TRUE@USE_AFTER_FREE3_WARNING = -Wuse-after-free=3
 AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	-Wold-style-definition -Wstrict-prototypes \
 	$(TRAMPOLINES_WARNING) $(LOGICAL_OP_WARNING) \
 	$(DUPLICATED_COND_WARNING) $(NULL_DEREFERENCE_WARNING) \
-	$(IMPLICIT_FALLTHROUGH_WARNING) $(if \
-	$($(*F)_no_Werror),,-Werror) $(if \
+	$(IMPLICIT_FALLTHROUGH_WARNING) $(USE_AFTER_FREE3_WARNING) \
+	$(if $($(*F)_no_Werror),,-Werror) $(if \
 	$($(*F)_no_Wunused),,-Wunused -Wextra) $(if \
 	$($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) $(if \
 	$($(*F)_no_Wpacked_not_aligned),$(NO_PACKED_NOT_ALIGNED_WARNING),) \
@@ -647,10 +663,9 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_cu_die.c dwarf_peel_type.c dwarf_default_lower_bound.c \
 		  dwarf_die_addr_die.c dwarf_get_units.c \
 		  libdw_find_split_unit.c dwarf_cu_info.c \
-		  dwarf_next_lines.c
+		  dwarf_next_lines.c dwarf_cu_dwp_section_info.c
 
 @MAINTAINER_MODE_TRUE@BUILT_SOURCES = $(srcdir)/known-dwarf.h
-@MAINTAINER_MODE_TRUE@MAINTAINERCLEANFILES = $(srcdir)/known-dwarf.h
 libdw_pic_a_SOURCES = 
 am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
 libdw_so_LIBS = ../libebl/libebl_pic.a ../backends/libebl_backends_pic.a \
@@ -674,6 +689,7 @@ noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h \
 
 EXTRA_DIST = libdw.map
 MOSTLYCLEANFILES = $(am_libdw_pic_a_OBJECTS) libdw.so libdw.so.$(VERSION)
+MAINTAINERCLEANFILES = $(srcdir)/known-dwarf.h
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -778,6 +794,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwarf_cfi_end.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwarf_child.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwarf_cu_die.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwarf_cu_dwp_section_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwarf_cu_getdwarf.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwarf_cu_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwarf_cuoffset.Po@am__quote@ # am--include-marker
@@ -1099,6 +1116,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/dwarf_cfi_end.Po
 	-rm -f ./$(DEPDIR)/dwarf_child.Po
 	-rm -f ./$(DEPDIR)/dwarf_cu_die.Po
+	-rm -f ./$(DEPDIR)/dwarf_cu_dwp_section_info.Po
 	-rm -f ./$(DEPDIR)/dwarf_cu_getdwarf.Po
 	-rm -f ./$(DEPDIR)/dwarf_cu_info.Po
 	-rm -f ./$(DEPDIR)/dwarf_cuoffset.Po
@@ -1271,6 +1289,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/dwarf_cfi_end.Po
 	-rm -f ./$(DEPDIR)/dwarf_child.Po
 	-rm -f ./$(DEPDIR)/dwarf_cu_die.Po
+	-rm -f ./$(DEPDIR)/dwarf_cu_dwp_section_info.Po
 	-rm -f ./$(DEPDIR)/dwarf_cu_getdwarf.Po
 	-rm -f ./$(DEPDIR)/dwarf_cu_info.Po
 	-rm -f ./$(DEPDIR)/dwarf_cuoffset.Po
@@ -1436,7 +1455,8 @@ print-%:
 libdw.so: $(srcdir)/libdw.map $(libdw_so_LIBS) $(libdw_so_DEPS)
 	$(AM_V_CCLD)$(LINK) $(dso_LDFLAGS) -o $@ \
 		-Wl,--soname,$@.$(VERSION),--enable-new-dtags \
-		-Wl,--version-script,$<,--no-undefined \
+		-Wl,--version-script,$< \
+		$(NO_UNDEFINED) \
 		-Wl,--whole-archive $(libdw_so_LIBS) -Wl,--no-whole-archive \
 		$(libdw_so_LDLIBS)
 	@$(textrel_check)

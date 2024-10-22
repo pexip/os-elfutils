@@ -188,6 +188,7 @@ License: GPL-3+
 
 Files: debian/po/pt.po
 Copyright: (C) 2021, Américo Monteiro <a_monteiro@gmx.com>
+License: GPL-3+
 
 License: GPL-3+
  This file is free software; you can redistribute it and/or modify

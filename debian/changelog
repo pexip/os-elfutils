@@ -1,3 +1,94 @@
+elfutils (0.192-4) unstable; urgency=medium
+
+  * Drop again the build dependency libimaevm-dev.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 22 Oct 2024 13:13:50 +0200
+
+elfutils (0.192-3) unstable; urgency=medium
+
+  * Also build-depend on libjson-c-dev.
+  * Bump standards version.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 21 Oct 2024 17:21:03 +0200
+
+elfutils (0.192-2) unstable; urgency=medium
+
+  * Build-depend on libimaevm-dev.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 21 Oct 2024 14:08:39 +0200
+
+elfutils (0.192-1) unstable; urgency=medium
+
+  * New upstream version.
+
+  [ Sergio Durigan Junior ]
+  * d/libdebuginfod-common.postrm: Correctly purge configuration in Debian.
+
+  [ Matthias Klose ]
+  * Drop the riscv-retval-workaround patch.
+  * Don't package fish.
+  * Update symbols files.
+  * Refresh patches.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 21 Oct 2024 12:04:15 +0200
+
+elfutils (0.191-2) unstable; urgency=medium
+
+  * d/control: Recommends libarchive-tools. (Closes: #1063767)
+
+ -- Sergio Durigan Junior <sergiodj@debian.org>  Sat, 13 Jul 2024 00:30:43 -0400
+
+elfutils (0.191-1) unstable; urgency=medium
+
+  * New upstream version.
+  * Add translations (it, sv). Closes: #1050108, #1049367.
+  * Fix cross build failure (Helmut Grohne). Closes: #1057813.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 12 Mar 2024 11:42:59 +0100
+
+elfutils (0.190-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Rename libraries for 64-bit time_t transition.
+
+ -- Michael Hudson-Doyle <mwhudson@debian.org>  Thu, 29 Feb 2024 00:13:08 +0000
+
+elfutils (0.190-1) unstable; urgency=medium
+
+  * New upstream version.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 16 Nov 2023 14:54:07 +0100
+
+elfutils (0.189-4) unstable; urgency=medium
+
+  * Remove bashism in maintainer script. Closes: #999414.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 04 Jul 2023 11:37:16 +0200
+
+elfutils (0.189-3) unstable; urgency=medium
+
+  * libelf-dev: Depend on libzstd-dev. Closes: #1040071.
+
+ -- Matthias Klose <doko@debian.org>  Sun, 02 Jul 2023 09:41:46 +0200
+
+elfutils (0.189-2) unstable; urgency=medium
+
+  * Use sh instead of bash in maintainer script. Closes: #999414.
+  * Add Romanian debconf templates translation (Remus-Gabriel Chelu).
+    Closes: #1031867.
+  * Fix syntax in debian/copyright (Bastian Germann). Closes: #1032126.
+  * Bump standards version.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 01 Jul 2023 13:35:22 +0200
+
+elfutils (0.189-1) experimental; urgency=medium
+
+  * New upstream version.
+  * Refresh patches.
+  * Build-depend on libzstd-dev and zstd.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 11 Apr 2023 12:51:29 +0200
+
 elfutils (0.188-2.1) unstable; urgency=medium
 
   * Non-maintainer upload.
