@@ -12,6 +12,9 @@
 /* Build debuginfod */
 #undef ENABLE_DEBUGINFOD
 
+/* Build IMA verification */
+#undef ENABLE_IMA_VERIFICATION
+
 /* Enable libdebuginfod */
 #undef ENABLE_LIBDEBUGINFOD
 
@@ -64,11 +67,17 @@
 /* Define to 1 if you have the <err.h> header file. */
 #undef HAVE_ERR_H
 
+/* Define to 1 if you have the <execinfo.h> header file. */
+#undef HAVE_EXECINFO_H
+
 /* Defined if __attribute__((fallthrough)) is supported */
 #undef HAVE_FALLTHROUGH
 
 /* Defined if __attribute__((gcc_struct)) is supported */
 #undef HAVE_GCC_STRUCT
+
+/* Define to 1 if you have the `getrlimit' function. */
+#undef HAVE_GETRLIMIT
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
@@ -79,6 +88,15 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if libarchive is available */
+#undef HAVE_LIBARCHIVE
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the `malloc_trim' function. */
+#undef HAVE_MALLOC_TRIM
+
 /* Define to 1 if you have the `mremap' function. */
 #undef HAVE_MREMAP
 
@@ -87,6 +105,12 @@
 
 /* Enable pthread_setname_np */
 #undef HAVE_PTHREAD_SETNAME_NP
+
+/* Define to 1 if you have the `sched_getaffinity' function. */
+#undef HAVE_SCHED_GETAFFINITY
+
+/* Define to 1 if you have the <sched.h> header file. */
+#undef HAVE_SCHED_H
 
 /* Define to 1 if `stdatomic.h` is provided by the system, 0 otherwise. */
 #undef HAVE_STDATOMIC_H
@@ -108,6 +132,17 @@
 
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
+
+/* Define to 1 if `sysprof-4/sysprof-capture-types.h` is provided by the
+   system, 0 otherwise. */
+#undef HAVE_SYSPROF_4_HEADERS
+
+/* Define to 1 if `sysprof-6/sysprof-capture-types.h` is provided by the
+   system, 0 otherwise. */
+#undef HAVE_SYSPROF_6_HEADERS
+
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#undef HAVE_SYS_RESOURCE_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
@@ -173,6 +208,9 @@
 
 /* Support ZSTD (zst) decompression via -lzstd. */
 #undef USE_ZSTD
+
+/* zstd compression support */
+#undef USE_ZSTD_COMPRESS
 
 /* Version number of package */
 #undef VERSION

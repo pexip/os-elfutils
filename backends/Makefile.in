@@ -94,13 +94,13 @@ host_triplet = @host@
 subdir = backends
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
-	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
-	$(top_srcdir)/m4/host-cpu-c-abi.m4 $(top_srcdir)/m4/iconv.m4 \
-	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/build-to-host.m4 \
+	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/host-cpu-c-abi.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(noinst_HEADERS) \
@@ -170,12 +170,23 @@ am__objects_14 = riscv_init.$(OBJEXT) riscv_symbol.$(OBJEXT) \
 am__objects_15 = csky_attrs.$(OBJEXT) csky_init.$(OBJEXT) \
 	csky_symbol.$(OBJEXT) csky_cfi.$(OBJEXT) csky_regs.$(OBJEXT) \
 	csky_initreg.$(OBJEXT) csky_corenote.$(OBJEXT)
+am__objects_16 = loongarch_init.$(OBJEXT) loongarch_symbol.$(OBJEXT) \
+	loongarch_cfi.$(OBJEXT) loongarch_regs.$(OBJEXT) \
+	loongarch_retval.$(OBJEXT) loongarch_initreg.$(OBJEXT) \
+	loongarch_unwind.$(OBJEXT) loongarch_corenote.$(OBJEXT)
+am__objects_17 = arc_init.$(OBJEXT) arc_symbol.$(OBJEXT)
+am__objects_18 = mips_init.$(OBJEXT) mips_symbol.$(OBJEXT) \
+	mips_initreg.$(OBJEXT) mips_cfi.$(OBJEXT) \
+	mips_unwind.$(OBJEXT) mips_regs.$(OBJEXT) \
+	mips_retval.$(OBJEXT) mips_corenote.$(OBJEXT)
+am__objects_19 = hexagon_init.$(OBJEXT) hexagon_symbol.$(OBJEXT)
 am_libebl_backends_a_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
 	$(am__objects_9) $(am__objects_10) $(am__objects_11) \
 	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
-	$(am__objects_15)
+	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
+	$(am__objects_18) $(am__objects_19)
 libebl_backends_a_OBJECTS = $(am_libebl_backends_a_OBJECTS)
 libebl_backends_pic_a_AR = $(AR) $(ARFLAGS)
 libebl_backends_pic_a_LIBADD =
@@ -202,7 +213,8 @@ am__depfiles_remade = ./$(DEPDIR)/aarch64_cfi.Po \
 	./$(DEPDIR)/aarch64_unwind.Po ./$(DEPDIR)/alpha_auxv.Po \
 	./$(DEPDIR)/alpha_corenote.Po ./$(DEPDIR)/alpha_init.Po \
 	./$(DEPDIR)/alpha_regs.Po ./$(DEPDIR)/alpha_retval.Po \
-	./$(DEPDIR)/alpha_symbol.Po ./$(DEPDIR)/arm_attrs.Po \
+	./$(DEPDIR)/alpha_symbol.Po ./$(DEPDIR)/arc_init.Po \
+	./$(DEPDIR)/arc_symbol.Po ./$(DEPDIR)/arm_attrs.Po \
 	./$(DEPDIR)/arm_auxv.Po ./$(DEPDIR)/arm_cfi.Po \
 	./$(DEPDIR)/arm_corenote.Po ./$(DEPDIR)/arm_init.Po \
 	./$(DEPDIR)/arm_initreg.Po ./$(DEPDIR)/arm_machineflagname.Po \
@@ -212,45 +224,54 @@ am__depfiles_remade = ./$(DEPDIR)/aarch64_cfi.Po \
 	./$(DEPDIR)/csky_attrs.Po ./$(DEPDIR)/csky_cfi.Po \
 	./$(DEPDIR)/csky_corenote.Po ./$(DEPDIR)/csky_init.Po \
 	./$(DEPDIR)/csky_initreg.Po ./$(DEPDIR)/csky_regs.Po \
-	./$(DEPDIR)/csky_symbol.Po ./$(DEPDIR)/i386_auxv.Po \
+	./$(DEPDIR)/csky_symbol.Po ./$(DEPDIR)/hexagon_init.Po \
+	./$(DEPDIR)/hexagon_symbol.Po ./$(DEPDIR)/i386_auxv.Po \
 	./$(DEPDIR)/i386_cfi.Po ./$(DEPDIR)/i386_corenote.Po \
 	./$(DEPDIR)/i386_init.Po ./$(DEPDIR)/i386_initreg.Po \
 	./$(DEPDIR)/i386_regs.Po ./$(DEPDIR)/i386_retval.Po \
 	./$(DEPDIR)/i386_symbol.Po ./$(DEPDIR)/i386_unwind.Po \
 	./$(DEPDIR)/ia64_init.Po ./$(DEPDIR)/ia64_regs.Po \
 	./$(DEPDIR)/ia64_retval.Po ./$(DEPDIR)/ia64_symbol.Po \
-	./$(DEPDIR)/m68k_cfi.Po ./$(DEPDIR)/m68k_corenote.Po \
-	./$(DEPDIR)/m68k_init.Po ./$(DEPDIR)/m68k_initreg.Po \
-	./$(DEPDIR)/m68k_regs.Po ./$(DEPDIR)/m68k_retval.Po \
-	./$(DEPDIR)/m68k_symbol.Po ./$(DEPDIR)/ppc64_corenote.Po \
-	./$(DEPDIR)/ppc64_init.Po ./$(DEPDIR)/ppc64_resolve_sym.Po \
-	./$(DEPDIR)/ppc64_retval.Po ./$(DEPDIR)/ppc64_symbol.Po \
-	./$(DEPDIR)/ppc64_unwind.Po ./$(DEPDIR)/ppc_attrs.Po \
-	./$(DEPDIR)/ppc_auxv.Po ./$(DEPDIR)/ppc_cfi.Po \
-	./$(DEPDIR)/ppc_corenote.Po ./$(DEPDIR)/ppc_init.Po \
-	./$(DEPDIR)/ppc_initreg.Po ./$(DEPDIR)/ppc_regs.Po \
-	./$(DEPDIR)/ppc_retval.Po ./$(DEPDIR)/ppc_symbol.Po \
-	./$(DEPDIR)/riscv64_corenote.Po ./$(DEPDIR)/riscv_cfi.Po \
-	./$(DEPDIR)/riscv_corenote.Po ./$(DEPDIR)/riscv_init.Po \
-	./$(DEPDIR)/riscv_initreg.Po ./$(DEPDIR)/riscv_regs.Po \
-	./$(DEPDIR)/riscv_retval.Po ./$(DEPDIR)/riscv_symbol.Po \
-	./$(DEPDIR)/s390_cfi.Po ./$(DEPDIR)/s390_corenote.Po \
-	./$(DEPDIR)/s390_init.Po ./$(DEPDIR)/s390_initreg.Po \
-	./$(DEPDIR)/s390_regs.Po ./$(DEPDIR)/s390_retval.Po \
-	./$(DEPDIR)/s390_symbol.Po ./$(DEPDIR)/s390_unwind.Po \
-	./$(DEPDIR)/s390x_corenote.Po ./$(DEPDIR)/sh_corenote.Po \
-	./$(DEPDIR)/sh_init.Po ./$(DEPDIR)/sh_regs.Po \
-	./$(DEPDIR)/sh_retval.Po ./$(DEPDIR)/sh_symbol.Po \
-	./$(DEPDIR)/sparc64_corenote.Po ./$(DEPDIR)/sparc_attrs.Po \
-	./$(DEPDIR)/sparc_auxv.Po ./$(DEPDIR)/sparc_cfi.Po \
-	./$(DEPDIR)/sparc_corenote.Po ./$(DEPDIR)/sparc_init.Po \
-	./$(DEPDIR)/sparc_initreg.Po ./$(DEPDIR)/sparc_regs.Po \
-	./$(DEPDIR)/sparc_retval.Po ./$(DEPDIR)/sparc_symbol.Po \
-	./$(DEPDIR)/x32_corenote.Po ./$(DEPDIR)/x86_64_cfi.Po \
-	./$(DEPDIR)/x86_64_corenote.Po ./$(DEPDIR)/x86_64_init.Po \
-	./$(DEPDIR)/x86_64_initreg.Po ./$(DEPDIR)/x86_64_regs.Po \
-	./$(DEPDIR)/x86_64_retval.Po ./$(DEPDIR)/x86_64_symbol.Po \
-	./$(DEPDIR)/x86_64_unwind.Po
+	./$(DEPDIR)/loongarch_cfi.Po ./$(DEPDIR)/loongarch_corenote.Po \
+	./$(DEPDIR)/loongarch_init.Po ./$(DEPDIR)/loongarch_initreg.Po \
+	./$(DEPDIR)/loongarch_regs.Po ./$(DEPDIR)/loongarch_retval.Po \
+	./$(DEPDIR)/loongarch_symbol.Po \
+	./$(DEPDIR)/loongarch_unwind.Po ./$(DEPDIR)/m68k_cfi.Po \
+	./$(DEPDIR)/m68k_corenote.Po ./$(DEPDIR)/m68k_init.Po \
+	./$(DEPDIR)/m68k_initreg.Po ./$(DEPDIR)/m68k_regs.Po \
+	./$(DEPDIR)/m68k_retval.Po ./$(DEPDIR)/m68k_symbol.Po \
+	./$(DEPDIR)/mips_cfi.Po ./$(DEPDIR)/mips_corenote.Po \
+	./$(DEPDIR)/mips_init.Po ./$(DEPDIR)/mips_initreg.Po \
+	./$(DEPDIR)/mips_regs.Po ./$(DEPDIR)/mips_retval.Po \
+	./$(DEPDIR)/mips_symbol.Po ./$(DEPDIR)/mips_unwind.Po \
+	./$(DEPDIR)/ppc64_corenote.Po ./$(DEPDIR)/ppc64_init.Po \
+	./$(DEPDIR)/ppc64_resolve_sym.Po ./$(DEPDIR)/ppc64_retval.Po \
+	./$(DEPDIR)/ppc64_symbol.Po ./$(DEPDIR)/ppc64_unwind.Po \
+	./$(DEPDIR)/ppc_attrs.Po ./$(DEPDIR)/ppc_auxv.Po \
+	./$(DEPDIR)/ppc_cfi.Po ./$(DEPDIR)/ppc_corenote.Po \
+	./$(DEPDIR)/ppc_init.Po ./$(DEPDIR)/ppc_initreg.Po \
+	./$(DEPDIR)/ppc_regs.Po ./$(DEPDIR)/ppc_retval.Po \
+	./$(DEPDIR)/ppc_symbol.Po ./$(DEPDIR)/riscv64_corenote.Po \
+	./$(DEPDIR)/riscv_cfi.Po ./$(DEPDIR)/riscv_corenote.Po \
+	./$(DEPDIR)/riscv_init.Po ./$(DEPDIR)/riscv_initreg.Po \
+	./$(DEPDIR)/riscv_regs.Po ./$(DEPDIR)/riscv_retval.Po \
+	./$(DEPDIR)/riscv_symbol.Po ./$(DEPDIR)/s390_cfi.Po \
+	./$(DEPDIR)/s390_corenote.Po ./$(DEPDIR)/s390_init.Po \
+	./$(DEPDIR)/s390_initreg.Po ./$(DEPDIR)/s390_regs.Po \
+	./$(DEPDIR)/s390_retval.Po ./$(DEPDIR)/s390_symbol.Po \
+	./$(DEPDIR)/s390_unwind.Po ./$(DEPDIR)/s390x_corenote.Po \
+	./$(DEPDIR)/sh_corenote.Po ./$(DEPDIR)/sh_init.Po \
+	./$(DEPDIR)/sh_regs.Po ./$(DEPDIR)/sh_retval.Po \
+	./$(DEPDIR)/sh_symbol.Po ./$(DEPDIR)/sparc64_corenote.Po \
+	./$(DEPDIR)/sparc_attrs.Po ./$(DEPDIR)/sparc_auxv.Po \
+	./$(DEPDIR)/sparc_cfi.Po ./$(DEPDIR)/sparc_corenote.Po \
+	./$(DEPDIR)/sparc_init.Po ./$(DEPDIR)/sparc_initreg.Po \
+	./$(DEPDIR)/sparc_regs.Po ./$(DEPDIR)/sparc_retval.Po \
+	./$(DEPDIR)/sparc_symbol.Po ./$(DEPDIR)/x32_corenote.Po \
+	./$(DEPDIR)/x86_64_cfi.Po ./$(DEPDIR)/x86_64_corenote.Po \
+	./$(DEPDIR)/x86_64_init.Po ./$(DEPDIR)/x86_64_initreg.Po \
+	./$(DEPDIR)/x86_64_regs.Po ./$(DEPDIR)/x86_64_retval.Po \
+	./$(DEPDIR)/x86_64_symbol.Po ./$(DEPDIR)/x86_64_unwind.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -315,6 +336,7 @@ CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_IMA_CERT_PATH = @DEBUGINFOD_IMA_CERT_PATH@
 DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
@@ -367,6 +389,7 @@ MSGFMT = @MSGFMT@
 MSGMERGE = @MSGMERGE@
 MSGMERGE_FOR_MSGFMT_OPTION = @MSGMERGE_FOR_MSGFMT_OPTION@
 NM = @NM@
+NO_UNDEFINED = @NO_UNDEFINED@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -393,6 +416,8 @@ XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
+ZSTD_COMPRESS_CFLAGS = @ZSTD_COMPRESS_CFLAGS@
+ZSTD_COMPRESS_LIBS = @ZSTD_COMPRESS_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -413,6 +438,7 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
+crypto_LIBS = @crypto_LIBS@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
@@ -432,6 +458,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+jsonc_CFLAGS = @jsonc_CFLAGS@
+jsonc_LIBS = @jsonc_LIBS@
 libarchive_CFLAGS = @libarchive_CFLAGS@
 libarchive_LIBS = @libarchive_LIBS@
 libcurl_CFLAGS = @libcurl_CFLAGS@
@@ -441,7 +469,10 @@ libexecdir = @libexecdir@
 libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
 libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
+localedir_c = @localedir_c@
+localedir_c_make = @localedir_c_make@
 localstatedir = @localstatedir@
+lzma_LIBS = @lzma_LIBS@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 obstack_LIBS = @obstack_LIBS@
@@ -452,6 +483,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+rpm_LIBS = @rpm_LIBS@
 runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
@@ -464,7 +496,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 zip_LIBS = @zip_LIBS@
-AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_srcdir)/lib -I.. \
+zstd_LIBS = @zstd_LIBS@
+AM_CPPFLAGS = -iquote . -I$(srcdir) -I$(top_srcdir)/lib -I.. \
 	-I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
 	-I$(top_srcdir)/libelf -I$(top_srcdir)/libdw
 
@@ -493,12 +526,14 @@ ARFLAGS = cr
 @HAVE_TRAMPOLINES_WARNING_TRUE@TRAMPOLINES_WARNING = -Wtrampolines
 @HAVE_NO_PACKED_NOT_ALIGNED_WARNING_FALSE@NO_PACKED_NOT_ALIGNED_WARNING = 
 @HAVE_NO_PACKED_NOT_ALIGNED_WARNING_TRUE@NO_PACKED_NOT_ALIGNED_WARNING = -Wno-packed-not-aligned
+@HAVE_USE_AFTER_FREE3_WARNING_FALSE@USE_AFTER_FREE3_WARNING = 
+@HAVE_USE_AFTER_FREE3_WARNING_TRUE@USE_AFTER_FREE3_WARNING = -Wuse-after-free=3
 AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	-Wold-style-definition -Wstrict-prototypes \
 	$(TRAMPOLINES_WARNING) $(LOGICAL_OP_WARNING) \
 	$(DUPLICATED_COND_WARNING) $(NULL_DEREFERENCE_WARNING) \
-	$(IMPLICIT_FALLTHROUGH_WARNING) $(if \
-	$($(*F)_no_Werror),,-Werror) $(if \
+	$(IMPLICIT_FALLTHROUGH_WARNING) $(USE_AFTER_FREE3_WARNING) \
+	$(if $($(*F)_no_Werror),,-Werror) $(if \
 	$($(*F)_no_Wunused),,-Wunused -Wextra) $(if \
 	$($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) $(if \
 	$($(*F)_no_Wpacked_not_aligned),$(NO_PACKED_NOT_ALIGNED_WARNING),) \
@@ -522,7 +557,7 @@ textrel_msg = echo "WARNING: TEXTREL found in '$@'"
 textrel_check = if $(READELF) -d $@ | grep -F -q TEXTREL; then $(textrel_found); fi
 noinst_LIBRARIES = libebl_backends.a libebl_backends_pic.a
 modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
-	  m68k bpf riscv csky
+	  m68k bpf riscv csky loongarch arc mips hexagon
 
 i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c i386_cfi.c \
 	    i386_retval.c i386_regs.c i386_auxv.c \
@@ -577,11 +612,23 @@ riscv_SRCS = riscv_init.c riscv_symbol.c riscv_cfi.c riscv_regs.c \
 csky_SRCS = csky_attrs.c csky_init.c csky_symbol.c csky_cfi.c \
 	    csky_regs.c csky_initreg.c csky_corenote.c
 
+loongarch_SRCS = loongarch_init.c loongarch_symbol.c loongarch_cfi.c \
+	    loongarch_regs.c loongarch_retval.c loongarch_initreg.c \
+	    loongarch_unwind.c loongarch_corenote.c
+
+arc_SRCS = arc_init.c arc_symbol.c
+mips_SRCS = mips_init.c mips_symbol.c mips_initreg.c \
+	    mips_cfi.c mips_unwind.c mips_regs.c mips_retval.c \
+	    mips_corenote.c
+
+hexagon_SRCS = hexagon_init.c hexagon_symbol.c
 libebl_backends_a_SOURCES = $(i386_SRCS) $(sh_SRCS) $(x86_64_SRCS) \
 			    $(ia64_SRCS) $(alpha_SRCS) $(arm_SRCS) \
 			    $(aarch64_SRCS) $(sparc_SRCS) $(ppc_SRCS) \
 			    $(ppc64_SRCS) $(s390_SRCS) \
-			    $(m68k_SRCS) $(bpf_SRCS) $(riscv_SRCS) $(csky_SRCS)
+			    $(m68k_SRCS) $(bpf_SRCS) $(riscv_SRCS) $(csky_SRCS) \
+			    $(loongarch_SRCS) $(arc_SRCS) $(mips_SRCS) \
+			    $(hexagon_SRCS)
 
 libebl_backends_pic_a_SOURCES = 
 am_libebl_backends_pic_a_OBJECTS = $(libebl_backends_a_SOURCES:.c=.os)
@@ -656,6 +703,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alpha_regs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alpha_retval.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alpha_symbol.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arc_init.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arc_symbol.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arm_attrs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arm_auxv.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arm_cfi.Po@am__quote@ # am--include-marker
@@ -676,6 +725,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_initreg.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_regs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csky_symbol.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hexagon_init.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hexagon_symbol.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_auxv.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_cfi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/i386_corenote.Po@am__quote@ # am--include-marker
@@ -689,6 +740,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ia64_regs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ia64_retval.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ia64_symbol.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loongarch_cfi.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loongarch_corenote.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loongarch_init.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loongarch_initreg.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loongarch_regs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loongarch_retval.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loongarch_symbol.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loongarch_unwind.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m68k_cfi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m68k_corenote.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m68k_init.Po@am__quote@ # am--include-marker
@@ -696,6 +755,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m68k_regs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m68k_retval.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m68k_symbol.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mips_cfi.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mips_corenote.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mips_init.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mips_initreg.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mips_regs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mips_retval.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mips_symbol.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mips_unwind.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ppc64_corenote.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ppc64_init.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ppc64_resolve_sym.Po@am__quote@ # am--include-marker
@@ -912,6 +979,8 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/alpha_regs.Po
 	-rm -f ./$(DEPDIR)/alpha_retval.Po
 	-rm -f ./$(DEPDIR)/alpha_symbol.Po
+	-rm -f ./$(DEPDIR)/arc_init.Po
+	-rm -f ./$(DEPDIR)/arc_symbol.Po
 	-rm -f ./$(DEPDIR)/arm_attrs.Po
 	-rm -f ./$(DEPDIR)/arm_auxv.Po
 	-rm -f ./$(DEPDIR)/arm_cfi.Po
@@ -932,6 +1001,8 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/csky_initreg.Po
 	-rm -f ./$(DEPDIR)/csky_regs.Po
 	-rm -f ./$(DEPDIR)/csky_symbol.Po
+	-rm -f ./$(DEPDIR)/hexagon_init.Po
+	-rm -f ./$(DEPDIR)/hexagon_symbol.Po
 	-rm -f ./$(DEPDIR)/i386_auxv.Po
 	-rm -f ./$(DEPDIR)/i386_cfi.Po
 	-rm -f ./$(DEPDIR)/i386_corenote.Po
@@ -945,6 +1016,14 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/ia64_regs.Po
 	-rm -f ./$(DEPDIR)/ia64_retval.Po
 	-rm -f ./$(DEPDIR)/ia64_symbol.Po
+	-rm -f ./$(DEPDIR)/loongarch_cfi.Po
+	-rm -f ./$(DEPDIR)/loongarch_corenote.Po
+	-rm -f ./$(DEPDIR)/loongarch_init.Po
+	-rm -f ./$(DEPDIR)/loongarch_initreg.Po
+	-rm -f ./$(DEPDIR)/loongarch_regs.Po
+	-rm -f ./$(DEPDIR)/loongarch_retval.Po
+	-rm -f ./$(DEPDIR)/loongarch_symbol.Po
+	-rm -f ./$(DEPDIR)/loongarch_unwind.Po
 	-rm -f ./$(DEPDIR)/m68k_cfi.Po
 	-rm -f ./$(DEPDIR)/m68k_corenote.Po
 	-rm -f ./$(DEPDIR)/m68k_init.Po
@@ -952,6 +1031,14 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/m68k_regs.Po
 	-rm -f ./$(DEPDIR)/m68k_retval.Po
 	-rm -f ./$(DEPDIR)/m68k_symbol.Po
+	-rm -f ./$(DEPDIR)/mips_cfi.Po
+	-rm -f ./$(DEPDIR)/mips_corenote.Po
+	-rm -f ./$(DEPDIR)/mips_init.Po
+	-rm -f ./$(DEPDIR)/mips_initreg.Po
+	-rm -f ./$(DEPDIR)/mips_regs.Po
+	-rm -f ./$(DEPDIR)/mips_retval.Po
+	-rm -f ./$(DEPDIR)/mips_symbol.Po
+	-rm -f ./$(DEPDIR)/mips_unwind.Po
 	-rm -f ./$(DEPDIR)/ppc64_corenote.Po
 	-rm -f ./$(DEPDIR)/ppc64_init.Po
 	-rm -f ./$(DEPDIR)/ppc64_resolve_sym.Po
@@ -1067,6 +1154,8 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/alpha_regs.Po
 	-rm -f ./$(DEPDIR)/alpha_retval.Po
 	-rm -f ./$(DEPDIR)/alpha_symbol.Po
+	-rm -f ./$(DEPDIR)/arc_init.Po
+	-rm -f ./$(DEPDIR)/arc_symbol.Po
 	-rm -f ./$(DEPDIR)/arm_attrs.Po
 	-rm -f ./$(DEPDIR)/arm_auxv.Po
 	-rm -f ./$(DEPDIR)/arm_cfi.Po
@@ -1087,6 +1176,8 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/csky_initreg.Po
 	-rm -f ./$(DEPDIR)/csky_regs.Po
 	-rm -f ./$(DEPDIR)/csky_symbol.Po
+	-rm -f ./$(DEPDIR)/hexagon_init.Po
+	-rm -f ./$(DEPDIR)/hexagon_symbol.Po
 	-rm -f ./$(DEPDIR)/i386_auxv.Po
 	-rm -f ./$(DEPDIR)/i386_cfi.Po
 	-rm -f ./$(DEPDIR)/i386_corenote.Po
@@ -1100,6 +1191,14 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/ia64_regs.Po
 	-rm -f ./$(DEPDIR)/ia64_retval.Po
 	-rm -f ./$(DEPDIR)/ia64_symbol.Po
+	-rm -f ./$(DEPDIR)/loongarch_cfi.Po
+	-rm -f ./$(DEPDIR)/loongarch_corenote.Po
+	-rm -f ./$(DEPDIR)/loongarch_init.Po
+	-rm -f ./$(DEPDIR)/loongarch_initreg.Po
+	-rm -f ./$(DEPDIR)/loongarch_regs.Po
+	-rm -f ./$(DEPDIR)/loongarch_retval.Po
+	-rm -f ./$(DEPDIR)/loongarch_symbol.Po
+	-rm -f ./$(DEPDIR)/loongarch_unwind.Po
 	-rm -f ./$(DEPDIR)/m68k_cfi.Po
 	-rm -f ./$(DEPDIR)/m68k_corenote.Po
 	-rm -f ./$(DEPDIR)/m68k_init.Po
@@ -1107,6 +1206,14 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/m68k_regs.Po
 	-rm -f ./$(DEPDIR)/m68k_retval.Po
 	-rm -f ./$(DEPDIR)/m68k_symbol.Po
+	-rm -f ./$(DEPDIR)/mips_cfi.Po
+	-rm -f ./$(DEPDIR)/mips_corenote.Po
+	-rm -f ./$(DEPDIR)/mips_init.Po
+	-rm -f ./$(DEPDIR)/mips_initreg.Po
+	-rm -f ./$(DEPDIR)/mips_regs.Po
+	-rm -f ./$(DEPDIR)/mips_retval.Po
+	-rm -f ./$(DEPDIR)/mips_symbol.Po
+	-rm -f ./$(DEPDIR)/mips_unwind.Po
 	-rm -f ./$(DEPDIR)/ppc64_corenote.Po
 	-rm -f ./$(DEPDIR)/ppc64_init.Po
 	-rm -f ./$(DEPDIR)/ppc64_resolve_sym.Po

@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2014, 2016 Red Hat, Inc.
+## Copyright (C) 1996-2014, 2016, 2024 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -19,15 +19,21 @@
 include $(top_srcdir)/config/eu.am
 DEFS += $(YYDEBUG) -DDEBUGPRED=@DEBUGPRED@ \
 	-DSRCDIR=\"$(shell cd $(srcdir);pwd)\" -DOBJDIR=\"$(shell pwd)\"
+
+DEFAULT_INCLUDES =
 AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 	    -I$(srcdir)/../libdw -I$(srcdir)/../libdwelf \
-	    -I$(srcdir)/../libdwfl -I$(srcdir)/../libasm
+	    -I$(srcdir)/../libdwfl -I$(srcdir)/../libasm -I../debuginfod
 
 AM_LDFLAGS = -Wl,-rpath-link,../libelf:../libdw $(STACK_USAGE_NO_ERROR)
 
 bin_PROGRAMS = readelf nm size strip elflint findtextrel addr2line \
 	       elfcmp objdump ranlib strings ar unstrip stack elfcompress \
-	       elfclassify
+	       elfclassify srcfiles
+
+if ENABLE_STACKTRACE
+bin_PROGRAMS += stacktrace
+endif
 
 noinst_LIBRARIES = libar.a
 
@@ -42,11 +48,21 @@ CLEANFILES += make-debug-archive
 if BUILD_STATIC
 libasm = ../libasm/libasm.a
 libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) -ldl -lpthread
-libelf = ../libelf/libelf.a -lz
+libelf = ../libelf/libelf.a -lz $(zstd_LIBS)
+if LIBDEBUGINFOD
+libdebuginfod = ../debuginfod/libdebuginfod.a -lpthread $(libcurl_LIBS) $(crypto_LIBS) $(jsonc_LIBS)
+else
+libdebuginfod =
+endif
 else
 libasm = ../libasm/libasm.so
 libdw = ../libdw/libdw.so
 libelf = ../libelf/libelf.so
+if LIBDEBUGINFOD
+libdebuginfod = ../debuginfod/libdebuginfod.so
+else
+libdebuginfod =
+endif
 endif
 libebl = ../libebl/libebl.a ../backends/libebl_backends.a ../libcpu/libcpu.a
 libeu = ../lib/libeu.a
@@ -82,8 +98,13 @@ strings_LDADD = $(libelf) $(libeu) $(argp_LDADD)
 ar_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD) $(obstack_LIBS)
 unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
 stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) $(demanglelib)
+if ENABLE_STACKTRACE
+stacktrace_LDADD = $(libelf) $(libdw) $(libeu) $(argp_LDADD)
+endif
 elfcompress_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
 elfclassify_LDADD = $(libelf) $(libdw) $(libeu) $(argp_LDADD)
+srcfiles_SOURCES = srcfiles.cxx
+srcfiles_LDADD = $(libdw) $(libelf) $(libeu)  $(argp_LDADD) $(libarchive_LIBS) $(libdebuginfod)
 
 installcheck-binPROGRAMS: $(bin_PROGRAMS)
 	bad=0; pid=$$$$; list="$(bin_PROGRAMS)"; for p in $$list; do \

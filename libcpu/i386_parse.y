@@ -46,6 +46,8 @@
 #include <libeu.h>
 #include <system.h>
 
+#include "i386_mne.h"
+
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 
@@ -1107,11 +1109,6 @@ print_op_fct (const void *nodep, VISIT value,
     }
 }
 
-
-#if NMNES < 2
-# error "bogus NMNES value"
-#endif
-
 static void
 instrtable_out (void)
 {
@@ -1123,7 +1120,7 @@ instrtable_out (void)
   fprintf (outfile, "#define MNEMONIC_BITS %zu\n", best_mnemonic_bits);
 #else
   fprintf (outfile, "#define MNEMONIC_BITS %ld\n",
-	   lrint (ceil (log2 (NMNES))));
+	   lrint (ceil (log2 (MNE_COUNT))));
 #endif
   fprintf (outfile, "#define SUFFIX_BITS %d\n", nbitsuf);
   for (int i = 0; i < 3; ++i)
@@ -1161,7 +1158,7 @@ instrtable_out (void)
   EMIT_SUFFIX (w1);
   EMIT_SUFFIX (W1);
 
-  fputc_unlocked ('\n', outfile);
+  fputc ('\n', outfile);
 
   for (int i = 0; i < 3; ++i)
     {
@@ -1336,7 +1333,7 @@ instrtable_out (void)
 	  b = b->next;
 	}
 
-      fputc_unlocked ('\n', outfile);
+      fputc ('\n', outfile);
     }
   fputs ("};\n", outfile);
 }

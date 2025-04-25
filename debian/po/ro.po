@@ -1,0 +1,57 @@
+# Mesajele în limba română pentru pachetul elfutils.
+# Romanian translation of elfutils.
+# Copyright © 2023 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the elfutils package.
+#
+# Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>, 2023.
+#
+# Cronologia traducerii fișierului „elfutils”:
+# Traducerea inițială, făcută de R-GC, pentru versiunea elfutils 0.188-2.1(2021-03-06).
+# Actualizare a traducerii pentru versiunea Y, făcută de X, Y(anul).
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: elfutils 0.188-2.1\n"
+"Report-Msgid-Bugs-To: elfutils@packages.debian.org\n"
+"POT-Creation-Date: 2021-03-06 18:23-0500\n"
+"PO-Revision-Date: 2023-02-19 10:34+0100\n"
+"Last-Translator: Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>\n"
+"Language-Team: Romanian <debian-l10n-romanian@lists.debian.org>\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n==0 || (n!=1 && n%100>=1 && "
+"n%100<=19) ? 1 : 2);\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid "Connect to Debian's debuginfod server to download debug symbols?"
+msgstr ""
+"Doriți să vă conectați la serverul Debian „debuginfod” pentru a descărca "
+"simboluri de depanare?"
+
+#. Type: boolean
+#. Description
+#: ../libdebuginfod-common.templates:1001
+msgid ""
+"While debugging programs (with GDB, for example) or using debuginfo-consumer "
+"applications, it is possible to connect to Debian's debuginfod server and "
+"download the necessary debug information for the program you are debugging on-"
+"the-fly, without the need to configure the debian-debug apt repository nor "
+"installing any dbgsym packages.  This service is maintained by Debian, and the "
+"only information you will have to send to it is the Build-ID hash of the "
+"program(s)/library(ies) being debugged."
+msgstr ""
+"În timp ce depanați programe (cu GDB, de exemplu) sau utilizați aplicații "
+"debuginfo-consumer, este posibil să vă conectați la serverul Debian "
+"„debuginfod” și să descărcați informațiile necesare de depanare pentru "
+"programul pe care îl depanați din mers, fără a fi nevoie să configurați "
+"depozitul apt „debian-debug” și nici să instalați niciun pachet „dbgsym”.  "
+"Acest serviciu este întreținut de Debian și singura informație pe care va "
+"trebui să-i trimiteți este suma de control a identificatorului de compilare "
+"(Build-ID hash) al programului/bibliotecii care este depanată (sau ale "
+"programelor/bibliotecilor care sunt depanate)."

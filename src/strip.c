@@ -1800,7 +1800,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		      elf_errmsg (-1));
 	}
 
-      char *debug_basename = basename (debug_fname_embed ?: debug_fname);
+      const char *debug_basename = xbasename (debug_fname_embed ?: debug_fname);
       off_t crc_offset = strlen (debug_basename) + 1;
       /* Align to 4 byte boundary */
       crc_offset = ((crc_offset - 1) & ~3) + 4;
@@ -2464,6 +2464,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   if (debug_fname != NULL && removing_sections)
     {
       /* Finally write the file.  */
+      if (permissive)
+	elf_flagelf (debugelf, ELF_C_SET, ELF_F_PERMISSIVE);
       if (unlikely (elf_update (debugelf, ELF_C_WRITE) == -1))
 	{
 	  error (0, 0, _("while writing '%s': %s"),
@@ -2543,8 +2545,7 @@ while computing checksum for debug information"));
     {
       error (0, 0, _("%s: error while creating ELF header: %s"),
 	     output_fname ?: fname, elf_errmsg (-1));
-      cleanup_debug ();
-      return 1;
+      result = 1;
     }
 
   /* The new section header string table index.  */
@@ -2552,8 +2553,7 @@ while computing checksum for debug information"));
     {
       error (0, 0, _("%s: error updating shdrstrndx: %s"),
 	     output_fname ?: fname, elf_errmsg (-1));
-      cleanup_debug ();
-      return 1;
+      result = 1;
     }
 
   /* We have everything from the old file.  */
@@ -2561,8 +2561,7 @@ while computing checksum for debug information"));
     {
       error (0, 0, _("%s: error while reading the file: %s"),
 	     fname, elf_errmsg (-1));
-      cleanup_debug ();
-      return 1;
+      result = 1;
     }
 
   /* The ELF library better follows our layout when this is not a

@@ -28,8 +28,7 @@
    not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
-#include "../libelf/libelfP.h"	/* For NOTE_ALIGN.  */
-#undef	_
+#include "libelfP.h"	/* For NOTE_ALIGN.  */
 #include "libdwflP.h"
 #include <gelf.h>
 
@@ -560,7 +559,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
   ndx = 0;
   do
     {
-      int seg = dwfl_segment_report_module (dwfl, ndx, NULL,
+      int seg = dwfl_segment_report_module (dwfl, ndx, NULL, executable,
 					    &dwfl_elf_phdr_memory_callback, elf,
 					    core_file_read_eagerly, elf,
 					    elf->maximum_size,
@@ -596,7 +595,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
       if (! __libdwfl_dynamic_vaddr_get (module->elf, &file_dynamic_vaddr))
 	continue;
       Dwfl_Module *mod;
-      mod = __libdwfl_report_elf (dwfl, basename (module->name), module->name,
+      mod = __libdwfl_report_elf (dwfl, xbasename (module->name), module->name,
 				  module->fd, module->elf,
 				  module->l_ld - file_dynamic_vaddr,
 				  true, true);

@@ -68,6 +68,10 @@ stamps/configure:
 	dh_autoreconf
 	@mkdir -p stamps
 ifneq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
+	CFLAGS='$(CFLAGS_FOR_BUILD)' \
+	CPPFLAGS='$(CPPFLAGS_FOR_BUILD)' \
+	CXXFLAGS='$(CXXFLAGS_FOR_BUILD)' \
+	LDFLAGS='$(LDFLAGS_FOR_BUILD)' \
 	./configure --enable-maintainer-mode \
 		--enable-libdebuginfod=dummy \
 		--disable-debuginfod
@@ -113,12 +117,17 @@ install: build
 	dh_prep
 	dh_installdirs
 
-	# Add here commands to install the package into debian/tmp
+	: # Add here commands to install the package into debian/tmp
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
-	# We do not provide a libebl anymore, use libdw instead.
+
+	: # We do not provide a libebl anymore, use libdw instead.
 	rm -f debian/tmp/usr/include/elfutils/libebl.h
-	# We don't install the systemd service file.
+
+	: # We don't install the systemd service file.
 	rm -f debian/tmp/usr/share/man/man8/debuginfod.service.8
+
+	: # Don't package fish.
+	rm -rf debian/tmp/usr/share/fish
 
 	dh_install --sourcedir=debian/tmp
 	rm -f debian/elfutils/usr/bin/debuginfod*
@@ -161,13 +170,13 @@ binary-arch: build-arch install
 	dh_strip_nondeterminism -a
 	dh_compress -a
 	dh_fixperms -a
-	dpkg-gensymbols -Pdebian/libdw1/ -plibdw1 -c4
-	dpkg-gensymbols -Pdebian/libasm1/ -plibasm1 -c4
-	dpkg-gensymbols -Pdebian/libelf1/ -plibelf1 -c4
-	dh_makeshlibs -plibelf1 -V "libelf1 (>= 0.132)"
-	dh_makeshlibs -plibasm1 -V "libasm1 (>= 0.132)"
-	dh_makeshlibs -plibdw1 -V "libdw1 (>= 0.138)"
-	dh_makeshlibs -plibdebuginfod1
+	dpkg-gensymbols -Pdebian/libdw1t64/ -plibdw1t64 -c4
+	dpkg-gensymbols -Pdebian/libasm1t64/ -plibasm1t64 -c4
+	dpkg-gensymbols -Pdebian/libelf1t64/ -plibelf1t64 -c4
+	dh_makeshlibs -plibelf1t64 -V "libelf1t64 (>= 0.132)"
+	dh_makeshlibs -plibasm1t64 -V "libasm1t64 (>= 0.132)"
+	dh_makeshlibs -plibdw1t64 -V "libdw1t64 (>= 0.138)"
+	dh_makeshlibs -plibdebuginfod1t64
 	dh_installdebconf -a
 	dh_installdeb -a
 	dh_shlibdeps -a

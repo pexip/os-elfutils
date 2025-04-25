@@ -31,7 +31,7 @@ include $(top_srcdir)/config/eu.am
 if BUILD_STATIC
 AM_CFLAGS += $(fpic_CFLAGS)
 endif
-AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libdwelf -pthread
+AM_CPPFLAGS += -I$(srcdir)/../libebl -I$(srcdir)/../libelf -I$(srcdir)/../libdwelf -pthread
 VERSION = 1
 
 lib_LIBRARIES = libdw.a
@@ -93,11 +93,10 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_cu_die.c dwarf_peel_type.c dwarf_default_lower_bound.c \
 		  dwarf_die_addr_die.c dwarf_get_units.c \
 		  libdw_find_split_unit.c dwarf_cu_info.c \
-		  dwarf_next_lines.c
+		  dwarf_next_lines.c dwarf_cu_dwp_section_info.c
 
 if MAINTAINER_MODE
 BUILT_SOURCES = $(srcdir)/known-dwarf.h
-MAINTAINERCLEANFILES = $(srcdir)/known-dwarf.h
 $(srcdir)/known-dwarf.h: $(top_srcdir)/config/known-dwarf.awk $(srcdir)/dwarf.h
 	gawk -f $^ > $@.new
 	mv -f $@.new $@
@@ -114,7 +113,8 @@ libdw_so_LDLIBS = $(libdw_so_DEPS) -ldl -lz $(argp_LDADD) $(fts_LIBS) $(obstack_
 libdw.so: $(srcdir)/libdw.map $(libdw_so_LIBS) $(libdw_so_DEPS)
 	$(AM_V_CCLD)$(LINK) $(dso_LDFLAGS) -o $@ \
 		-Wl,--soname,$@.$(VERSION),--enable-new-dtags \
-		-Wl,--version-script,$<,--no-undefined \
+		-Wl,--version-script,$< \
+		$(NO_UNDEFINED) \
 		-Wl,--whole-archive $(libdw_so_LIBS) -Wl,--no-whole-archive \
 		$(libdw_so_LDLIBS)
 	@$(textrel_check)
@@ -153,3 +153,4 @@ noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h \
 EXTRA_DIST = libdw.map
 
 MOSTLYCLEANFILES = $(am_libdw_pic_a_OBJECTS) libdw.so libdw.so.$(VERSION)
+MAINTAINERCLEANFILES = $(srcdir)/known-dwarf.h
