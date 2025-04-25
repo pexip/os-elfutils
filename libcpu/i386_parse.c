@@ -123,6 +123,8 @@
 #include <libeu.h>
 #include <system.h>
 
+#include "i386_mne.h"
+
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 
@@ -288,7 +290,7 @@ extern FILE *outfile;
 static size_t best_mnemonic_bits;
 #endif
 
-#line 292 "i386_parse.c"
+#line 294 "i386_parse.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -365,7 +367,7 @@ extern int i386_debug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 215 "i386_parse.y"
+#line 217 "i386_parse.y"
 
   unsigned long int num;
   char *str;
@@ -375,7 +377,7 @@ union YYSTYPE
   struct argname *name;
   struct argument *arg;
 
-#line 379 "i386_parse.c"
+#line 381 "i386_parse.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -813,10 +815,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   245,   245,   255,   256,   259,   261,   263,   265,   277,
-     280,   281,   284,   367,   370,   386,   389,   399,   406,   414,
-     418,   425,   432,   454,   457,   460,   470,   478,   486,   489,
-     521,   530,   537
+       0,   247,   247,   257,   258,   261,   263,   265,   267,   279,
+     282,   283,   286,   369,   372,   388,   391,   401,   408,   416,
+     420,   427,   434,   456,   459,   462,   472,   480,   488,   491,
+     523,   532,   539
 };
 #endif
 
@@ -1402,7 +1404,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* spec: masks kPERCPERC '\n' instrs  */
-#line 246 "i386_parse.y"
+#line 248 "i386_parse.y"
                     {
 		      if (error_message_count != 0)
 			error (EXIT_FAILURE, 0,
@@ -1410,29 +1412,29 @@ yyreduce:
 
 		      instrtable_out ();
 		    }
-#line 1414 "i386_parse.c"
+#line 1416 "i386_parse.c"
     break;
 
   case 5: /* mask: kMASK kBITFIELD kNUMBER  */
-#line 260 "i386_parse.y"
+#line 262 "i386_parse.y"
                     { new_bitfield ((yyvsp[-1].str), (yyvsp[0].num)); }
-#line 1420 "i386_parse.c"
+#line 1422 "i386_parse.c"
     break;
 
   case 6: /* mask: kPREFIX kBITFIELD  */
-#line 262 "i386_parse.y"
+#line 264 "i386_parse.y"
                     { new_bitfield ((yyvsp[0].str), -1); }
-#line 1426 "i386_parse.c"
+#line 1428 "i386_parse.c"
     break;
 
   case 7: /* mask: kSUFFIX kBITFIELD  */
-#line 264 "i386_parse.y"
+#line 266 "i386_parse.y"
                     { new_bitfield ((yyvsp[0].str), -2); }
-#line 1432 "i386_parse.c"
+#line 1434 "i386_parse.c"
     break;
 
   case 8: /* mask: kSYNONYM kBITFIELD kBITFIELD  */
-#line 266 "i386_parse.y"
+#line 268 "i386_parse.y"
                     {
 		      struct synonym *newp = xmalloc (sizeof (*newp));
 		      newp->from = (yyvsp[-1].str);
@@ -1444,11 +1446,11 @@ yyreduce:
 		      else if (tsearch ( newp, &synonyms, compare_syn) == NULL)
 			error (EXIT_FAILURE, 0, "tsearch");
 		    }
-#line 1448 "i386_parse.c"
+#line 1450 "i386_parse.c"
     break;
 
   case 12: /* instr: bytes ':' bitfieldopt kID bitfieldopt optargs  */
-#line 285 "i386_parse.y"
+#line 287 "i386_parse.y"
                     {
 		      if ((yyvsp[-3].field) != NULL && strcmp ((yyvsp[-3].field)->name, "RE") != 0
 			  && strcmp ((yyvsp[-3].field)->name, "R") != 0)
@@ -1531,11 +1533,11 @@ yyreduce:
 			  ++ninstructions;
 			}
 		    }
-#line 1535 "i386_parse.c"
+#line 1537 "i386_parse.c"
     break;
 
   case 14: /* bitfieldopt: kBITFIELD  */
-#line 371 "i386_parse.y"
+#line 373 "i386_parse.y"
                     {
 		      struct known_bitfield search;
 		      search.name = (yyvsp[0].str);
@@ -1550,17 +1552,17 @@ yyreduce:
 		      else
 			(yyval.field) = *res;
 		    }
-#line 1554 "i386_parse.c"
+#line 1556 "i386_parse.c"
     break;
 
   case 15: /* bitfieldopt: %empty  */
-#line 386 "i386_parse.y"
+#line 388 "i386_parse.y"
                     { (yyval.field) = NULL; }
-#line 1560 "i386_parse.c"
+#line 1562 "i386_parse.c"
     break;
 
   case 16: /* bytes: bytes ',' byte  */
-#line 390 "i386_parse.y"
+#line 392 "i386_parse.y"
                     {
 		      check_bits ((yyvsp[0].bit));
 
@@ -1570,20 +1572,20 @@ yyreduce:
 		      runp->next = (yyvsp[0].bit);
 		      (yyval.bit) = (yyvsp[-2].bit);
 		    }
-#line 1574 "i386_parse.c"
+#line 1576 "i386_parse.c"
     break;
 
   case 17: /* bytes: byte  */
-#line 400 "i386_parse.y"
+#line 402 "i386_parse.y"
                     {
 		      check_bits ((yyvsp[0].bit));
 		      (yyval.bit) = (yyvsp[0].bit);
 		    }
-#line 1583 "i386_parse.c"
+#line 1585 "i386_parse.c"
     break;
 
   case 18: /* byte: byte bit  */
-#line 407 "i386_parse.y"
+#line 409 "i386_parse.y"
                     {
 		      struct bitvalue *runp = (yyvsp[-1].bit);
 		      while (runp->next != NULL)
@@ -1591,39 +1593,39 @@ yyreduce:
 		      runp->next = (yyvsp[0].bit);
 		      (yyval.bit) = (yyvsp[-1].bit);
 		    }
-#line 1595 "i386_parse.c"
+#line 1597 "i386_parse.c"
     break;
 
   case 19: /* byte: bit  */
-#line 415 "i386_parse.y"
+#line 417 "i386_parse.y"
                     { (yyval.bit) = (yyvsp[0].bit); }
-#line 1601 "i386_parse.c"
+#line 1603 "i386_parse.c"
     break;
 
   case 20: /* bit: '0'  */
-#line 419 "i386_parse.y"
+#line 421 "i386_parse.y"
                     {
 		      (yyval.bit) = xmalloc (sizeof (struct bitvalue));
 		      (yyval.bit)->type = zeroone;
 		      (yyval.bit)->value = 0;
 		      (yyval.bit)->next = NULL;
 		    }
-#line 1612 "i386_parse.c"
+#line 1614 "i386_parse.c"
     break;
 
   case 21: /* bit: '1'  */
-#line 426 "i386_parse.y"
+#line 428 "i386_parse.y"
                     {
 		      (yyval.bit) = xmalloc (sizeof (struct bitvalue));
 		      (yyval.bit)->type = zeroone;
 		      (yyval.bit)->value = 1;
 		      (yyval.bit)->next = NULL;
 		    }
-#line 1623 "i386_parse.c"
+#line 1625 "i386_parse.c"
     break;
 
   case 22: /* bit: kBITFIELD  */
-#line 433 "i386_parse.y"
+#line 435 "i386_parse.y"
                     {
 		      (yyval.bit) = xmalloc (sizeof (struct bitvalue));
 		      struct known_bitfield search;
@@ -1643,23 +1645,23 @@ yyreduce:
 			}
 		      (yyval.bit)->next = NULL;
 		    }
-#line 1647 "i386_parse.c"
+#line 1649 "i386_parse.c"
     break;
 
   case 23: /* optargs: kSPACE args  */
-#line 455 "i386_parse.y"
+#line 457 "i386_parse.y"
                     { (yyval.arg) = (yyvsp[0].arg); }
-#line 1653 "i386_parse.c"
+#line 1655 "i386_parse.c"
     break;
 
   case 24: /* optargs: %empty  */
-#line 457 "i386_parse.y"
+#line 459 "i386_parse.y"
                     { (yyval.arg) = NULL; }
-#line 1659 "i386_parse.c"
+#line 1661 "i386_parse.c"
     break;
 
   case 25: /* args: args ',' arg  */
-#line 461 "i386_parse.y"
+#line 463 "i386_parse.y"
                     {
 		      struct argument *runp = (yyvsp[-2].arg);
 		      while (runp->next != NULL)
@@ -1669,21 +1671,21 @@ yyreduce:
 		      runp->next->next = NULL;
 		      (yyval.arg) = (yyvsp[-2].arg);
 		    }
-#line 1673 "i386_parse.c"
+#line 1675 "i386_parse.c"
     break;
 
   case 26: /* args: arg  */
-#line 471 "i386_parse.y"
+#line 473 "i386_parse.y"
                     {
 		      (yyval.arg) = xmalloc (sizeof (struct argument));
 		      (yyval.arg)->name = combine ((yyvsp[0].name));
 		      (yyval.arg)->next = NULL;
 		    }
-#line 1683 "i386_parse.c"
+#line 1685 "i386_parse.c"
     break;
 
   case 27: /* arg: arg argcomp  */
-#line 479 "i386_parse.y"
+#line 481 "i386_parse.y"
                     {
 		      struct argname *runp = (yyvsp[-1].name);
 		      while (runp->next != NULL)
@@ -1691,17 +1693,17 @@ yyreduce:
 		      runp->next = (yyvsp[0].name);
 		      (yyval.name) = (yyvsp[-1].name);
 		    }
-#line 1695 "i386_parse.c"
+#line 1697 "i386_parse.c"
     break;
 
   case 28: /* arg: argcomp  */
-#line 487 "i386_parse.y"
+#line 489 "i386_parse.y"
                     { (yyval.name) = (yyvsp[0].name); }
-#line 1701 "i386_parse.c"
+#line 1703 "i386_parse.c"
     break;
 
   case 29: /* argcomp: kBITFIELD  */
-#line 490 "i386_parse.y"
+#line 492 "i386_parse.y"
                     {
 		      (yyval.name) = xmalloc (sizeof (struct argname));
 		      (yyval.name)->type = nfield;
@@ -1733,11 +1735,11 @@ yyreduce:
 		      else
 			(yyval.name)->field = *res;
 		    }
-#line 1737 "i386_parse.c"
+#line 1739 "i386_parse.c"
     break;
 
   case 30: /* argcomp: kCHAR  */
-#line 522 "i386_parse.y"
+#line 524 "i386_parse.y"
                     {
 		      (yyval.name) = xmalloc (sizeof (struct argname));
 		      (yyval.name)->type = string;
@@ -1746,22 +1748,22 @@ yyreduce:
 		      (yyval.name)->str[0] = (yyvsp[0].ch);
 		      (yyval.name)->str[1] = '\0';
 		    }
-#line 1750 "i386_parse.c"
+#line 1752 "i386_parse.c"
     break;
 
   case 31: /* argcomp: kID  */
-#line 531 "i386_parse.y"
+#line 533 "i386_parse.y"
                     {
 		      (yyval.name) = xmalloc (sizeof (struct argname));
 		      (yyval.name)->type = string;
 		      (yyval.name)->next = NULL;
 		      (yyval.name)->str = (yyvsp[0].str);
 		    }
-#line 1761 "i386_parse.c"
+#line 1763 "i386_parse.c"
     break;
 
   case 32: /* argcomp: ':'  */
-#line 538 "i386_parse.y"
+#line 540 "i386_parse.y"
                     {
 		      (yyval.name) = xmalloc (sizeof (struct argname));
 		      (yyval.name)->type = string;
@@ -1770,11 +1772,11 @@ yyreduce:
 		      (yyval.name)->str[0] = ':';
 		      (yyval.name)->str[1] = '\0';
 		    }
-#line 1774 "i386_parse.c"
+#line 1776 "i386_parse.c"
     break;
 
 
-#line 1778 "i386_parse.c"
+#line 1780 "i386_parse.c"
 
       default: break;
     }
@@ -1967,7 +1969,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 548 "i386_parse.y"
+#line 550 "i386_parse.y"
 
 
 static void
@@ -2530,11 +2532,6 @@ print_op_fct (const void *nodep, VISIT value,
     }
 }
 
-
-#if NMNES < 2
-# error "bogus NMNES value"
-#endif
-
 static void
 instrtable_out (void)
 {
@@ -2546,7 +2543,7 @@ instrtable_out (void)
   fprintf (outfile, "#define MNEMONIC_BITS %zu\n", best_mnemonic_bits);
 #else
   fprintf (outfile, "#define MNEMONIC_BITS %ld\n",
-	   lrint (ceil (log2 (NMNES))));
+	   lrint (ceil (log2 (MNE_COUNT))));
 #endif
   fprintf (outfile, "#define SUFFIX_BITS %d\n", nbitsuf);
   for (int i = 0; i < 3; ++i)
@@ -2584,7 +2581,7 @@ instrtable_out (void)
   EMIT_SUFFIX (w1);
   EMIT_SUFFIX (W1);
 
-  fputc_unlocked ('\n', outfile);
+  fputc ('\n', outfile);
 
   for (int i = 0; i < 3; ++i)
     {
@@ -2759,7 +2756,7 @@ instrtable_out (void)
 	  b = b->next;
 	}
 
-      fputc_unlocked ('\n', outfile);
+      fputc ('\n', outfile);
     }
   fputs ("};\n", outfile);
 }

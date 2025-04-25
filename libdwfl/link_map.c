@@ -29,7 +29,7 @@
 
 #include <config.h>
 #include "libdwflP.h"
-#include "../libdw/memory-access.h"
+#include "memory-access.h"
 #include "system.h"
 
 #include <fcntl.h>
@@ -331,11 +331,17 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
   int result = 0;
 
   /* There can't be more elements in the link_map list than there are
-     segments.  DWFL->lookup_elts is probably twice that number, so it
-     is certainly above the upper bound.  If we iterate too many times,
-     there must be a loop in the pointers due to link_map clobberation.  */
+     segments.  A segment is created for each PT_LOAD and there can be
+     up to 5 per module (-z separate-code, tends to create four LOAD
+     segments, gold has -z text-unlikely-segment, which might result
+     in creating that number of load segments) DWFL->lookup_elts is
+     probably twice the number of modules, so that multiplied by max
+     PT_LOADs is certainly above the upper bound.  If we iterate too
+     many times, there must be a loop in the pointers due to link_map
+     clobberation.  */
+#define MAX_PT_LOAD 5
   size_t iterations = 0;
-  while (next != 0 && ++iterations < dwfl->lookup_elts)
+  while (next != 0 && ++iterations < dwfl->lookup_elts * MAX_PT_LOAD)
     {
       if (read_addrs (&memory_closure, elfclass, elfdata,
 		      &buffer, &buffer_available, next, &read_vaddr,
@@ -410,7 +416,20 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
       if (name != NULL)
 	{
 	  /* This code is mostly inlined dwfl_report_elf.  */
-	  // XXX hook for sysroot
+	  char *sysroot_name = NULL;
+	  const char *sysroot = dwfl->sysroot;
+
+	  /* Don't use the sysroot if the path is already inside it.  */
+	  bool name_in_sysroot = sysroot && startswith (name, sysroot);
+
+	  if (sysroot && !name_in_sysroot)
+	    {
+	      if (asprintf (&sysroot_name, "%s%s", sysroot, name) < 0)
+		return release_buffer (&memory_closure, &buffer, &buffer_available, -1);
+
+	      name = sysroot_name;
+	    }
+
 	  int fd = open (name, O_RDONLY);
 	  if (fd >= 0)
 	    {
@@ -469,7 +488,7 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 		      if (r_debug_info_module == NULL)
 			{
 			  // XXX hook for sysroot
-			  mod = __libdwfl_report_elf (dwfl, basename (name),
+			  mod = __libdwfl_report_elf (dwfl, xbasename (name),
 						      name, fd, elf, base,
 						      true, true);
 			  if (mod != NULL)
@@ -496,6 +515,7 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 		    close (fd);
 		}
 	    }
+	  free(sysroot_name);
 	}
 
       if (mod != NULL)

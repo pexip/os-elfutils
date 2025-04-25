@@ -95,16 +95,18 @@ check_PROGRAMS = arextract$(EXEEXT) arsymtest$(EXEEXT) \
 	update2$(EXEEXT) update3$(EXEEXT) update4$(EXEEXT) \
 	test-nlist$(EXEEXT) show-die-info$(EXEEXT) get-files$(EXEEXT) \
 	next-files$(EXEEXT) get-lines$(EXEEXT) next-lines$(EXEEXT) \
-	get-pubnames$(EXEEXT) get-aranges$(EXEEXT) allfcts$(EXEEXT) \
-	line2addr$(EXEEXT) addrscopes$(EXEEXT) funcscopes$(EXEEXT) \
-	show-abbrev$(EXEEXT) hash$(EXEEXT) newscn$(EXEEXT) \
-	ecp$(EXEEXT) dwflmodtest$(EXEEXT) find-prologues$(EXEEXT) \
+	get-pubnames$(EXEEXT) get-files-define-file$(EXEEXT) \
+	get-aranges$(EXEEXT) allfcts$(EXEEXT) line2addr$(EXEEXT) \
+	addrscopes$(EXEEXT) funcscopes$(EXEEXT) show-abbrev$(EXEEXT) \
+	hash$(EXEEXT) newscn$(EXEEXT) ecp$(EXEEXT) \
+	dwflmodtest$(EXEEXT) find-prologues$(EXEEXT) \
 	funcretval$(EXEEXT) allregs$(EXEEXT) rdwrmmap$(EXEEXT) \
 	dwfl-bug-addr-overflow$(EXEEXT) arls$(EXEEXT) \
 	dwfl-bug-fd-leak$(EXEEXT) dwfl-addr-sect$(EXEEXT) \
 	dwfl-bug-report$(EXEEXT) early-offscn$(EXEEXT) \
 	dwfl-bug-getmodules$(EXEEXT) dwarf-getmacros$(EXEEXT) \
-	dwarf-ranges$(EXEEXT) addrcfi$(EXEEXT) dwarfcfi$(EXEEXT) \
+	dwarf-ranges$(EXEEXT) addrcfi$(EXEEXT) \
+	dwfl-core-noncontig$(EXEEXT) dwarfcfi$(EXEEXT) \
 	test-flag-nobits$(EXEEXT) dwarf-getstring$(EXEEXT) \
 	rerequest_tag$(EXEEXT) alldts$(EXEEXT) typeiter$(EXEEXT) \
 	typeiter2$(EXEEXT) low_high_pc$(EXEEXT) \
@@ -118,7 +120,7 @@ check_PROGRAMS = arextract$(EXEEXT) arsymtest$(EXEEXT) \
 	deleted$(EXEEXT) deleted-lib.so$(EXEEXT) \
 	aggregate_size$(EXEEXT) peel_type$(EXEEXT) vdsosyms$(EXEEXT) \
 	getsrc_die$(EXEEXT) strptr$(EXEEXT) newdata$(EXEEXT) \
-	elfstrtab$(EXEEXT) dwfl-proc-attach$(EXEEXT) \
+	newzdata$(EXEEXT) elfstrtab$(EXEEXT) dwfl-proc-attach$(EXEEXT) \
 	elfshphehdr$(EXEEXT) elfstrmerge$(EXEEXT) \
 	dwelfgnucompressed$(EXEEXT) elfgetchdr$(EXEEXT) \
 	elfgetzdata$(EXEEXT) elfputzdata$(EXEEXT) zstrptr$(EXEEXT) \
@@ -130,9 +132,12 @@ check_PROGRAMS = arextract$(EXEEXT) arsymtest$(EXEEXT) \
 	addsections$(EXEEXT) xlate_notes$(EXEEXT) elfrdwrnop$(EXEEXT) \
 	dwelf_elf_e_machine_string$(EXEEXT) getphdrnum$(EXEEXT) \
 	leb128$(EXEEXT) read_unaligned$(EXEEXT) msg_tst$(EXEEXT) \
-	system-elf-libelf-test$(EXEEXT) \
-	nvidia_extended_linemap_libdw$(EXEEXT) $(am__EXEEXT_1) \
-	$(am__EXEEXT_2) $(am__EXEEXT_3)
+	system-elf-libelf-test$(EXEEXT) system-elf-gelf-test$(EXEEXT) \
+	nvidia_extended_linemap_libdw$(EXEEXT) \
+	elf-print-reloc-syms$(EXEEXT) cu-dwp-section-info$(EXEEXT) \
+	declfiles$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2) \
+	$(am__EXEEXT_3) $(am__EXEEXT_4) \
+	funcretval_test_struct$(EXEEXT)
 @BIARCH_TRUE@am__append_3 = backtrace-child-biarch
 TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile$(EXEEXT) \
 	test-nlist$(EXEEXT) run-ar-N.sh update1$(EXEEXT) \
@@ -146,8 +151,9 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile$(EXEEXT) \
 	run-strip-test6.sh run-strip-test7.sh run-strip-test8.sh \
 	run-strip-test9.sh run-strip-test10.sh run-strip-test11.sh \
 	run-strip-test12.sh run-strip-nothing.sh run-strip-g.sh \
-	run-annobingroup.sh run-strip-groups.sh run-strip-reloc.sh \
-	run-strip-strmerge.sh run-strip-nobitsalign.sh \
+	run-annobingroup.sh run-strip-groups.sh run-strip-strmerge.sh \
+	run-strip-reloc-ko.sh run-strip-reloc-self.sh \
+	run-strip-reloc-ppc64.sh run-strip-nobitsalign.sh \
 	run-strip-remove-keep.sh run-unstrip-test.sh \
 	run-unstrip-test2.sh run-unstrip-test3.sh run-unstrip-test4.sh \
 	run-unstrip-M.sh run-elfstrmerge-test.sh run-ecp-test.sh \
@@ -180,10 +186,12 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile$(EXEEXT) \
 	run-readelf-vmcoreinfo.sh run-readelf-mixed-corenote.sh \
 	run-dwfllines.sh run-readelf-variant.sh run-readelf-fat-lto.sh \
 	run-dwfl-report-elf-align.sh run-addr2line-test.sh \
-	run-dwfl-report-offline-memory.sh run-addr2line-i-test.sh \
-	run-addr2line-i-lex-test.sh run-addr2line-i-demangle-test.sh \
-	run-addr2line-alt-debugpath.sh run-varlocs.sh run-exprlocs.sh \
-	run-varlocs-vars.sh run-funcretval.sh run-backtrace-native.sh \
+	run-dwfl-report-offline-memory.sh run-addr2line-C-test.sh \
+	run-addr2line-i-test.sh run-addr2line-i-lex-test.sh \
+	run-addr2line-i-demangle-test.sh \
+	run-addr2line-alt-debugpath.sh run-funcretval-struct.sh \
+	run-varlocs.sh run-exprlocs.sh run-varlocs-vars.sh \
+	run-funcretval.sh run-backtrace-native.sh \
 	run-backtrace-data.sh run-backtrace-dwarf.sh \
 	run-backtrace-native-biarch.sh run-backtrace-native-core.sh \
 	run-backtrace-native-core-biarch.sh \
@@ -202,37 +210,44 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile$(EXEEXT) \
 	run-allfcts-multi.sh run-deleted.sh run-linkmap-cut.sh \
 	run-aggregate-size.sh run-peel-type.sh vdsosyms$(EXEEXT) \
 	run-readelf-A.sh run-getsrc-die.sh run-strptr.sh \
-	newdata$(EXEEXT) elfstrtab$(EXEEXT) dwfl-proc-attach$(EXEEXT) \
-	elfshphehdr$(EXEEXT) run-lfs-symbols.sh \
-	run-dwelfgnucompressed.sh run-elfgetchdr.sh run-elfgetzdata.sh \
-	run-elfputzdata.sh run-zstrptr.sh run-compress-test.sh \
-	run-readelf-zdebug.sh run-readelf-zdebug-rel.sh \
-	emptyfile$(EXEEXT) vendorelf$(EXEEXT) fillfile$(EXEEXT) \
+	newdata$(EXEEXT) newzdata$(EXEEXT) elfstrtab$(EXEEXT) \
+	dwfl-proc-attach$(EXEEXT) elfshphehdr$(EXEEXT) \
+	run-lfs-symbols.sh run-dwelfgnucompressed.sh run-elfgetchdr.sh \
+	run-elfgetzdata.sh run-elfputzdata.sh run-zstrptr.sh \
+	run-compress-test.sh run-readelf-zdebug.sh \
+	run-readelf-zdebug-rel.sh emptyfile$(EXEEXT) \
+	vendorelf$(EXEEXT) fillfile$(EXEEXT) \
 	dwarf_default_lower_bound$(EXEEXT) run-dwarf-die-addr-die.sh \
 	run-get-units-invalid.sh run-get-units-split.sh \
 	run-attr-integrate-skel.sh run-all-dwarf-ranges.sh \
 	run-unit-info.sh run-reloc-bpf.sh run-next-cfi.sh \
 	run-next-cfi-self.sh run-reverse-sections.sh \
 	run-reverse-sections-self.sh run-copyadd-sections.sh \
-	run-copymany-sections.sh run-typeiter-many.sh \
+	run-copymany-be32.sh run-copymany-le32.sh run-copymany-be64.sh \
+	run-copymany-le64.sh run-typeiter-many.sh \
 	run-strip-test-many.sh run-strip-version.sh run-xlate-note.sh \
 	run-readelf-discr.sh run-dwelf_elf_e_machine_string.sh \
 	run-elfclassify.sh run-elfclassify-self.sh \
 	run-disasm-riscv64.sh run-pt_gnu_prop-tests.sh \
 	run-getphdrnum.sh run-test-includes.sh leb128$(EXEEXT) \
 	read_unaligned$(EXEEXT) msg_tst$(EXEEXT) \
-	system-elf-libelf-test$(EXEEXT) $(am__EXEEXT_1) \
-	run-disasm-bpf.sh run-low_high_pc-dw-form-indirect.sh \
+	system-elf-libelf-test$(EXEEXT) system-elf-gelf-test$(EXEEXT) \
+	$(am__EXEEXT_1) run-disasm-bpf.sh \
+	run-low_high_pc-dw-form-indirect.sh \
 	run-nvidia-extended-linemap-libdw.sh \
 	run-nvidia-extended-linemap-readelf.sh \
 	run-readelf-dw-form-indirect.sh run-strip-largealign.sh \
-	run-readelf-Dd.sh $(am__append_4) $(am__append_5) \
-	$(am__append_7) $(am__append_8)
-@LZMA_TRUE@am__append_4 = run-readelf-s.sh run-dwflsyms.sh
+	run-readelf-Dd.sh run-dwfl-core-noncontig.sh \
+	run-cu-dwp-section-info.sh run-declfiles.sh run-sysroot.sh \
+	$(am__append_4) $(am__append_5) $(am__append_7) \
+	$(am__append_8) $(am__append_9) $(am__append_11) \
+	run-funcretval-struct-native.sh
+@LZMA_TRUE@am__append_4 = run-readelf-s.sh run-dwflsyms.sh run-debuginfod-seekable.sh
 @HAVE_ZSTD_TRUE@am__append_5 = run-readelf-compressed-zstd.sh
 @DEBUGINFOD_TRUE@am__append_6 = debuginfod_build_id_find
 # With the dummy delegation doesn't work
-@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@am__append_7 = run-debuginfod-dlopen.sh \
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@am__append_7 = run-srcfiles-self.sh \
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-dlopen.sh \
 @DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-artifact-running.sh \
 @DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-fd-prefetch-caches.sh \
 @DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-regex.sh \
@@ -252,25 +267,32 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile$(EXEEXT) \
 @DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-federation-sqlite.sh \
 @DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-federation-link.sh \
 @DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@         run-debuginfod-percent-escape.sh \
-@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@         run-debuginfod-x-forwarded-for.sh \
-@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@         run-debuginfod-response-headers.sh \
-@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@         run-debuginfod-extraction-passive.sh \
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-x-forwarded-for.sh \
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-response-headers.sh \
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-extraction-passive.sh \
 @DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-webapi-concurrency.sh \
-@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-section.sh
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-section.sh \
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-IXr.sh \
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-client-profile.sh \
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-find-metadata.sh \
+@DEBUGINFOD_TRUE@@DUMMY_LIBDEBUGINFOD_FALSE@	 run-debuginfod-longsource.sh
 
 # Will crash on too old libmicrohttpd
 # Too many open file descriptors confuses libmicrohttpd < 0.9.51
 @DEBUGINFOD_TRUE@@OLD_LIBMICROHTTPD_FALSE@am__append_8 = run-debuginfod-federation-metrics.sh
+@DEBUGINFOD_TRUE@@ENABLE_IMA_VERIFICATION_TRUE@am__append_9 = run-debuginfod-ima-verification.sh
+@HAVE_CXX11_TRUE@am__append_10 = funcretval_test++11
+@HAVE_CXX11_TRUE@am__append_11 = run-funcretval++11.sh
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
-	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
-	$(top_srcdir)/m4/host-cpu-c-abi.m4 $(top_srcdir)/m4/iconv.m4 \
-	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/build-to-host.m4 \
+	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/host-cpu-c-abi.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
@@ -283,11 +305,13 @@ am__EXEEXT_1 = asm-tst1$(EXEEXT) asm-tst2$(EXEEXT) asm-tst3$(EXEEXT) \
 	asm-tst7$(EXEEXT) asm-tst8$(EXEEXT) asm-tst9$(EXEEXT)
 @BIARCH_TRUE@am__EXEEXT_2 = backtrace-child-biarch$(EXEEXT)
 @DEBUGINFOD_TRUE@am__EXEEXT_3 = debuginfod_build_id_find$(EXEEXT)
+@HAVE_CXX11_TRUE@am__EXEEXT_4 = funcretval_test++11$(EXEEXT)
 addrcfi_SOURCES = addrcfi.c
 addrcfi_OBJECTS = addrcfi.$(OBJEXT)
 am__DEPENDENCIES_1 =
 @BUILD_STATIC_FALSE@am__DEPENDENCIES_2 = ../libelf/libelf.so
-@BUILD_STATIC_TRUE@am__DEPENDENCIES_2 = ../libelf/libelf.a
+@BUILD_STATIC_TRUE@am__DEPENDENCIES_2 = ../libelf/libelf.a \
+@BUILD_STATIC_TRUE@	$(am__DEPENDENCIES_1) $(libeu)
 @BUILD_STATIC_FALSE@am__DEPENDENCIES_3 = ../libdw/libdw.so
 @BUILD_STATIC_TRUE@am__DEPENDENCIES_3 = ../libdw/libdw.a \
 @BUILD_STATIC_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
@@ -392,6 +416,9 @@ buildid_SOURCES = buildid.c
 buildid_OBJECTS = buildid.$(OBJEXT)
 buildid_DEPENDENCIES = $(libeu) $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_2)
+cu_dwp_section_info_SOURCES = cu-dwp-section-info.c
+cu_dwp_section_info_OBJECTS = cu-dwp-section-info.$(OBJEXT)
+cu_dwp_section_info_DEPENDENCIES = $(am__DEPENDENCIES_3)
 debugaltlink_SOURCES = debugaltlink.c
 debugaltlink_OBJECTS = debugaltlink.$(OBJEXT)
 debugaltlink_DEPENDENCIES = $(libeu) $(am__DEPENDENCIES_3) \
@@ -404,6 +431,9 @@ debuglink_SOURCES = debuglink.c
 debuglink_OBJECTS = debuglink.$(OBJEXT)
 debuglink_DEPENDENCIES = $(libeu) $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_2)
+declfiles_SOURCES = declfiles.c
+declfiles_OBJECTS = declfiles.$(OBJEXT)
+declfiles_DEPENDENCIES = $(am__DEPENDENCIES_3)
 deleted_SOURCES = deleted.c
 deleted_OBJECTS = deleted.$(OBJEXT)
 deleted_DEPENDENCIES = ./deleted-lib.so
@@ -461,6 +491,10 @@ dwfl_bug_report_SOURCES = dwfl-bug-report.c
 dwfl_bug_report_OBJECTS = dwfl-bug-report.$(OBJEXT)
 dwfl_bug_report_DEPENDENCIES = $(am__DEPENDENCIES_3) $(libebl) \
 	$(am__DEPENDENCIES_2)
+dwfl_core_noncontig_SOURCES = dwfl-core-noncontig.c
+dwfl_core_noncontig_OBJECTS = dwfl-core-noncontig.$(OBJEXT)
+dwfl_core_noncontig_DEPENDENCIES = $(am__DEPENDENCIES_3) \
+	$(am__DEPENDENCIES_2)
 dwfl_proc_attach_SOURCES = dwfl-proc-attach.c
 dwfl_proc_attach_OBJECTS = dwfl-proc-attach.$(OBJEXT)
 dwfl_proc_attach_DEPENDENCIES = $(libeu) $(am__DEPENDENCIES_3)
@@ -473,7 +507,7 @@ dwfl_report_offline_memory_SOURCES = dwfl-report-offline-memory.c
 dwfl_report_offline_memory_OBJECTS =  \
 	dwfl-report-offline-memory.$(OBJEXT)
 dwfl_report_offline_memory_DEPENDENCIES = $(libeu) \
-	$(am__DEPENDENCIES_3)
+	$(am__DEPENDENCIES_3) $(am__DEPENDENCIES_2)
 dwfl_report_segment_contiguous_SOURCES =  \
 	dwfl-report-segment-contiguous.c
 dwfl_report_segment_contiguous_OBJECTS =  \
@@ -498,6 +532,9 @@ early_offscn_DEPENDENCIES = $(libeu) $(am__DEPENDENCIES_2)
 ecp_SOURCES = ecp.c
 ecp_OBJECTS = ecp.$(OBJEXT)
 ecp_DEPENDENCIES = $(libeu) $(am__DEPENDENCIES_2)
+elf_print_reloc_syms_SOURCES = elf-print-reloc-syms.c
+elf_print_reloc_syms_OBJECTS = elf-print-reloc-syms.$(OBJEXT)
+elf_print_reloc_syms_DEPENDENCIES = $(am__DEPENDENCIES_2)
 elfcopy_SOURCES = elfcopy.c
 elfcopy_OBJECTS = elfcopy.$(OBJEXT)
 elfcopy_DEPENDENCIES = $(am__DEPENDENCIES_2)
@@ -537,6 +574,14 @@ funcretval_SOURCES = funcretval.c
 funcretval_OBJECTS = funcretval.$(OBJEXT)
 funcretval_DEPENDENCIES = $(libeu) $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_1)
+am__funcretval_test__11_SOURCES_DIST = funcretval_test++11.cxx
+@HAVE_CXX11_TRUE@am_funcretval_test__11_OBJECTS =  \
+@HAVE_CXX11_TRUE@	funcretval_test++11.$(OBJEXT)
+funcretval_test__11_OBJECTS = $(am_funcretval_test__11_OBJECTS)
+funcretval_test__11_LDADD = $(LDADD)
+am_funcretval_test_struct_OBJECTS = funcretval_test_struct.$(OBJEXT)
+funcretval_test_struct_OBJECTS = $(am_funcretval_test_struct_OBJECTS)
+funcretval_test_struct_LDADD = $(LDADD)
 funcscopes_SOURCES = funcscopes.c
 funcscopes_OBJECTS = funcscopes.$(OBJEXT)
 funcscopes_DEPENDENCIES = $(libeu) $(am__DEPENDENCIES_3) \
@@ -547,6 +592,10 @@ get_aranges_DEPENDENCIES = $(am__DEPENDENCIES_3) $(am__DEPENDENCIES_2)
 get_files_SOURCES = get-files.c
 get_files_OBJECTS = get-files.$(OBJEXT)
 get_files_DEPENDENCIES = $(am__DEPENDENCIES_3) $(am__DEPENDENCIES_2)
+get_files_define_file_SOURCES = get-files-define-file.c
+get_files_define_file_OBJECTS = get-files-define-file.$(OBJEXT)
+get_files_define_file_DEPENDENCIES = $(am__DEPENDENCIES_3) \
+	$(am__DEPENDENCIES_2)
 get_lines_SOURCES = get-lines.c
 get_lines_OBJECTS = get-lines.$(OBJEXT)
 get_lines_DEPENDENCIES = $(am__DEPENDENCIES_3) $(am__DEPENDENCIES_2)
@@ -593,6 +642,9 @@ newfile_DEPENDENCIES = $(am__DEPENDENCIES_2)
 newscn_SOURCES = newscn.c
 newscn_OBJECTS = newscn.$(OBJEXT)
 newscn_DEPENDENCIES = $(am__DEPENDENCIES_2)
+newzdata_SOURCES = newzdata.c
+newzdata_OBJECTS = newzdata.$(OBJEXT)
+newzdata_DEPENDENCIES = $(am__DEPENDENCIES_2)
 next_files_SOURCES = next-files.c
 next_files_OBJECTS = next-files.$(OBJEXT)
 next_files_DEPENDENCIES = $(am__DEPENDENCIES_3) $(am__DEPENDENCIES_2)
@@ -645,6 +697,10 @@ showptable_DEPENDENCIES = $(am__DEPENDENCIES_2)
 strptr_SOURCES = strptr.c
 strptr_OBJECTS = strptr.$(OBJEXT)
 strptr_DEPENDENCIES = $(am__DEPENDENCIES_2)
+system_elf_gelf_test_SOURCES = system-elf-gelf-test.c
+system_elf_gelf_test_OBJECTS =  \
+	system_elf_gelf_test-system-elf-gelf-test.$(OBJEXT)
+system_elf_gelf_test_DEPENDENCIES = $(am__DEPENDENCIES_2)
 system_elf_libelf_test_SOURCES = system-elf-libelf-test.c
 system_elf_libelf_test_OBJECTS =  \
 	system_elf_libelf_test-system-elf-libelf-test.$(OBJEXT)
@@ -729,9 +785,11 @@ am__depfiles_remade = ./$(DEPDIR)/addrcfi.Po ./$(DEPDIR)/addrscopes.Po \
 	./$(DEPDIR)/backtrace.Po \
 	./$(DEPDIR)/backtrace_child-backtrace-child.Po \
 	./$(DEPDIR)/backtrace_dwarf-backtrace-dwarf.Po \
-	./$(DEPDIR)/buildid.Po ./$(DEPDIR)/debugaltlink.Po \
+	./$(DEPDIR)/buildid.Po ./$(DEPDIR)/cu-dwp-section-info.Po \
+	./$(DEPDIR)/debugaltlink.Po \
 	./$(DEPDIR)/debuginfod_build_id_find.Po \
-	./$(DEPDIR)/debuglink.Po ./$(DEPDIR)/deleted.Po \
+	./$(DEPDIR)/debuglink.Po ./$(DEPDIR)/declfiles.Po \
+	./$(DEPDIR)/deleted.Po \
 	./$(DEPDIR)/deleted_lib_so-deleted-lib.Po \
 	./$(DEPDIR)/dwarf-die-addr-die.Po \
 	./$(DEPDIR)/dwarf-getmacros.Po ./$(DEPDIR)/dwarf-getstring.Po \
@@ -744,20 +802,25 @@ am__depfiles_remade = ./$(DEPDIR)/addrcfi.Po ./$(DEPDIR)/addrscopes.Po \
 	./$(DEPDIR)/dwfl-bug-addr-overflow.Po \
 	./$(DEPDIR)/dwfl-bug-fd-leak.Po \
 	./$(DEPDIR)/dwfl-bug-getmodules.Po \
-	./$(DEPDIR)/dwfl-bug-report.Po ./$(DEPDIR)/dwfl-proc-attach.Po \
+	./$(DEPDIR)/dwfl-bug-report.Po \
+	./$(DEPDIR)/dwfl-core-noncontig.Po \
+	./$(DEPDIR)/dwfl-proc-attach.Po \
 	./$(DEPDIR)/dwfl-report-elf-align.Po \
 	./$(DEPDIR)/dwfl-report-offline-memory.Po \
 	./$(DEPDIR)/dwfl-report-segment-contiguous.Po \
 	./$(DEPDIR)/dwfllines.Po ./$(DEPDIR)/dwflmodtest.Po \
 	./$(DEPDIR)/dwflsyms.Po ./$(DEPDIR)/early-offscn.Po \
-	./$(DEPDIR)/ecp.Po ./$(DEPDIR)/elfcopy.Po \
-	./$(DEPDIR)/elfgetchdr.Po ./$(DEPDIR)/elfgetzdata.Po \
-	./$(DEPDIR)/elfputzdata.Po ./$(DEPDIR)/elfrdwrnop.Po \
-	./$(DEPDIR)/elfshphehdr.Po ./$(DEPDIR)/elfstrmerge.Po \
-	./$(DEPDIR)/elfstrtab.Po ./$(DEPDIR)/emptyfile.Po \
-	./$(DEPDIR)/fillfile.Po ./$(DEPDIR)/find-prologues.Po \
-	./$(DEPDIR)/funcretval.Po ./$(DEPDIR)/funcscopes.Po \
-	./$(DEPDIR)/get-aranges.Po ./$(DEPDIR)/get-files.Po \
+	./$(DEPDIR)/ecp.Po ./$(DEPDIR)/elf-print-reloc-syms.Po \
+	./$(DEPDIR)/elfcopy.Po ./$(DEPDIR)/elfgetchdr.Po \
+	./$(DEPDIR)/elfgetzdata.Po ./$(DEPDIR)/elfputzdata.Po \
+	./$(DEPDIR)/elfrdwrnop.Po ./$(DEPDIR)/elfshphehdr.Po \
+	./$(DEPDIR)/elfstrmerge.Po ./$(DEPDIR)/elfstrtab.Po \
+	./$(DEPDIR)/emptyfile.Po ./$(DEPDIR)/fillfile.Po \
+	./$(DEPDIR)/find-prologues.Po ./$(DEPDIR)/funcretval.Po \
+	./$(DEPDIR)/funcretval_test++11.Po \
+	./$(DEPDIR)/funcretval_test_struct.Po \
+	./$(DEPDIR)/funcscopes.Po ./$(DEPDIR)/get-aranges.Po \
+	./$(DEPDIR)/get-files-define-file.Po ./$(DEPDIR)/get-files.Po \
 	./$(DEPDIR)/get-lines.Po ./$(DEPDIR)/get-pubnames.Po \
 	./$(DEPDIR)/get-units-invalid.Po \
 	./$(DEPDIR)/get-units-split.Po ./$(DEPDIR)/getphdrnum.Po \
@@ -765,8 +828,9 @@ am__depfiles_remade = ./$(DEPDIR)/addrcfi.Po ./$(DEPDIR)/addrscopes.Po \
 	./$(DEPDIR)/leb128.Po ./$(DEPDIR)/line2addr.Po \
 	./$(DEPDIR)/low_high_pc.Po ./$(DEPDIR)/msg_tst.Po \
 	./$(DEPDIR)/newdata.Po ./$(DEPDIR)/newfile.Po \
-	./$(DEPDIR)/newscn.Po ./$(DEPDIR)/next-files.Po \
-	./$(DEPDIR)/next-lines.Po ./$(DEPDIR)/next_cfi.Po \
+	./$(DEPDIR)/newscn.Po ./$(DEPDIR)/newzdata.Po \
+	./$(DEPDIR)/next-files.Po ./$(DEPDIR)/next-lines.Po \
+	./$(DEPDIR)/next_cfi.Po \
 	./$(DEPDIR)/nvidia_extended_linemap_libdw.Po \
 	./$(DEPDIR)/peel_type.Po ./$(DEPDIR)/rdwrmmap.Po \
 	./$(DEPDIR)/read_unaligned.Po ./$(DEPDIR)/rerequest_tag.Po \
@@ -774,6 +838,7 @@ am__depfiles_remade = ./$(DEPDIR)/addrcfi.Po ./$(DEPDIR)/addrscopes.Po \
 	./$(DEPDIR)/sectiondump.Po ./$(DEPDIR)/show-abbrev.Po \
 	./$(DEPDIR)/show-die-info.Po ./$(DEPDIR)/showptable.Po \
 	./$(DEPDIR)/strptr.Po \
+	./$(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Po \
 	./$(DEPDIR)/system_elf_libelf_test-system-elf-libelf-test.Po \
 	./$(DEPDIR)/test-elf_cntl_gelf_getshdr.Po \
 	./$(DEPDIR)/test-flag-nobits.Po \
@@ -801,33 +866,50 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+AM_V_CXX = $(am__v_CXX_@AM_V@)
+am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
+am__v_CXX_0 = @echo "  CXX     " $@;
+am__v_CXX_1 = 
+CXXLD = $(CXX)
+CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
+	-o $@
+AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
+am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
+am__v_CXXLD_0 = @echo "  CXXLD   " $@;
+am__v_CXXLD_1 = 
 SOURCES = addrcfi.c addrscopes.c addsections.c aggregate_size.c \
 	all-dwarf-ranges.c alldts.c allfcts.c allregs.c arextract.c \
 	arls.c arsymtest.c asm-tst1.c asm-tst2.c asm-tst3.c asm-tst4.c \
 	asm-tst5.c asm-tst6.c asm-tst7.c asm-tst8.c asm-tst9.c \
 	attr-integrate-skel.c backtrace.c backtrace-child.c \
 	$(backtrace_child_biarch_SOURCES) backtrace-data.c \
-	backtrace-dwarf.c buildid.c debugaltlink.c \
-	debuginfod_build_id_find.c debuglink.c deleted.c deleted-lib.c \
-	dwarf-die-addr-die.c dwarf-getmacros.c dwarf-getstring.c \
-	dwarf-ranges.c dwarf_default_lower_bound.c dwarfcfi.c \
+	backtrace-dwarf.c buildid.c cu-dwp-section-info.c \
+	debugaltlink.c debuginfod_build_id_find.c debuglink.c \
+	declfiles.c deleted.c deleted-lib.c dwarf-die-addr-die.c \
+	dwarf-getmacros.c dwarf-getstring.c dwarf-ranges.c \
+	dwarf_default_lower_bound.c dwarfcfi.c \
 	dwelf_elf_e_machine_string.c dwelfgnucompressed.c \
 	dwfl-addr-sect.c dwfl-bug-addr-overflow.c dwfl-bug-fd-leak.c \
-	dwfl-bug-getmodules.c dwfl-bug-report.c dwfl-proc-attach.c \
-	dwfl-report-elf-align.c dwfl-report-offline-memory.c \
-	dwfl-report-segment-contiguous.c dwfllines.c dwflmodtest.c \
-	dwflsyms.c early-offscn.c ecp.c elfcopy.c elfgetchdr.c \
-	elfgetzdata.c elfputzdata.c elfrdwrnop.c elfshphehdr.c \
-	elfstrmerge.c elfstrtab.c emptyfile.c fillfile.c \
-	find-prologues.c funcretval.c funcscopes.c get-aranges.c \
-	get-files.c get-lines.c get-pubnames.c get-units-invalid.c \
-	get-units-split.c getphdrnum.c getsrc_die.c hash.c leb128.c \
-	line2addr.c low_high_pc.c msg_tst.c newdata.c newfile.c \
-	newscn.c next-files.c next-lines.c next_cfi.c \
-	nvidia_extended_linemap_libdw.c peel_type.c rdwrmmap.c \
-	read_unaligned.c rerequest_tag.c saridx.c scnnames.c \
-	sectiondump.c show-abbrev.c show-die-info.c showptable.c \
-	strptr.c system-elf-libelf-test.c test-elf_cntl_gelf_getshdr.c \
+	dwfl-bug-getmodules.c dwfl-bug-report.c dwfl-core-noncontig.c \
+	dwfl-proc-attach.c dwfl-report-elf-align.c \
+	dwfl-report-offline-memory.c dwfl-report-segment-contiguous.c \
+	dwfllines.c dwflmodtest.c dwflsyms.c early-offscn.c ecp.c \
+	elf-print-reloc-syms.c elfcopy.c elfgetchdr.c elfgetzdata.c \
+	elfputzdata.c elfrdwrnop.c elfshphehdr.c elfstrmerge.c \
+	elfstrtab.c emptyfile.c fillfile.c find-prologues.c \
+	funcretval.c $(funcretval_test__11_SOURCES) \
+	$(funcretval_test_struct_SOURCES) funcscopes.c get-aranges.c \
+	get-files.c get-files-define-file.c get-lines.c get-pubnames.c \
+	get-units-invalid.c get-units-split.c getphdrnum.c \
+	getsrc_die.c hash.c leb128.c line2addr.c low_high_pc.c \
+	msg_tst.c newdata.c newfile.c newscn.c newzdata.c next-files.c \
+	next-lines.c next_cfi.c nvidia_extended_linemap_libdw.c \
+	peel_type.c rdwrmmap.c read_unaligned.c rerequest_tag.c \
+	saridx.c scnnames.c sectiondump.c show-abbrev.c \
+	show-die-info.c showptable.c strptr.c system-elf-gelf-test.c \
+	system-elf-libelf-test.c test-elf_cntl_gelf_getshdr.c \
 	test-flag-nobits.c test-nlist.c typeiter.c typeiter2.c \
 	unit-info.c update1.c update2.c update3.c update4.c varlocs.c \
 	vdsosyms.c vendorelf.c xlate_notes.c zstrptr.c
@@ -837,27 +919,31 @@ DIST_SOURCES = addrcfi.c addrscopes.c addsections.c aggregate_size.c \
 	asm-tst5.c asm-tst6.c asm-tst7.c asm-tst8.c asm-tst9.c \
 	attr-integrate-skel.c backtrace.c backtrace-child.c \
 	$(backtrace_child_biarch_SOURCES) backtrace-data.c \
-	backtrace-dwarf.c buildid.c debugaltlink.c \
-	debuginfod_build_id_find.c debuglink.c deleted.c deleted-lib.c \
-	dwarf-die-addr-die.c dwarf-getmacros.c dwarf-getstring.c \
-	dwarf-ranges.c dwarf_default_lower_bound.c dwarfcfi.c \
+	backtrace-dwarf.c buildid.c cu-dwp-section-info.c \
+	debugaltlink.c debuginfod_build_id_find.c debuglink.c \
+	declfiles.c deleted.c deleted-lib.c dwarf-die-addr-die.c \
+	dwarf-getmacros.c dwarf-getstring.c dwarf-ranges.c \
+	dwarf_default_lower_bound.c dwarfcfi.c \
 	dwelf_elf_e_machine_string.c dwelfgnucompressed.c \
 	dwfl-addr-sect.c dwfl-bug-addr-overflow.c dwfl-bug-fd-leak.c \
-	dwfl-bug-getmodules.c dwfl-bug-report.c dwfl-proc-attach.c \
-	dwfl-report-elf-align.c dwfl-report-offline-memory.c \
-	dwfl-report-segment-contiguous.c dwfllines.c dwflmodtest.c \
-	dwflsyms.c early-offscn.c ecp.c elfcopy.c elfgetchdr.c \
-	elfgetzdata.c elfputzdata.c elfrdwrnop.c elfshphehdr.c \
-	elfstrmerge.c elfstrtab.c emptyfile.c fillfile.c \
-	find-prologues.c funcretval.c funcscopes.c get-aranges.c \
-	get-files.c get-lines.c get-pubnames.c get-units-invalid.c \
-	get-units-split.c getphdrnum.c getsrc_die.c hash.c leb128.c \
-	line2addr.c low_high_pc.c msg_tst.c newdata.c newfile.c \
-	newscn.c next-files.c next-lines.c next_cfi.c \
-	nvidia_extended_linemap_libdw.c peel_type.c rdwrmmap.c \
-	read_unaligned.c rerequest_tag.c saridx.c scnnames.c \
-	sectiondump.c show-abbrev.c show-die-info.c showptable.c \
-	strptr.c system-elf-libelf-test.c test-elf_cntl_gelf_getshdr.c \
+	dwfl-bug-getmodules.c dwfl-bug-report.c dwfl-core-noncontig.c \
+	dwfl-proc-attach.c dwfl-report-elf-align.c \
+	dwfl-report-offline-memory.c dwfl-report-segment-contiguous.c \
+	dwfllines.c dwflmodtest.c dwflsyms.c early-offscn.c ecp.c \
+	elf-print-reloc-syms.c elfcopy.c elfgetchdr.c elfgetzdata.c \
+	elfputzdata.c elfrdwrnop.c elfshphehdr.c elfstrmerge.c \
+	elfstrtab.c emptyfile.c fillfile.c find-prologues.c \
+	funcretval.c $(am__funcretval_test__11_SOURCES_DIST) \
+	$(funcretval_test_struct_SOURCES) funcscopes.c get-aranges.c \
+	get-files.c get-files-define-file.c get-lines.c get-pubnames.c \
+	get-units-invalid.c get-units-split.c getphdrnum.c \
+	getsrc_die.c hash.c leb128.c line2addr.c low_high_pc.c \
+	msg_tst.c newdata.c newfile.c newscn.c newzdata.c next-files.c \
+	next-lines.c next_cfi.c nvidia_extended_linemap_libdw.c \
+	peel_type.c rdwrmmap.c read_unaligned.c rerequest_tag.c \
+	saridx.c scnnames.c sectiondump.c show-abbrev.c \
+	show-die-info.c showptable.c strptr.c system-elf-gelf-test.c \
+	system-elf-libelf-test.c test-elf_cntl_gelf_getshdr.c \
 	test-flag-nobits.c test-nlist.c typeiter.c typeiter2.c \
 	unit-info.c update1.c update2.c update3.c update4.c varlocs.c \
 	vdsosyms.c vendorelf.c xlate_notes.c zstrptr.c
@@ -1113,6 +1199,7 @@ CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_IMA_CERT_PATH = @DEBUGINFOD_IMA_CERT_PATH@
 DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
@@ -1165,6 +1252,7 @@ MSGFMT = @MSGFMT@
 MSGMERGE = @MSGMERGE@
 MSGMERGE_FOR_MSGFMT_OPTION = @MSGMERGE_FOR_MSGFMT_OPTION@
 NM = @NM@
+NO_UNDEFINED = @NO_UNDEFINED@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -1191,6 +1279,8 @@ XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
+ZSTD_COMPRESS_CFLAGS = @ZSTD_COMPRESS_CFLAGS@
+ZSTD_COMPRESS_LIBS = @ZSTD_COMPRESS_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -1211,6 +1301,7 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
+crypto_LIBS = @crypto_LIBS@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
@@ -1230,6 +1321,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+jsonc_CFLAGS = @jsonc_CFLAGS@
+jsonc_LIBS = @jsonc_LIBS@
 libarchive_CFLAGS = @libarchive_CFLAGS@
 libarchive_LIBS = @libarchive_LIBS@
 libcurl_CFLAGS = @libcurl_CFLAGS@
@@ -1239,7 +1332,10 @@ libexecdir = @libexecdir@
 libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
 libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
+localedir_c = @localedir_c@
+localedir_c_make = @localedir_c_make@
 localstatedir = @localstatedir@
+lzma_LIBS = @lzma_LIBS@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 obstack_LIBS = @obstack_LIBS@
@@ -1250,6 +1346,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+rpm_LIBS = @rpm_LIBS@
 runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
@@ -1262,7 +1359,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 zip_LIBS = @zip_LIBS@
-AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_srcdir)/lib -I.. \
+zstd_LIBS = @zstd_LIBS@
+AM_CPPFLAGS = -iquote . -I$(srcdir) -I$(top_srcdir)/lib -I.. \
 	-I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
 	-I$(top_srcdir)/libdwfl -I$(top_srcdir)/libdwelf \
 	-I$(top_srcdir)/libebl -I$(top_srcdir)/libelf \
@@ -1293,10 +1391,13 @@ ARFLAGS = cr
 @HAVE_TRAMPOLINES_WARNING_TRUE@TRAMPOLINES_WARNING = -Wtrampolines
 @HAVE_NO_PACKED_NOT_ALIGNED_WARNING_FALSE@NO_PACKED_NOT_ALIGNED_WARNING = 
 @HAVE_NO_PACKED_NOT_ALIGNED_WARNING_TRUE@NO_PACKED_NOT_ALIGNED_WARNING = -Wno-packed-not-aligned
+@HAVE_USE_AFTER_FREE3_WARNING_FALSE@USE_AFTER_FREE3_WARNING = 
+@HAVE_USE_AFTER_FREE3_WARNING_TRUE@USE_AFTER_FREE3_WARNING = -Wuse-after-free=3
 AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	    -Wold-style-definition -Wstrict-prototypes $(TRAMPOLINES_WARNING) \
 	    $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
 	    $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+	    $(USE_AFTER_FREE3_WARNING) \
 	    $(if $($(*F)_no_Werror),,-Werror) \
 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
 	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
@@ -1317,7 +1418,7 @@ COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage, $(COMPILE))
 DEFS.os = -DPIC -DSHARED $(am__append_1)
 
 # A lock file used to make sure only one test dumps core at a time
-CLEANFILES = *.gcno *.gcda core-dump-backtrace.lock
+CLEANFILES = *.gcno *.gcda libelf.h core-dump-backtrace.lock
 textrel_msg = echo "WARNING: TEXTREL found in '$@'"
 @FATAL_TEXTREL_FALSE@textrel_found = $(textrel_msg)
 @FATAL_TEXTREL_TRUE@textrel_found = $(textrel_msg); exit 1
@@ -1332,12 +1433,15 @@ asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 
 @GCOV_FALSE@GCOV_FLAGS = 
 @GCOV_TRUE@GCOV_FLAGS = -fprofile-arcs -ftest-coverage
-@USE_ADDRESS_SANITIZER_FALSE@EXTRA_NLIST_CFLAGS = 
+@USE_ADDRESS_SANITIZER_FALSE@@USE_MEMORY_SANITIZER_FALSE@EXTRA_NLIST_CFLAGS = 
+@USE_ADDRESS_SANITIZER_FALSE@@USE_MEMORY_SANITIZER_TRUE@EXTRA_NLIST_CFLAGS = -fsanitize=memory -fsanitize-memory-track-origins
 
 # test_nlist checks its own symbol table, and expects various symbols
 # to be in the order as specified in the source file. Explicitly set
-# minimal CFLAGS. But add address sanitizer if in use.
+# minimal CFLAGS. But add sanitizers if in use.
 @USE_ADDRESS_SANITIZER_TRUE@EXTRA_NLIST_CFLAGS = -fsanitize=address
+@HAVE_CXX11_TRUE@funcretval_test__11_SOURCES = funcretval_test++11.cxx
+funcretval_test_struct_SOURCES = funcretval_test_struct.c
 EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-ar-N.sh \
 	     run-show-die-info.sh run-get-files.sh run-get-lines.sh \
@@ -1363,9 +1467,12 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile-annobingroup-x86_64.o.bz2 \
 	     run-strip-strmerge.sh run-strip-nobitsalign.sh \
 	     testfile-nobitsalign.bz2 testfile-nobitsalign.strip.bz2 \
-	     run-strip-reloc.sh hello_i386.ko.bz2 hello_x86_64.ko.bz2 \
+	     run-strip-reloc-ko.sh run-strip-reloc-self.sh \
+	     run-strip-reloc-ppc64.sh strip-reloc-subr.sh \
+	     hello_i386.ko.bz2 hello_x86_64.ko.bz2 \
 	     hello_ppc64.ko.bz2 hello_s390.ko.bz2 hello_aarch64.ko.bz2 \
 	     hello_m68k.ko.bz2 hello_riscv64.ko.bz2 hello_csky.ko.bz2 \
+	     hello_arc_hs4.ko.bz2 hello_hexagon.ko.bz2 \
 	     run-unstrip-test.sh run-unstrip-test2.sh \
 	     testfile-info-link.bz2 testfile-info-link.debuginfo.bz2 \
 	     testfile-info-link.stripped.bz2 run-unstrip-test3.sh \
@@ -1377,7 +1484,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	     run-nm-syms.sh testfilesyms32.bz2 testfilesyms64.bz2 \
 	     run-nm-self.sh run-readelf-self.sh run-readelf-info-plus.sh \
-	     run-readelf-compressed.sh \
+	     run-srcfiles-self.sh \
+		 run-readelf-compressed.sh \
 	     run-readelf-compressed-zstd.sh \
 	     run-readelf-const-values.sh testfile-const-values.debug.bz2 \
 	     run-addrcfi.sh run-dwarfcfi.sh \
@@ -1422,7 +1530,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile46.bz2 testfile47.bz2 testfile48.bz2 testfile48.debug.bz2 \
 	     testfile49.bz2 testfile50.bz2 testfile51.bz2 \
 	     testfile-macros-0xff.bz2 \
-	     run-readelf-macro.sh testfilemacro.bz2 \
+	     run-readelf-macro.sh testfilemacro.bz2 testfileclangmacro.bz2 \
 	     run-readelf-loc.sh testfileloc.bz2 \
 	     splitdwarf4-not-split4.dwo.bz2 \
 	     testfile-splitdwarf4-not-split4.debug.bz2 \
@@ -1471,7 +1579,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-readelf-Dd.sh \
 	     testfile-s390x-hash-both.bz2 \
 	     run-readelf-gdb_index.sh testfilegdbindex5.bz2 \
-	     testfilegdbindex7.bz2 \
+	     testfilegdbindex7.bz2 testfilegdbindex9.bz2 \
+	     testfilegdbindex9-no-maininfo.bz2 \
 	     run-readelf-s.sh testfilebazdbg.bz2 testfilebazdyn.bz2 \
 	     testfilebazmin.bz2 testfilebazdbg.debug.bz2 testfilebazmdb.bz2 \
 	     testfilebaztab.bz2 testfilebasmin.bz2 testfilebaxmin.bz2 \
@@ -1501,7 +1610,9 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile-dwfl-report-elf-align-shlib.so.bz2 \
 	     testfilenolines.bz2 test-core-lib.so.bz2 test-core.core.bz2 \
 	     test-core.exec.bz2 run-addr2line-test.sh \
+	     run-addr2line-C-test.sh \
 	     run-addr2line-i-test.sh testfile-inlines.bz2 \
+	     testfile-inlines-lto.bz2 \
 	     run-addr2line-i-lex-test.sh testfile-lex-inlines.bz2 \
 	     run-addr2line-i-demangle-test.sh run-addr2line-alt-debugpath.sh \
 	     testfileppc32.bz2 testfileppc64.bz2 \
@@ -1525,6 +1636,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile_aarch64_core.bz2 testfile_i686_core.bz2 \
 	     addrx_constx-4.dwo.bz2 addrx_constx-5.dwo.bz2 \
 	     testfile-addrx_constx-4.bz2 testfile-addrx_constx-5.bz2 \
+	     run-funcretval-struct.sh funcretval_test_struct_riscv.bz2 \
 	     run-funcretval.sh funcretval_test.c funcretval_test_aarch64.bz2 \
 	     run-backtrace-data.sh run-backtrace-dwarf.sh cleanup-13.c \
 	     run-backtrace-native.sh run-backtrace-native-biarch.sh \
@@ -1597,7 +1709,9 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile-riscv64.bz2 testfile-riscv64-s.bz2 \
 	     testfile-riscv64-core.bz2 \
 	     run-reverse-sections.sh run-reverse-sections-self.sh \
-	     run-copyadd-sections.sh run-copymany-sections.sh \
+	     run-copyadd-sections.sh test-copymany-subr.sh \
+	     run-copymany-be32.sh run-copymany-le32.sh \
+	     run-copymany-be64.sh run-copymany-le64.sh \
 	     run-large-elf-file.sh \
 	     run-typeiter-many.sh run-strip-test-many.sh \
 	     testfile-debug-rel-ppc64-g.o.bz2 \
@@ -1637,6 +1751,10 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
              run-debuginfod-extraction-passive.sh \
              run-debuginfod-webapi-concurrency.sh \
 	     run-debuginfod-section.sh \
+	     run-debuginfod-IXr.sh \
+	     run-debuginfod-ima-verification.sh \
+	     run-debuginfod-find-metadata.sh \
+	     run-debuginfod-longsource.sh \
 	     debuginfod-rpms/fedora30/hello2-1.0-2.src.rpm \
 	     debuginfod-rpms/fedora30/hello2-1.0-2.x86_64.rpm \
 	     debuginfod-rpms/fedora30/hello2-debuginfo-1.0-2.x86_64.rpm \
@@ -1660,24 +1778,58 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     debuginfod-rpms/rhel7/hello2-debuginfo-1.0-2.x86_64.rpm \
 	     debuginfod-rpms/rhel7/hello2-two-1.0-2.x86_64.rpm \
 	     debuginfod-rpms/rhel7/hello2-two-1.0-2.x86_64.rpm \
+	     debuginfod-rpms/seekable-xz/compressme-seekable-xz-1.0-1.src.rpm \
+	     debuginfod-rpms/seekable-xz/compressme-seekable-xz-1.0-1.x86_64.rpm \
+	     debuginfod-rpms/seekable-xz/compressme-seekable-xz-debuginfo-1.0-1.x86_64.rpm \
+	     debuginfod-rpms/seekable-xz/compressme-seekable-xz-debugsource-1.0-1.x86_64.rpm \
+             debuginfod-ima/koji/arch/hello-2.10-9.fc38.x86_64.rpm \
+             debuginfod-ima/koji/data/sigcache/keyid/arch/hello-2.10-9.fc38.x86_64.rpm.sig \
+	     debuginfod-ima/koji/fedora-38-ima.pem \
+	     debuginfod-ima/rhel9/hello2-1.0-1.x86_64.rpm \
+	     debuginfod-ima/rhel9/imacert.der \
 	     debuginfod-debs/hithere-dbgsym_1.0-1_amd64.ddeb \
 	     debuginfod-debs/hithere_1.0-1.debian.tar.xz \
 	     debuginfod-debs/hithere_1.0-1.dsc \
 	     debuginfod-debs/hithere_1.0-1_amd64.deb \
 	     debuginfod-debs/hithere_1.0.orig.tar.gz \
+	     debuginfod-debs/seekable-xz/compressme-seekable-xz_1.0-1_amd64.deb \
+	     debuginfod-debs/seekable-xz/compressme-seekable-xz_1.0-1.debian.tar.xz \
+	     debuginfod-debs/seekable-xz/compressme-seekable-xz_1.0-1.dsc \
+	     debuginfod-debs/seekable-xz/compressme-seekable-xz_1.0.orig.tar.xz \
+	     debuginfod-debs/seekable-xz/compressme-seekable-xz-dbgsym_1.0-1_amd64.deb \
 	     debuginfod-tars/hello-1-1-x86_64.pkg.tar.xz \
 	     debuginfod-tars/hello-debug-1-1-x86_64.pkg.tar.bz2 \
 	     debuginfod-tars/pacman-sources/PKGBUILD \
 	     debuginfod-tars/pacman-sources/README.md \
 	     debuginfod-tars/pacman-sources/hello.c \
+	     debuginfod-tars/bighello.tar \
+	     debuginfod-tars/bighello-sources/bighello.c \
+	     debuginfod-tars/bighello-sources/bighello.h \
 	     run-pt_gnu_prop-tests.sh \
 	     testfile_pt_gnu_prop.bz2 testfile_pt_gnu_prop32.bz2 \
 	     run-getphdrnum.sh testfile-phdrs.elf.bz2 \
 	     run-test-includes.sh run-low_high_pc-dw-form-indirect.sh \
+	     run-debuginfod-client-profile.sh \
 	     run-readelf-dw-form-indirect.sh testfile-dw-form-indirect.bz2 \
 	     run-nvidia-extended-linemap-libdw.sh run-nvidia-extended-linemap-readelf.sh \
 	     testfile_nvidia_linemap.bz2 \
-	     testfile-largealign.o.bz2 run-strip-largealign.sh
+	     testfile-largealign.o.bz2 run-strip-largealign.sh \
+	     run-funcretval++11.sh \
+	     run-funcretval-struct-native.sh \
+	     test-ar-duplicates.a.bz2 \
+	     run-dwfl-core-noncontig.sh testcore-noncontig.bz2 \
+	     testfile-dwarf5-line-clang.bz2 \
+	     testfile-dwp-4.bz2 testfile-dwp-4.dwp.bz2 \
+	     testfile-dwp-4-strict.bz2 testfile-dwp-4-strict.dwp.bz2 \
+	     testfile-dwp-5.bz2 testfile-dwp-5.dwp.bz2 testfile-dwp.source \
+	     run-cu-dwp-section-info.sh run-declfiles.sh \
+	     testfile-dwp-5-cu-index-overflow.bz2 \
+	     testfile-dwp-5-cu-index-overflow.dwp.bz2 \
+	     testfile-dwp-4-cu-index-overflow.bz2 \
+	     testfile-dwp-4-cu-index-overflow.dwp.bz2 \
+	     testfile-dwp-cu-index-overflow.source \
+	     testfile-define-file.bz2 \
+	     testfile-sysroot.tar.bz2 run-sysroot.sh run-debuginfod-seekable.sh
 
 @USE_VALGRIND_TRUE@valgrind_cmd = valgrind -q --leak-check=full --error-exitcode=1
 installed_TESTS_ENVIRONMENT = libdir='$(DESTDIR)$(libdir)'; \
@@ -1716,7 +1868,7 @@ LOG_COMPILER = $(abs_srcdir)/test-wrapper.sh \
 @BUILD_STATIC_FALSE@libdw = ../libdw/libdw.so
 @BUILD_STATIC_TRUE@libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl -lpthread
 @BUILD_STATIC_FALSE@libelf = ../libelf/libelf.so
-@BUILD_STATIC_TRUE@libelf = ../libelf/libelf.a -lz
+@BUILD_STATIC_TRUE@libelf = ../libelf/libelf.a -lz $(zstd_LIBS) $(libeu)
 @BUILD_STATIC_FALSE@libasm = ../libasm/libasm.so
 @BUILD_STATIC_TRUE@libasm = ../libasm/libasm.a
 libebl = ../libebl/libebl.a ../backends/libebl_backends.a ../libcpu/libcpu.a
@@ -1745,6 +1897,7 @@ show_abbrev_LDADD = $(libdw) $(libelf)
 get_lines_LDADD = $(libdw) $(libelf)
 next_lines_LDADD = $(libdw) $(libelf)
 get_files_LDADD = $(libdw) $(libelf)
+get_files_define_file_LDADD = $(libdw) $(libelf)
 next_files_LDADD = $(libdw) $(libelf)
 get_aranges_LDADD = $(libdw) $(libelf)
 allfcts_LDADD = $(libdw) $(libelf)
@@ -1772,6 +1925,7 @@ dwfl_bug_fd_leak_LDADD = $(libeu) $(libdw) $(libebl) $(libelf)
 dwfl_bug_report_LDADD = $(libdw) $(libebl) $(libelf)
 dwfl_bug_getmodules_LDADD = $(libeu) $(libdw) $(libebl) $(libelf)
 dwfl_addr_sect_LDADD = $(libeu) $(libdw) $(libebl) $(libelf) $(argp_LDADD)
+dwfl_core_noncontig_LDADD = $(libdw) $(libelf)
 dwarf_getmacros_LDADD = $(libdw)
 dwarf_ranges_LDADD = $(libdw)
 dwarf_getstring_LDADD = $(libdw)
@@ -1787,7 +1941,7 @@ test_elf_cntl_gelf_getshdr_LDADD = $(libelf)
 dwflsyms_LDADD = $(libdw) $(libelf) $(argp_LDADD)
 dwfllines_LDADD = $(libeu) $(libdw) $(libelf) $(argp_LDADD)
 dwfl_report_elf_align_LDADD = $(libeu) $(libdw)
-dwfl_report_offline_memory_LDADD = $(libeu) $(libdw)
+dwfl_report_offline_memory_LDADD = $(libeu) $(libdw) $(libelf)
 dwfl_report_segment_contiguous_LDADD = $(libdw) $(libebl) $(libelf)
 varlocs_LDADD = $(libeu) $(libdw) $(libelf) $(argp_LDADD)
 backtrace_LDADD = $(libeu) $(libdw) $(libelf) $(argp_LDADD)
@@ -1810,6 +1964,7 @@ vdsosyms_LDADD = $(libeu) $(libdw) $(libelf)
 getsrc_die_LDADD = $(libeu) $(libdw) $(libelf)
 strptr_LDADD = $(libelf)
 newdata_LDADD = $(libelf)
+newzdata_LDADD = $(libelf)
 elfstrtab_LDADD = $(libelf)
 dwfl_proc_attach_LDADD = $(libeu) $(libdw)
 dwfl_proc_attach_LDFLAGS = -pthread -rdynamic $(AM_LDFLAGS)
@@ -1841,16 +1996,25 @@ getphdrnum_LDADD = $(libelf) $(libdw)
 leb128_LDADD = $(libelf) $(libdw)
 read_unaligned_LDADD = $(libelf) $(libdw)
 nvidia_extended_linemap_libdw_LDADD = $(libelf) $(libdw)
+elf_print_reloc_syms_LDADD = $(libelf)
+cu_dwp_section_info_LDADD = $(libdw)
+declfiles_LDADD = $(libdw)
 
-# We want to test the libelf header against the system elf.h header.
+# We want to test the libelf headers against the system elf.h header.
 # Don't include any -I CPPFLAGS. Except when we install our own elf.h.
+# For the gelf test we do want our own libelf.h, but nothing else.
+BUILT_SOURCES = libelf.h
 @INSTALL_ELFH_FALSE@system_elf_libelf_test_CPPFLAGS = 
 @INSTALL_ELFH_TRUE@system_elf_libelf_test_CPPFLAGS = -I$(top_srcdir)/libelf
+@INSTALL_ELFH_FALSE@system_elf_gelf_test_CPPFLAGS = -I.
+@INSTALL_ELFH_TRUE@system_elf_gelf_test_CPPFLAGS = -I$(top_srcdir)/libelf
 system_elf_libelf_test_LDADD = $(libelf)
-all: all-am
+system_elf_gelf_test_LDADD = $(libelf)
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .log .o .obj .test .test$(EXEEXT) .trs
+.SUFFIXES: .c .cxx .log .o .obj .test .test$(EXEEXT) .trs
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/config/eu.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -1989,6 +2153,10 @@ buildid$(EXEEXT): $(buildid_OBJECTS) $(buildid_DEPENDENCIES) $(EXTRA_buildid_DEP
 	@rm -f buildid$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(buildid_OBJECTS) $(buildid_LDADD) $(LIBS)
 
+cu-dwp-section-info$(EXEEXT): $(cu_dwp_section_info_OBJECTS) $(cu_dwp_section_info_DEPENDENCIES) $(EXTRA_cu_dwp_section_info_DEPENDENCIES) 
+	@rm -f cu-dwp-section-info$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(cu_dwp_section_info_OBJECTS) $(cu_dwp_section_info_LDADD) $(LIBS)
+
 debugaltlink$(EXEEXT): $(debugaltlink_OBJECTS) $(debugaltlink_DEPENDENCIES) $(EXTRA_debugaltlink_DEPENDENCIES) 
 	@rm -f debugaltlink$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debugaltlink_OBJECTS) $(debugaltlink_LDADD) $(LIBS)
@@ -2000,6 +2168,10 @@ debuginfod_build_id_find$(EXEEXT): $(debuginfod_build_id_find_OBJECTS) $(debugin
 debuglink$(EXEEXT): $(debuglink_OBJECTS) $(debuglink_DEPENDENCIES) $(EXTRA_debuglink_DEPENDENCIES) 
 	@rm -f debuglink$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(debuglink_OBJECTS) $(debuglink_LDADD) $(LIBS)
+
+declfiles$(EXEEXT): $(declfiles_OBJECTS) $(declfiles_DEPENDENCIES) $(EXTRA_declfiles_DEPENDENCIES) 
+	@rm -f declfiles$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(declfiles_OBJECTS) $(declfiles_LDADD) $(LIBS)
 
 deleted$(EXEEXT): $(deleted_OBJECTS) $(deleted_DEPENDENCIES) $(EXTRA_deleted_DEPENDENCIES) 
 	@rm -f deleted$(EXEEXT)
@@ -2061,6 +2233,10 @@ dwfl-bug-report$(EXEEXT): $(dwfl_bug_report_OBJECTS) $(dwfl_bug_report_DEPENDENC
 	@rm -f dwfl-bug-report$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(dwfl_bug_report_OBJECTS) $(dwfl_bug_report_LDADD) $(LIBS)
 
+dwfl-core-noncontig$(EXEEXT): $(dwfl_core_noncontig_OBJECTS) $(dwfl_core_noncontig_DEPENDENCIES) $(EXTRA_dwfl_core_noncontig_DEPENDENCIES) 
+	@rm -f dwfl-core-noncontig$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(dwfl_core_noncontig_OBJECTS) $(dwfl_core_noncontig_LDADD) $(LIBS)
+
 dwfl-proc-attach$(EXEEXT): $(dwfl_proc_attach_OBJECTS) $(dwfl_proc_attach_DEPENDENCIES) $(EXTRA_dwfl_proc_attach_DEPENDENCIES) 
 	@rm -f dwfl-proc-attach$(EXEEXT)
 	$(AM_V_CCLD)$(dwfl_proc_attach_LINK) $(dwfl_proc_attach_OBJECTS) $(dwfl_proc_attach_LDADD) $(LIBS)
@@ -2096,6 +2272,10 @@ early-offscn$(EXEEXT): $(early_offscn_OBJECTS) $(early_offscn_DEPENDENCIES) $(EX
 ecp$(EXEEXT): $(ecp_OBJECTS) $(ecp_DEPENDENCIES) $(EXTRA_ecp_DEPENDENCIES) 
 	@rm -f ecp$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(ecp_OBJECTS) $(ecp_LDADD) $(LIBS)
+
+elf-print-reloc-syms$(EXEEXT): $(elf_print_reloc_syms_OBJECTS) $(elf_print_reloc_syms_DEPENDENCIES) $(EXTRA_elf_print_reloc_syms_DEPENDENCIES) 
+	@rm -f elf-print-reloc-syms$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(elf_print_reloc_syms_OBJECTS) $(elf_print_reloc_syms_LDADD) $(LIBS)
 
 elfcopy$(EXEEXT): $(elfcopy_OBJECTS) $(elfcopy_DEPENDENCIES) $(EXTRA_elfcopy_DEPENDENCIES) 
 	@rm -f elfcopy$(EXEEXT)
@@ -2145,6 +2325,14 @@ funcretval$(EXEEXT): $(funcretval_OBJECTS) $(funcretval_DEPENDENCIES) $(EXTRA_fu
 	@rm -f funcretval$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(funcretval_OBJECTS) $(funcretval_LDADD) $(LIBS)
 
+funcretval_test++11$(EXEEXT): $(funcretval_test__11_OBJECTS) $(funcretval_test__11_DEPENDENCIES) $(EXTRA_funcretval_test__11_DEPENDENCIES) 
+	@rm -f funcretval_test++11$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(funcretval_test__11_OBJECTS) $(funcretval_test__11_LDADD) $(LIBS)
+
+funcretval_test_struct$(EXEEXT): $(funcretval_test_struct_OBJECTS) $(funcretval_test_struct_DEPENDENCIES) $(EXTRA_funcretval_test_struct_DEPENDENCIES) 
+	@rm -f funcretval_test_struct$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(funcretval_test_struct_OBJECTS) $(funcretval_test_struct_LDADD) $(LIBS)
+
 funcscopes$(EXEEXT): $(funcscopes_OBJECTS) $(funcscopes_DEPENDENCIES) $(EXTRA_funcscopes_DEPENDENCIES) 
 	@rm -f funcscopes$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(funcscopes_OBJECTS) $(funcscopes_LDADD) $(LIBS)
@@ -2156,6 +2344,10 @@ get-aranges$(EXEEXT): $(get_aranges_OBJECTS) $(get_aranges_DEPENDENCIES) $(EXTRA
 get-files$(EXEEXT): $(get_files_OBJECTS) $(get_files_DEPENDENCIES) $(EXTRA_get_files_DEPENDENCIES) 
 	@rm -f get-files$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(get_files_OBJECTS) $(get_files_LDADD) $(LIBS)
+
+get-files-define-file$(EXEEXT): $(get_files_define_file_OBJECTS) $(get_files_define_file_DEPENDENCIES) $(EXTRA_get_files_define_file_DEPENDENCIES) 
+	@rm -f get-files-define-file$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(get_files_define_file_OBJECTS) $(get_files_define_file_LDADD) $(LIBS)
 
 get-lines$(EXEEXT): $(get_lines_OBJECTS) $(get_lines_DEPENDENCIES) $(EXTRA_get_lines_DEPENDENCIES) 
 	@rm -f get-lines$(EXEEXT)
@@ -2212,6 +2404,10 @@ newfile$(EXEEXT): $(newfile_OBJECTS) $(newfile_DEPENDENCIES) $(EXTRA_newfile_DEP
 newscn$(EXEEXT): $(newscn_OBJECTS) $(newscn_DEPENDENCIES) $(EXTRA_newscn_DEPENDENCIES) 
 	@rm -f newscn$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(newscn_OBJECTS) $(newscn_LDADD) $(LIBS)
+
+newzdata$(EXEEXT): $(newzdata_OBJECTS) $(newzdata_DEPENDENCIES) $(EXTRA_newzdata_DEPENDENCIES) 
+	@rm -f newzdata$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(newzdata_OBJECTS) $(newzdata_LDADD) $(LIBS)
 
 next-files$(EXEEXT): $(next_files_OBJECTS) $(next_files_DEPENDENCIES) $(EXTRA_next_files_DEPENDENCIES) 
 	@rm -f next-files$(EXEEXT)
@@ -2272,6 +2468,10 @@ showptable$(EXEEXT): $(showptable_OBJECTS) $(showptable_DEPENDENCIES) $(EXTRA_sh
 strptr$(EXEEXT): $(strptr_OBJECTS) $(strptr_DEPENDENCIES) $(EXTRA_strptr_DEPENDENCIES) 
 	@rm -f strptr$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(strptr_OBJECTS) $(strptr_LDADD) $(LIBS)
+
+system-elf-gelf-test$(EXEEXT): $(system_elf_gelf_test_OBJECTS) $(system_elf_gelf_test_DEPENDENCIES) $(EXTRA_system_elf_gelf_test_DEPENDENCIES) 
+	@rm -f system-elf-gelf-test$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(system_elf_gelf_test_OBJECTS) $(system_elf_gelf_test_LDADD) $(LIBS)
 
 system-elf-libelf-test$(EXEEXT): $(system_elf_libelf_test_OBJECTS) $(system_elf_libelf_test_DEPENDENCIES) $(EXTRA_system_elf_libelf_test_DEPENDENCIES) 
 	@rm -f system-elf-libelf-test$(EXEEXT)
@@ -2366,9 +2566,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/backtrace_child-backtrace-child.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/backtrace_dwarf-backtrace-dwarf.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buildid.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cu-dwp-section-info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debugaltlink.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debuginfod_build_id_find.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debuglink.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/declfiles.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/deleted.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/deleted_lib_so-deleted-lib.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwarf-die-addr-die.Po@am__quote@ # am--include-marker
@@ -2384,6 +2586,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwfl-bug-fd-leak.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwfl-bug-getmodules.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwfl-bug-report.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwfl-core-noncontig.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwfl-proc-attach.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwfl-report-elf-align.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwfl-report-offline-memory.Po@am__quote@ # am--include-marker
@@ -2393,6 +2596,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwflsyms.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/early-offscn.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ecp.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf-print-reloc-syms.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elfcopy.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elfgetchdr.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elfgetzdata.Po@am__quote@ # am--include-marker
@@ -2405,8 +2609,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fillfile.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/find-prologues.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/funcretval.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/funcretval_test++11.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/funcretval_test_struct.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/funcscopes.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get-aranges.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get-files-define-file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get-files.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get-lines.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get-pubnames.Po@am__quote@ # am--include-marker
@@ -2422,6 +2629,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newdata.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newfile.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newscn.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newzdata.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/next-files.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/next-lines.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/next_cfi.Po@am__quote@ # am--include-marker
@@ -2437,6 +2645,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/show-die-info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/showptable.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strptr.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system_elf_libelf_test-system-elf-libelf-test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-elf_cntl_gelf_getshdr.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test-flag-nobits.Po@am__quote@ # am--include-marker
@@ -2516,6 +2725,20 @@ deleted_lib_so-deleted-lib.obj: deleted-lib.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(deleted_lib_so_CFLAGS) $(CFLAGS) -c -o deleted_lib_so-deleted-lib.obj `if test -f 'deleted-lib.c'; then $(CYGPATH_W) 'deleted-lib.c'; else $(CYGPATH_W) '$(srcdir)/deleted-lib.c'; fi`
 
+system_elf_gelf_test-system-elf-gelf-test.o: system-elf-gelf-test.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(system_elf_gelf_test_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT system_elf_gelf_test-system-elf-gelf-test.o -MD -MP -MF $(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Tpo -c -o system_elf_gelf_test-system-elf-gelf-test.o `test -f 'system-elf-gelf-test.c' || echo '$(srcdir)/'`system-elf-gelf-test.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Tpo $(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='system-elf-gelf-test.c' object='system_elf_gelf_test-system-elf-gelf-test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(system_elf_gelf_test_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o system_elf_gelf_test-system-elf-gelf-test.o `test -f 'system-elf-gelf-test.c' || echo '$(srcdir)/'`system-elf-gelf-test.c
+
+system_elf_gelf_test-system-elf-gelf-test.obj: system-elf-gelf-test.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(system_elf_gelf_test_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT system_elf_gelf_test-system-elf-gelf-test.obj -MD -MP -MF $(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Tpo -c -o system_elf_gelf_test-system-elf-gelf-test.obj `if test -f 'system-elf-gelf-test.c'; then $(CYGPATH_W) 'system-elf-gelf-test.c'; else $(CYGPATH_W) '$(srcdir)/system-elf-gelf-test.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Tpo $(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='system-elf-gelf-test.c' object='system_elf_gelf_test-system-elf-gelf-test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(system_elf_gelf_test_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o system_elf_gelf_test-system-elf-gelf-test.obj `if test -f 'system-elf-gelf-test.c'; then $(CYGPATH_W) 'system-elf-gelf-test.c'; else $(CYGPATH_W) '$(srcdir)/system-elf-gelf-test.c'; fi`
+
 system_elf_libelf_test-system-elf-libelf-test.o: system-elf-libelf-test.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(system_elf_libelf_test_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT system_elf_libelf_test-system-elf-libelf-test.o -MD -MP -MF $(DEPDIR)/system_elf_libelf_test-system-elf-libelf-test.Tpo -c -o system_elf_libelf_test-system-elf-libelf-test.o `test -f 'system-elf-libelf-test.c' || echo '$(srcdir)/'`system-elf-libelf-test.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/system_elf_libelf_test-system-elf-libelf-test.Tpo $(DEPDIR)/system_elf_libelf_test-system-elf-libelf-test.Po
@@ -2543,6 +2766,20 @@ test_nlist-test-nlist.obj: test-nlist.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test-nlist.c' object='test_nlist-test-nlist.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test_nlist_CFLAGS) $(CFLAGS) -c -o test_nlist-test-nlist.obj `if test -f 'test-nlist.c'; then $(CYGPATH_W) 'test-nlist.c'; else $(CYGPATH_W) '$(srcdir)/test-nlist.c'; fi`
+
+.cxx.o:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
+
+.cxx.obj:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -3010,16 +3247,30 @@ run-strip-groups.sh.log: run-strip-groups.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-run-strip-reloc.sh.log: run-strip-reloc.sh
-	@p='run-strip-reloc.sh'; \
-	b='run-strip-reloc.sh'; \
+run-strip-strmerge.sh.log: run-strip-strmerge.sh
+	@p='run-strip-strmerge.sh'; \
+	b='run-strip-strmerge.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-run-strip-strmerge.sh.log: run-strip-strmerge.sh
-	@p='run-strip-strmerge.sh'; \
-	b='run-strip-strmerge.sh'; \
+run-strip-reloc-ko.sh.log: run-strip-reloc-ko.sh
+	@p='run-strip-reloc-ko.sh'; \
+	b='run-strip-reloc-ko.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-strip-reloc-self.sh.log: run-strip-reloc-self.sh
+	@p='run-strip-reloc-self.sh'; \
+	b='run-strip-reloc-self.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-strip-reloc-ppc64.sh.log: run-strip-reloc-ppc64.sh
+	@p='run-strip-reloc-ppc64.sh'; \
+	b='run-strip-reloc-ppc64.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -3605,6 +3856,13 @@ run-dwfl-report-offline-memory.sh.log: run-dwfl-report-offline-memory.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-addr2line-C-test.sh.log: run-addr2line-C-test.sh
+	@p='run-addr2line-C-test.sh'; \
+	b='run-addr2line-C-test.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 run-addr2line-i-test.sh.log: run-addr2line-i-test.sh
 	@p='run-addr2line-i-test.sh'; \
 	b='run-addr2line-i-test.sh'; \
@@ -3629,6 +3887,13 @@ run-addr2line-i-demangle-test.sh.log: run-addr2line-i-demangle-test.sh
 run-addr2line-alt-debugpath.sh.log: run-addr2line-alt-debugpath.sh
 	@p='run-addr2line-alt-debugpath.sh'; \
 	b='run-addr2line-alt-debugpath.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-funcretval-struct.sh.log: run-funcretval-struct.sh
+	@p='run-funcretval-struct.sh'; \
+	b='run-funcretval-struct.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -3941,6 +4206,13 @@ newdata.log: newdata$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+newzdata.log: newzdata$(EXEEXT)
+	@p='newzdata$(EXEEXT)'; \
+	b='newzdata'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 elfstrtab.log: elfstrtab$(EXEEXT)
 	@p='elfstrtab$(EXEEXT)'; \
 	b='elfstrtab'; \
@@ -4137,9 +4409,30 @@ run-copyadd-sections.sh.log: run-copyadd-sections.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-run-copymany-sections.sh.log: run-copymany-sections.sh
-	@p='run-copymany-sections.sh'; \
-	b='run-copymany-sections.sh'; \
+run-copymany-be32.sh.log: run-copymany-be32.sh
+	@p='run-copymany-be32.sh'; \
+	b='run-copymany-be32.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-copymany-le32.sh.log: run-copymany-le32.sh
+	@p='run-copymany-le32.sh'; \
+	b='run-copymany-le32.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-copymany-be64.sh.log: run-copymany-be64.sh
+	@p='run-copymany-be64.sh'; \
+	b='run-copymany-be64.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-copymany-le64.sh.log: run-copymany-le64.sh
+	@p='run-copymany-le64.sh'; \
+	b='run-copymany-le64.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -4256,6 +4549,13 @@ system-elf-libelf-test.log: system-elf-libelf-test$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+system-elf-gelf-test.log: system-elf-gelf-test$(EXEEXT)
+	@p='system-elf-gelf-test$(EXEEXT)'; \
+	b='system-elf-gelf-test'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 asm-tst1.log: asm-tst1$(EXEEXT)
 	@p='asm-tst1$(EXEEXT)'; \
 	b='asm-tst1'; \
@@ -4368,6 +4668,34 @@ run-readelf-Dd.sh.log: run-readelf-Dd.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-dwfl-core-noncontig.sh.log: run-dwfl-core-noncontig.sh
+	@p='run-dwfl-core-noncontig.sh'; \
+	b='run-dwfl-core-noncontig.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-cu-dwp-section-info.sh.log: run-cu-dwp-section-info.sh
+	@p='run-cu-dwp-section-info.sh'; \
+	b='run-cu-dwp-section-info.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-declfiles.sh.log: run-declfiles.sh
+	@p='run-declfiles.sh'; \
+	b='run-declfiles.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-sysroot.sh.log: run-sysroot.sh
+	@p='run-sysroot.sh'; \
+	b='run-sysroot.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 run-readelf-s.sh.log: run-readelf-s.sh
 	@p='run-readelf-s.sh'; \
 	b='run-readelf-s.sh'; \
@@ -4382,9 +4710,23 @@ run-dwflsyms.sh.log: run-dwflsyms.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-debuginfod-seekable.sh.log: run-debuginfod-seekable.sh
+	@p='run-debuginfod-seekable.sh'; \
+	b='run-debuginfod-seekable.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 run-readelf-compressed-zstd.sh.log: run-readelf-compressed-zstd.sh
 	@p='run-readelf-compressed-zstd.sh'; \
 	b='run-readelf-compressed-zstd.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-srcfiles-self.sh.log: run-srcfiles-self.sh
+	@p='run-srcfiles-self.sh'; \
+	b='run-srcfiles-self.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -4564,9 +4906,58 @@ run-debuginfod-section.sh.log: run-debuginfod-section.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-debuginfod-IXr.sh.log: run-debuginfod-IXr.sh
+	@p='run-debuginfod-IXr.sh'; \
+	b='run-debuginfod-IXr.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-debuginfod-client-profile.sh.log: run-debuginfod-client-profile.sh
+	@p='run-debuginfod-client-profile.sh'; \
+	b='run-debuginfod-client-profile.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-debuginfod-find-metadata.sh.log: run-debuginfod-find-metadata.sh
+	@p='run-debuginfod-find-metadata.sh'; \
+	b='run-debuginfod-find-metadata.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-debuginfod-longsource.sh.log: run-debuginfod-longsource.sh
+	@p='run-debuginfod-longsource.sh'; \
+	b='run-debuginfod-longsource.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 run-debuginfod-federation-metrics.sh.log: run-debuginfod-federation-metrics.sh
 	@p='run-debuginfod-federation-metrics.sh'; \
 	b='run-debuginfod-federation-metrics.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-debuginfod-ima-verification.sh.log: run-debuginfod-ima-verification.sh
+	@p='run-debuginfod-ima-verification.sh'; \
+	b='run-debuginfod-ima-verification.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-funcretval++11.sh.log: run-funcretval++11.sh
+	@p='run-funcretval++11.sh'; \
+	b='run-funcretval++11.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+run-funcretval-struct-native.sh.log: run-funcretval-struct-native.sh
+	@p='run-funcretval-struct-native.sh'; \
+	b='run-funcretval-struct-native.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -4621,11 +5012,14 @@ distdir-am: $(DISTFILES)
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile
 installdirs:
-install: install-am
-install-exec: install-exec-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
+install-exec: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
 
@@ -4658,6 +5052,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic mostlyclean-am
@@ -4690,9 +5085,11 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/backtrace_child-backtrace-child.Po
 	-rm -f ./$(DEPDIR)/backtrace_dwarf-backtrace-dwarf.Po
 	-rm -f ./$(DEPDIR)/buildid.Po
+	-rm -f ./$(DEPDIR)/cu-dwp-section-info.Po
 	-rm -f ./$(DEPDIR)/debugaltlink.Po
 	-rm -f ./$(DEPDIR)/debuginfod_build_id_find.Po
 	-rm -f ./$(DEPDIR)/debuglink.Po
+	-rm -f ./$(DEPDIR)/declfiles.Po
 	-rm -f ./$(DEPDIR)/deleted.Po
 	-rm -f ./$(DEPDIR)/deleted_lib_so-deleted-lib.Po
 	-rm -f ./$(DEPDIR)/dwarf-die-addr-die.Po
@@ -4708,6 +5105,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/dwfl-bug-fd-leak.Po
 	-rm -f ./$(DEPDIR)/dwfl-bug-getmodules.Po
 	-rm -f ./$(DEPDIR)/dwfl-bug-report.Po
+	-rm -f ./$(DEPDIR)/dwfl-core-noncontig.Po
 	-rm -f ./$(DEPDIR)/dwfl-proc-attach.Po
 	-rm -f ./$(DEPDIR)/dwfl-report-elf-align.Po
 	-rm -f ./$(DEPDIR)/dwfl-report-offline-memory.Po
@@ -4717,6 +5115,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/dwflsyms.Po
 	-rm -f ./$(DEPDIR)/early-offscn.Po
 	-rm -f ./$(DEPDIR)/ecp.Po
+	-rm -f ./$(DEPDIR)/elf-print-reloc-syms.Po
 	-rm -f ./$(DEPDIR)/elfcopy.Po
 	-rm -f ./$(DEPDIR)/elfgetchdr.Po
 	-rm -f ./$(DEPDIR)/elfgetzdata.Po
@@ -4729,8 +5128,11 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/fillfile.Po
 	-rm -f ./$(DEPDIR)/find-prologues.Po
 	-rm -f ./$(DEPDIR)/funcretval.Po
+	-rm -f ./$(DEPDIR)/funcretval_test++11.Po
+	-rm -f ./$(DEPDIR)/funcretval_test_struct.Po
 	-rm -f ./$(DEPDIR)/funcscopes.Po
 	-rm -f ./$(DEPDIR)/get-aranges.Po
+	-rm -f ./$(DEPDIR)/get-files-define-file.Po
 	-rm -f ./$(DEPDIR)/get-files.Po
 	-rm -f ./$(DEPDIR)/get-lines.Po
 	-rm -f ./$(DEPDIR)/get-pubnames.Po
@@ -4746,6 +5148,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/newdata.Po
 	-rm -f ./$(DEPDIR)/newfile.Po
 	-rm -f ./$(DEPDIR)/newscn.Po
+	-rm -f ./$(DEPDIR)/newzdata.Po
 	-rm -f ./$(DEPDIR)/next-files.Po
 	-rm -f ./$(DEPDIR)/next-lines.Po
 	-rm -f ./$(DEPDIR)/next_cfi.Po
@@ -4761,6 +5164,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/show-die-info.Po
 	-rm -f ./$(DEPDIR)/showptable.Po
 	-rm -f ./$(DEPDIR)/strptr.Po
+	-rm -f ./$(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Po
 	-rm -f ./$(DEPDIR)/system_elf_libelf_test-system-elf-libelf-test.Po
 	-rm -f ./$(DEPDIR)/test-elf_cntl_gelf_getshdr.Po
 	-rm -f ./$(DEPDIR)/test-flag-nobits.Po
@@ -4849,9 +5253,11 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/backtrace_child-backtrace-child.Po
 	-rm -f ./$(DEPDIR)/backtrace_dwarf-backtrace-dwarf.Po
 	-rm -f ./$(DEPDIR)/buildid.Po
+	-rm -f ./$(DEPDIR)/cu-dwp-section-info.Po
 	-rm -f ./$(DEPDIR)/debugaltlink.Po
 	-rm -f ./$(DEPDIR)/debuginfod_build_id_find.Po
 	-rm -f ./$(DEPDIR)/debuglink.Po
+	-rm -f ./$(DEPDIR)/declfiles.Po
 	-rm -f ./$(DEPDIR)/deleted.Po
 	-rm -f ./$(DEPDIR)/deleted_lib_so-deleted-lib.Po
 	-rm -f ./$(DEPDIR)/dwarf-die-addr-die.Po
@@ -4867,6 +5273,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/dwfl-bug-fd-leak.Po
 	-rm -f ./$(DEPDIR)/dwfl-bug-getmodules.Po
 	-rm -f ./$(DEPDIR)/dwfl-bug-report.Po
+	-rm -f ./$(DEPDIR)/dwfl-core-noncontig.Po
 	-rm -f ./$(DEPDIR)/dwfl-proc-attach.Po
 	-rm -f ./$(DEPDIR)/dwfl-report-elf-align.Po
 	-rm -f ./$(DEPDIR)/dwfl-report-offline-memory.Po
@@ -4876,6 +5283,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/dwflsyms.Po
 	-rm -f ./$(DEPDIR)/early-offscn.Po
 	-rm -f ./$(DEPDIR)/ecp.Po
+	-rm -f ./$(DEPDIR)/elf-print-reloc-syms.Po
 	-rm -f ./$(DEPDIR)/elfcopy.Po
 	-rm -f ./$(DEPDIR)/elfgetchdr.Po
 	-rm -f ./$(DEPDIR)/elfgetzdata.Po
@@ -4888,8 +5296,11 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/fillfile.Po
 	-rm -f ./$(DEPDIR)/find-prologues.Po
 	-rm -f ./$(DEPDIR)/funcretval.Po
+	-rm -f ./$(DEPDIR)/funcretval_test++11.Po
+	-rm -f ./$(DEPDIR)/funcretval_test_struct.Po
 	-rm -f ./$(DEPDIR)/funcscopes.Po
 	-rm -f ./$(DEPDIR)/get-aranges.Po
+	-rm -f ./$(DEPDIR)/get-files-define-file.Po
 	-rm -f ./$(DEPDIR)/get-files.Po
 	-rm -f ./$(DEPDIR)/get-lines.Po
 	-rm -f ./$(DEPDIR)/get-pubnames.Po
@@ -4905,6 +5316,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/newdata.Po
 	-rm -f ./$(DEPDIR)/newfile.Po
 	-rm -f ./$(DEPDIR)/newscn.Po
+	-rm -f ./$(DEPDIR)/newzdata.Po
 	-rm -f ./$(DEPDIR)/next-files.Po
 	-rm -f ./$(DEPDIR)/next-lines.Po
 	-rm -f ./$(DEPDIR)/next_cfi.Po
@@ -4920,6 +5332,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/show-die-info.Po
 	-rm -f ./$(DEPDIR)/showptable.Po
 	-rm -f ./$(DEPDIR)/strptr.Po
+	-rm -f ./$(DEPDIR)/system_elf_gelf_test-system-elf-gelf-test.Po
 	-rm -f ./$(DEPDIR)/system_elf_libelf_test-system-elf-libelf-test.Po
 	-rm -f ./$(DEPDIR)/test-elf_cntl_gelf_getshdr.Po
 	-rm -f ./$(DEPDIR)/test-flag-nobits.Po
@@ -4953,7 +5366,8 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: check-am install-am install-strip
+.MAKE: all check check-am install install-am install-exec \
+	install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-TESTS \
 	check-am clean clean-checkPROGRAMS clean-generic cscopelist-am \
@@ -5000,10 +5414,16 @@ test-nlist$(EXEEXT): test-nlist.c
 
 @DEMANGLE_FALSE@export ELFUTILS_DISABLE_DEMANGLE = 1
 
+@USE_ZSTD_COMPRESS_TRUE@export ELFUTILS_ZSTD = 1
+
+@USE_MEMORY_SANITIZER_TRUE@export ELFUTILS_MEMORY_SANITIZER = 1
+
 installcheck-local:
 	$(MAKE) $(AM_MAKEFLAGS) \
 		TESTS_ENVIRONMENT="$(installed_TESTS_ENVIRONMENT)" \
 		LOG_COMPILER="$(installed_LOG_COMPILER)" check-TESTS
+libelf.h: $(top_srcdir)/libelf/libelf.h
+	ln -s $< $@
 
 @GCOV_TRUE@check: check-am coverage
 @GCOV_TRUE@.PHONY: coverage

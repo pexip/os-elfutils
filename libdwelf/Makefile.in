@@ -93,13 +93,13 @@ host_triplet = @host@
 subdir = libdwelf
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
-	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/gettext.m4 \
-	$(top_srcdir)/m4/host-cpu-c-abi.m4 $(top_srcdir)/m4/iconv.m4 \
-	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/lib-ld.m4 \
-	$(top_srcdir)/m4/lib-link.m4 $(top_srcdir)/m4/lib-prefix.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/zip.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/biarch.m4 $(top_srcdir)/m4/build-to-host.m4 \
+	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/host-cpu-c-abi.m4 \
+	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/intlmacosx.m4 \
+	$(top_srcdir)/m4/lib-ld.m4 $(top_srcdir)/m4/lib-link.m4 \
+	$(top_srcdir)/m4/lib-prefix.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/progtest.m4 \
+	$(top_srcdir)/m4/zip.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(noinst_HEADERS) \
@@ -236,6 +236,7 @@ CXX = @CXX@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+DEBUGINFOD_IMA_CERT_PATH = @DEBUGINFOD_IMA_CERT_PATH@
 DEBUGINFOD_URLS = @DEBUGINFOD_URLS@
 DEBUGPRED = @DEBUGPRED@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
@@ -288,6 +289,7 @@ MSGFMT = @MSGFMT@
 MSGMERGE = @MSGMERGE@
 MSGMERGE_FOR_MSGFMT_OPTION = @MSGMERGE_FOR_MSGFMT_OPTION@
 NM = @NM@
+NO_UNDEFINED = @NO_UNDEFINED@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -314,6 +316,8 @@ XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
+ZSTD_COMPRESS_CFLAGS = @ZSTD_COMPRESS_CFLAGS@
+ZSTD_COMPRESS_LIBS = @ZSTD_COMPRESS_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -334,6 +338,7 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
+crypto_LIBS = @crypto_LIBS@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
@@ -353,6 +358,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+jsonc_CFLAGS = @jsonc_CFLAGS@
+jsonc_LIBS = @jsonc_LIBS@
 libarchive_CFLAGS = @libarchive_CFLAGS@
 libarchive_LIBS = @libarchive_LIBS@
 libcurl_CFLAGS = @libcurl_CFLAGS@
@@ -362,7 +369,10 @@ libexecdir = @libexecdir@
 libmicrohttpd_CFLAGS = @libmicrohttpd_CFLAGS@
 libmicrohttpd_LIBS = @libmicrohttpd_LIBS@
 localedir = @localedir@
+localedir_c = @localedir_c@
+localedir_c_make = @localedir_c_make@
 localstatedir = @localstatedir@
+lzma_LIBS = @lzma_LIBS@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 obstack_LIBS = @obstack_LIBS@
@@ -373,6 +383,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+rpm_LIBS = @rpm_LIBS@
 runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
@@ -385,7 +396,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 zip_LIBS = @zip_LIBS@
-AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_srcdir)/lib -I.. \
+zstd_LIBS = @zstd_LIBS@
+AM_CPPFLAGS = -iquote . -I$(srcdir) -I$(top_srcdir)/lib -I.. \
 	-I$(srcdir)/../libelf -I$(srcdir)/../libdw \
 	-I$(srcdir)/../libdwfl -I$(srcdir)/../libebl
 
@@ -414,10 +426,13 @@ ARFLAGS = cr
 @HAVE_TRAMPOLINES_WARNING_TRUE@TRAMPOLINES_WARNING = -Wtrampolines
 @HAVE_NO_PACKED_NOT_ALIGNED_WARNING_FALSE@NO_PACKED_NOT_ALIGNED_WARNING = 
 @HAVE_NO_PACKED_NOT_ALIGNED_WARNING_TRUE@NO_PACKED_NOT_ALIGNED_WARNING = -Wno-packed-not-aligned
+@HAVE_USE_AFTER_FREE3_WARNING_FALSE@USE_AFTER_FREE3_WARNING = 
+@HAVE_USE_AFTER_FREE3_WARNING_TRUE@USE_AFTER_FREE3_WARNING = -Wuse-after-free=3
 AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	    -Wold-style-definition -Wstrict-prototypes $(TRAMPOLINES_WARNING) \
 	    $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
 	    $(NULL_DEREFERENCE_WARNING) $(IMPLICIT_FALLTHROUGH_WARNING) \
+	    $(USE_AFTER_FREE3_WARNING) \
 	    $(if $($(*F)_no_Werror),,-Werror) \
 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
 	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \

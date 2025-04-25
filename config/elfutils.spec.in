@@ -31,6 +31,8 @@ BuildRequires: pkgconfig(libmicrohttpd) >= 0.9.33
 BuildRequires: pkgconfig(libcurl) >= 7.29.0
 BuildRequires: pkgconfig(sqlite3) >= 3.7.17
 BuildRequires: pkgconfig(libarchive) >= 3.1.2
+# For debugindod metadata query
+BuildRequires: pkgconfig(json-c) >= 0.11
 
 # For tests need to bunzip2 test files.
 BuildRequires: bzip2
@@ -42,6 +44,14 @@ BuildRequires: bsdtar
 BuildRequires: curl
 # For run-debuginfod-response-headers.sh test case
 BuildRequires: socat
+# For run-debuginfod-find-metadata.sh
+BuildRequires: jq
+
+# For debuginfod rpm IMA verification
+BuildRequires: rpm-devel
+BuildRequires: ima-evm-utils-devel
+BuildRequires: openssl-devel
+BuildRequires: rpm-sign
 
 %define _gnu %{nil}
 %define _programprefix eu-
@@ -233,7 +243,7 @@ fi
 
 %files
 %license COPYING COPYING-GPLV2 COPYING-LGPLV3 doc/COPYING-GFDL
-%doc README TODO CONTRIBUTING
+%doc README TODO CONTRIBUTING SECURITY CONDUCT
 %{_bindir}/eu-addr2line
 %{_bindir}/eu-ar
 %{_bindir}/eu-elfclassify
@@ -247,6 +257,7 @@ fi
 %{_bindir}/eu-ranlib
 %{_bindir}/eu-readelf
 %{_bindir}/eu-size
+%{_bindir}/eu-srcfiles
 %{_bindir}/eu-stack
 %{_bindir}/eu-strings
 %{_bindir}/eu-strip
@@ -291,6 +302,9 @@ fi
 %{_libdir}/libelf.so
 %{_libdir}/pkgconfig/libelf.pc
 %{_mandir}/man3/elf_*.3*
+%{_mandir}/man3/elf32_*.3*
+%{_mandir}/man3/elf64_*.3*
+%{_mandir}/man3/libelf.3*
 
 %files libelf-devel-static
 %{_libdir}/libelf.a
@@ -306,6 +320,7 @@ fi
 %{_mandir}/man1/debuginfod-find.1*
 %{_mandir}/man7/debuginfod*.7*
 %config(noreplace) %{_sysconfdir}/profile.d/*
+%config(noreplace) %{_datadir}/fish/vendor_conf.d/debuginfod.fish
 %config(noreplace) %{_sysconfdir}/debuginfod/*
   
 %files debuginfod-client-devel
@@ -341,6 +356,60 @@ exit 0
 %systemd_postun_with_restart debuginfod.service
 
 %changelog
+* Fri Oct 18 2024 Aaron Merey <amerey@redhat.com> 0.192-1
+- CONDUCT: A new code of conduct has been adopted.  See the CONDUCT file
+  for more information.
+- debuginfod: Add per-file signature verification for integrity checking,
+  using RPM IMA scheme from Fedora/RHEL.
+- New API for metadata queries: file name -> buildid.
+- Server-side extraction of files from kernel debuginfo packages is
+  significantly faster. Now takes < 0.25 seconds, down from ~50 seconds.
+- libdw: New function dwfl_set_sysroot.
+- stacktrace: Experimental new tool that can process a stream of stack
+  samples from the Sysprof profiler and unwind them into call chains.
+  Enable on x86 with --enable-stacktrace. See README.eu-stacktrace in the
+  development branch for detailed usage instructions:
+  https://sourceware.org/cgit/elfutils/tree/README.eu-stacktrace?h=users/serhei/eu-stacktrace
+
+* Fri Mar  1 2024 Aaron Merey <amerey@redhat.com> 0.191-1
+- dwarf_addrdie now supports binaries lacking a .debug_aranges
+  section.
+- Improved support for DWARF package files.  Add new function
+  dwarf_cu_dwp_section_info.
+- debuginfod: Caching eviction logic improvements to improve retention
+  of small/frequent/slow files such as Fedora's vdso.debug.
+- srcfiles: Can now fetch the source files of a DWARF/ELF file and
+  place them into a zip.
+
+* Fri Nov  3 2023 Mark Wielaard <mark@klomp.org> 0.190-1
+- CONTRIBUTING: Switch from real name policy to known identity policy.
+  Updated ChangeLog policy (no more separate ChangeLog files).
+  There is a SECURITY bug policy now. The default branch is now 'main'.
+- libelf: Add RELR support.
+- libdw: Recognize .debug_[ct]u_index sections.
+- readelf: Support readelf -Ds, --use-dynamic --symbol.
+  Support .gdb_index version 9
+- scrlines: New tool that compiles a list of source files associated
+  with a specified dwarf/elf file.
+- debuginfod: Schema change (reindexing required, sorry!) for a 60%
+  compression in filename representation, which was a large
+  part of the sqlite index; also, more deliberate sqlite
+  -wal management during scanning using the --scan-checkpoint option.
+- backends: Various LoongArch updates.
+
+* Fri Mar  3 2023 Mark Wielaard <mark@klomp.org> 0.189-1
+- configure: eu-nm, eu-addr2line and eu-stack can provide demangled
+  symbols when linked with libstdc++. Use --disable-demangler to disable.
+  A new option --enable-sanitize-memory has been added for msan sanitizer
+  support.
+- libelf: elf_compress now supports ELFCOMPRESS_ZSTD when build
+  against libzstd
+- libdwfl: dwfl_module_return_value_location now returns 0 (no return
+  type) for DIEs that point to a DW_TAG_unspecified_type.
+- elfcompress: -t, --type= now support zstd if libelf has been build
+  with ELFCOMPRESS_ZSTD support.
+- backends: Add support for LoongArch and Synopsys ARCv2 processors.
+
 * Wed Nov  2 2022 Mark Wielaard <mark@klomp.org> 0.188-1
 - readelf: Add -D, --use-dynamic option.
 - debuginfod-client: Add $DEBUGINFOD_HEADERS_FILE setting to supply
