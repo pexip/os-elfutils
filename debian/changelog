@@ -1,3 +1,9 @@
+elfutils (0.192-4+pexip25u1) pexip-trixie; urgency=medium
+
+  * Initial trixie build
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Tue, 29 Apr 2025 22:30:49 +0100
+
 elfutils (0.192-4) unstable; urgency=medium
 
   * Drop again the build dependency libimaevm-dev.
