@@ -18,7 +18,7 @@ Build-Depends: dpkg-dev (>= 1.22.5), debhelper (>= 11),
   libarchive-dev <!pkg.elfutils.nodebuginfod>,
   libjson-c-dev <!pkg.elfutils.nodebuginfod>,
   libmicrohttpd-dev <!pkg.elfutils.nodebuginfod>,
-  libcurl4-gnutls-dev <!pkg.elfutils.nodebuginfod>,
+  libcurl4-openssl-dev <!pkg.elfutils.nodebuginfod>,
   libsqlite3-dev <!pkg.elfutils.nodebuginfod>,
 Build-Conflicts: autoconf2.13
 Standards-Version: 4.7.0

@@ -1,3 +1,9 @@
+elfutils (0.192-4+pexip25u3) pexip-trixie; urgency=medium
+
+  * Move to building against libcurl4-openssl-dev
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Wed, 04 Feb 2026 10:34:47 +0000
+
 elfutils (0.192-4+pexip25u2) pexip-trixie; urgency=medium
 
   * Trixie build for product distribution
